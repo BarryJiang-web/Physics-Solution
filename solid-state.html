@@ -66,9 +66,129 @@
                 height: auto;
             }
         }
+        textarea.editable-content {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #fdfdfd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .dev-edit-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .dev-delete-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 4px;
+        }
+        .sidebar-sticky {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        .sidebar-sticky::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dev-tool {
+            display: none;
+        }
+        /* 认证弹窗 */
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-overlay.active {
+            display: flex;
+        }
+        .auth-modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .auth-modal .form-label {
+            font-weight: 600;
+        }
+        .auth-modal .btn-primary {
+            background: var(--solid-state-blue);
+            border: none;
+        }
+        .auth-modal .btn-primary:hover {
+            background: #1a5fc0;
+        }
+        .auth-error {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+        #authButtons {
+            display: none !important;
+        }
+        /* 密码输入框切换显示 */
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle .toggle-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            background: none;
+            border: none;
+            padding: 0;
+            z-index: 5;
+        }
+        .password-toggle .toggle-eye:hover {
+            color: #333;
+        }
     </style>
 </head>
 <body>
+    <!-- 开发者认证弹窗 -->
+    <div class="auth-overlay" id="devAuthOverlay">
+        <div class="auth-modal">
+            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--solid-state-blue);"></i>开发者验证</h4>
+            <p class="text-muted small">请输入账号与密码以启用开发者模式</p>
+            <div class="mb-3">
+                <label class="form-label">账号</label>
+                <input type="text" class="form-control" id="devAccount" placeholder="请输入账号">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <div class="password-toggle">
+                    <input type="password" class="form-control" id="devPassword" placeholder="请输入密码">
+                    <button class="toggle-eye" type="button" onclick="togglePasswordVisibility()" tabindex="-1">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="auth-error" id="authError">账号或密码错误，请重试。</div>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-secondary" onclick="closeDevAuth()">取消</button>
+                <button class="btn btn-primary" onclick="verifyDevAuth()"><i class="fas fa-unlock me-1"></i> 验证并开启</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
@@ -87,18 +207,19 @@
                         <a class="nav-link active" href="solid-state.html"><i class="fas fa-crystal me-1"></i> 固体物理</a>
                     </li>
                 </ul>
-                <div class="d-flex">
-                    <div id="authButtons">
-                        <a href="login.html" class="btn btn-outline-primary me-2">登录</a>
-                        <a href="login.html#register" class="btn btn-primary">注册</a>
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch me-4 d-flex align-items-center" id="devModeSwitchContainer">
+                        <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;"><i class="fas fa-code"></i> 开发者模式</label>
                     </div>
+                    <div id="authButtons"></div>
                     <div id="userMenu" style="display: none;">
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="userDropdown" data-bs-toggle="dropdown">
                                 <i class="fas fa-user me-1"></i> <span id="usernameDisplay"></span>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="quantum.html"><i class="fas fa-code me-1"></i> 开发者模式</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-code me-1"></i> 开发者模式</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a></li>
                             </ul>
@@ -124,158 +245,170 @@
         <div class="row">
             <!-- 左侧导航 -->
             <div class="col-lg-3 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                <div class="sidebar-sticky">
+                    <!-- 搜索框 -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-search me-2"></i>搜索题目</h5>
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词 (如：晶体)...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="list-group list-group-flush">
-                        <a href="#chapter1" class="list-group-item list-group-item-action active">1. 晶体结构</a>
-                        <a href="#chapter2" class="list-group-item list-group-item-action">2. 倒格子与布里渊区</a>
-                        <a href="#chapter3" class="list-group-item list-group-item-action">3. 能带理论</a>
-                        <a href="#chapter4" class="list-group-item list-group-item-action">4. 半导体物理</a>
-                    </div>
-                </div>
 
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                        </div>
+                        <div class="list-group list-group-flush" id="chapterNavbar">
+                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 晶体结构</a>
+                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 倒格子与布里渊区</a>
+                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 能带理论</a>
+                            <a href="#chapter4" class="list-group-item list-group-item-action">4. 半导体物理</a>
+                        </div>
                     </div>
-                    <div class="card-body text-center">
-                        <img src="solid-state.jpg" alt="固体物理导论" class="img-fluid book-cover mb-3">
-                        <h6>固体物理导论</h6>
-                        <p class="text-muted small">Charles Kittel</p>
-                    </div>
-                </div>
 
-                <!-- 资料库部分 -->
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="solid-state.jpg" alt="固体物理导论" class="img-fluid book-cover mb-3">
+                            <h6>固体物理导论</h6>
+                            <p class="text-muted small">Charles Kittel</p>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="resource-item">
-                            <a href="固体物理学【胡安 章维益】.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理导论》胡安 章维益</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
+
+                    <!-- 资料库部分 -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
                         </div>
-                        <div class="resource-item">
-                            <a href="固体物理学[黄昆]教材.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理学》黄昆</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理学习题指导.刘友之.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理学习习题》刘友之</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理学及习题解答.徐至中.1989.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理》徐至终</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="【固体物理教程】·王矜奉.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理教程》王矜奉</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理-韦丹.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理》韦丹</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理-彭俊虎.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理》彭俊虎</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理基础-阎守胜.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理基础》阎守胜</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理（胡安）课后答案.PDF" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>《固体物理导论》胡安 课后习题答案</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">习题答案</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理学学习参考书.陈金富.高教版.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>固体物理学学习参考书</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理学问题和习题-黄波.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>固体物理学问题和习题-黄波</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">习题解答</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="固体物理笔记.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>蒋泊远笔记</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典固体物理教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="中国科技大学研究生课程《固体物理》讲义.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>中国科技大学研究生课程《固体物理》讲义</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">中国科技大学研究生课程《固体物理》讲义</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="北京大学固体物理课件.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>北京大学固体物理课件</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">高校ppt</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="基尔泰固体物理导论-教材.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>基尔泰固体物理导论-教材</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">外国教材</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="有机固体物理.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>有机固体物理</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">物理化学交叉</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="计算固体物理学【邹宪武,金准智】.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>计算固体物理学</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">邹宪武</small>
-                        </div>
-                        <div class="text-center mt-3">
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                                <i class="fas fa-upload me-1"></i>上传资料
-                            </button>
+                        <div class="card-body">
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理学【胡安 章维益】.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理导论》胡安 章维益</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理学[黄昆]教材.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理学》黄昆</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理学习题指导.刘友之.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理学习习题》刘友之</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理学及习题解答.徐至中.1989.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理》徐至终</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/【固体物理教程】·王矜奉.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理教程》王矜奉</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理-韦丹.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理》韦丹</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理-彭俊虎.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理》彭俊虎</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理基础-阎守胜.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理基础》阎守胜</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理（胡安）课后答案.PDF" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>《固体物理导论》胡安 课后习题答案</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">习题答案</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理学学习参考书.陈金富.高教版.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>固体物理学学习参考书</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理学问题和习题-黄波.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>固体物理学问题和习题-黄波</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">习题解答</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/固体物理笔记.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>蒋泊远笔记</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典固体物理教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/中国科技大学研究生课程《固体物理》讲义.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>中国科技大学研究生课程《固体物理》讲义</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">中国科技大学研究生课程《固体物理》讲义</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/北京大学固体物理课件.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>北京大学固体物理课件</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">高校ppt</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/基尔泰固体物理导论-教材.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>基尔泰固体物理导论-教材</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">外国教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/有机固体物理.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>有机固体物理</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">物理化学交叉</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/solid-state/计算固体物理学【邹宪武,金准智】.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>计算固体物理学</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">邹宪武</small>
+                            </div>
+                            <div class="text-center mt-3">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                    <i class="fas fa-upload me-1"></i>上传资料
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -284,92 +417,59 @@
             <!-- 右侧内容 -->
             <div class="col-lg-9">
                 <!-- 第一章：晶体结构 -->
-                <div class="mb-5" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-atom me-2"></i>第一章：晶体结构
+                <div class="mb-5 chapter-container" id="chapter1">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-atom me-2 text-primary"></i>第一章：晶体结构
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--solid-state-blue);">18题</span>
                     </div>
-
-                    <!-- 问题1.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题1.1 - 面心立方结构</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>计算面心立方(FCC)结构的原子堆积密度。</p>
-                                <div class="alert alert-info mt-3">
-                                    <i class="fas fa-book me-2"></i>来源: Kittel《固体物理导论》第一章习题3
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> FCC晶胞中有4个原子（8个角原子各贡献1/8，6个面心原子各贡献1/2）</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 设原子半径为r，则立方体对角线长度为 \(4r = \sqrt{3}a\)，因此晶格常数 \(a = \frac{4r}{\sqrt{3}}\)</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 晶胞体积 \(V = a^3 = \frac{64r^3}{3\sqrt{3}}\)</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤4：</strong> 原子总体积 \(V_{atoms} = 4 \times \frac{4}{3}\pi r^3 = \frac{16}{3}\pi r^3\)</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤5：</strong> 堆积密度：</p>
-                                    <p>\[
-                                    \text{堆积密度} = \frac{V_{atoms}}{V} = \frac{\frac{16}{3}\pi r^3}{\frac{64r^3}{3\sqrt{3}}} = \frac{\pi\sqrt{3}}{8} \approx 0.74
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="1"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
+                        <i class="fas fa-plus mr-1"></i> 在第一章添加新题目
+                    </button>
                 </div>
 
                 <!-- 第二章：倒格子与布里渊区 -->
-                <div class="mb-5" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-project-diagram me-2"></i>第二章：倒格子与布里渊区
+                <div class="mb-5 chapter-container" id="chapter2">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-project-diagram me-2 text-primary"></i>第二章：倒格子与布里渊区
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--solid-state-blue);">15题</span>
                     </div>
+                    <div class="question-list" data-chapter="2"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
+                        <i class="fas fa-plus mr-1"></i> 在第二章添加新题目
+                    </button>
+                </div>
 
-                    <!-- 问题2.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.1 - 布里渊区构造</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>画出简单立方晶格的第一布里渊区，并计算其体积。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> 简单立方晶格的倒格子也是简单立方，倒格矢为：</p>
-                                    <p>\[
-                                    \mathbf{b}_1 = \frac{2\pi}{a}\mathbf{i}, \quad
-                                    \mathbf{b}_2 = \frac{2\pi}{a}\mathbf{j}, \quad
-                                    \mathbf{b}_3 = \frac{2\pi}{a}\mathbf{k}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 第一布里渊区是倒格子空间的Wigner-Seitz原胞，对于简单立方晶格，它是一个边长为 \(\frac{2\pi}{a}\) 的立方体。</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 布里渊区体积：</p>
-                                    <p>\[
-                                    V_{BZ} = \left(\frac{2\pi}{a}\right)^3
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤4：</strong> 布里渊区边界由垂直于倒格矢的平面构成，这些平面位于倒格矢的中点。</p>
-                                </div>
-                            </div>
-                        </div>
+                <!-- 第三章：能带理论 -->
+                <div class="mb-5 chapter-container" id="chapter3">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-chart-line me-2 text-primary"></i>第三章：能带理论
+                        </h2>
+                        <span class="badge rounded-pill" style="background-color: var(--solid-state-blue);">12题</span>
                     </div>
+                    <div class="question-list" data-chapter="3"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">
+                        <i class="fas fa-plus mr-1"></i> 在第三章添加新题目
+                    </button>
+                </div>
+
+                <!-- 第四章：半导体物理 -->
+                <div class="mb-5 chapter-container" id="chapter4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-microchip me-2 text-primary"></i>第四章：半导体物理
+                        </h2>
+                        <span class="badge rounded-pill" style="background-color: var(--solid-state-blue);">10题</span>
+                    </div>
+                    <div class="question-list" data-chapter="4"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">
+                        <i class="fas fa-plus mr-1"></i> 在第四章添加新题目
+                    </button>
                 </div>
             </div>
         </div>
@@ -437,7 +537,384 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
-        // 检查登录状态并更新UI
+        // ======================== 数据层 ============================
+        const DEFAULT_DATA = {
+            questions: [
+                {
+                    id: '1_1',
+                    chapter: 1,
+                    title: '问题1.1 - 面心立方结构',
+                    desc: '计算面心立方(FCC)结构的原子堆积密度。',
+                    source: 'Kittel《固体物理导论》第一章习题3',
+                    ans: '步骤1：FCC晶胞中有4个原子（8个角原子各贡献1/8，6个面心原子各贡献1/2）\n\n步骤2：设原子半径为r，则立方体对角线长度为 \\(4r = \\sqrt{3}a\\)，因此晶格常数 \\(a = \\frac{4r}{\\sqrt{3}}\\)\n\n步骤3：晶胞体积 \\(V = a^3 = \\frac{64r^3}{3\\sqrt{3}}\\)\n\n步骤4：原子总体积 \\(V_{atoms} = 4 \\times \\frac{4}{3}\\pi r^3 = \\frac{16}{3}\\pi r^3\\)\n\n步骤5：堆积密度：\n\\[ \\text{堆积密度} = \\frac{V_{atoms}}{V} = \\frac{\\frac{16}{3}\\pi r^3}{\\frac{64r^3}{3\\sqrt{3}}} = \\frac{\\pi\\sqrt{3}}{8} \\approx 0.74 \\]'
+                },
+                {
+                    id: '1_2',
+                    chapter: 1,
+                    title: '问题1.2 - 体心立方结构',
+                    desc: '计算体心立方(BCC)结构的原子堆积密度。',
+                    source: 'Kittel《固体物理导论》第一章习题4',
+                    ans: '步骤1：BCC晶胞中有2个原子（8个角原子各贡献1/8，1个体心原子贡献1）\n\n步骤2：设原子半径为r，则立方体对角线长度为 \\(4r = \\sqrt{3}a\\)，因此晶格常数 \\(a = \\frac{4r}{\\sqrt{3}}\\)\n\n步骤3：晶胞体积 \\(V = a^3 = \\frac{64r^3}{3\\sqrt{3}}\\)\n\n步骤4：原子总体积 \\(V_{atoms} = 2 \\times \\frac{4}{3}\\pi r^3 = \\frac{8}{3}\\pi r^3\\)\n\n步骤5：堆积密度：\n\\[ \\text{堆积密度} = \\frac{V_{atoms}}{V} = \\frac{\\frac{8}{3}\\pi r^3}{\\frac{64r^3}{3\\sqrt{3}}} = \\frac{\\pi\\sqrt{3}}{8} \\approx 0.68 \\]'
+                },
+                {
+                    id: '2_1',
+                    chapter: 2,
+                    title: '问题2.1 - 布里渊区构造',
+                    desc: '画出简单立方晶格的第一布里渊区，并计算其体积。',
+                    source: 'Kittel《固体物理导论》第二章习题2',
+                    ans: '步骤1：简单立方晶格的倒格子也是简单立方，倒格矢为：\n\\[ \\mathbf{b}_1 = \\frac{2\\pi}{a}\\mathbf{i}, \\quad \\mathbf{b}_2 = \\frac{2\\pi}{a}\\mathbf{j}, \\quad \\mathbf{b}_3 = \\frac{2\\pi}{a}\\mathbf{k} \\]\n\n步骤2：第一布里渊区是倒格子空间的Wigner-Seitz原胞，对于简单立方晶格，它是一个边长为 \\(\\frac{2\\pi}{a}\\) 的立方体。\n\n步骤3：布里渊区体积：\n\\[ V_{BZ} = \\left(\\frac{2\\pi}{a}\\right)^3 \\]\n\n步骤4：布里渊区边界由垂直于倒格矢的平面构成，这些平面位于倒格矢的中点。'
+                },
+                {
+                    id: '3_1',
+                    chapter: 3,
+                    title: '问题3.1 - 近自由电子模型',
+                    desc: '简述近自由电子模型的基本假设和能隙形成机制。',
+                    source: 'Kittel《固体物理导论》第七章',
+                    ans: '步骤1：近自由电子模型假设电子在离子实产生的周期势场中运动，周期势可视为微扰。\n\n步骤2：当电子波矢满足布拉格条件 \\(\\mathbf{k} = \\pm \\frac{1}{2}\\mathbf{G}\\) 时，电子波发生布拉格反射，形成驻波。\n\n步骤3：驻波导致电子概率密度在离子实附近或之间集中，对应的能量不同，形成能隙。\n\n步骤4：能隙宽度等于周期势的傅里叶分量 \\(2|V_G|\\)。'
+                },
+                {
+                    id: '4_1',
+                    chapter: 4,
+                    title: '问题4.1 - 本征半导体载流子浓度',
+                    desc: '推导本征半导体的载流子浓度表达式。',
+                    source: 'Kittel《固体物理导论》第八章',
+                    ans: '步骤1：本征半导体中，电子浓度 \\(n\\) 和空穴浓度 \\(p\\) 相等，\\(n = p = n_i\\)。\n\n步骤2：导带电子浓度：\n\\[ n = N_c \\exp\\left(-\\frac{E_c - E_F}{k_B T}\\right) \\]\n\n步骤3：价带空穴浓度：\n\\[ p = N_v \\exp\\left(-\\frac{E_F - E_v}{k_B T}\\right) \\]\n\n步骤4：本征费米能级近似位于禁带中央，\\(E_F \\approx \\frac{E_c + E_v}{2}\\)\n\n步骤5：本征载流子浓度：\n\\[ n_i = \\sqrt{N_c N_v} \\exp\\left(-\\frac{E_g}{2k_B T}\\right) \\]'
+                }
+            ]
+        };
+
+        const STORAGE_KEY = 'solid_state_questions_data';
+        let devModeActive = false;
+
+        function loadQuestionsData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && Array.isArray(parsed.questions)) {
+                        return parsed;
+                    }
+                } catch (e) {}
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+
+        function saveQuestionsData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        let questionsData = loadQuestionsData();
+
+        // ======================== 渲染引擎 ============================
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function parseTextToHTML(text, type) {
+            const trimmed = text.trim();
+            if (type === 'title') return trimmed;
+            if (type === 'source') {
+                if (!trimmed) return '';
+                return `<div class="alert alert-info mt-2 mb-0"><i class="fas fa-book me-2"></i>来源: ${trimmed}</div>`;
+            }
+            const blocks = trimmed.split(/\n\s*\n/);
+            let finalHTML = '';
+            blocks.forEach(block => {
+                if (!block.trim()) return;
+                const formattedBlock = block.replace(/\n/g, '<br>');
+                if (type === 'desc') {
+                    finalHTML += `<p>${formattedBlock}</p>`;
+                } else if (type === 'ans') {
+                    finalHTML += `<div class="solution-step"><p>${formattedBlock}</p></div>`;
+                }
+            });
+            return finalHTML || trimmed;
+        }
+
+        function renderChapter(chapterNum) {
+            const container = document.querySelector(`.chapter-container#chapter${chapterNum} .question-list`);
+            if (!container) return;
+            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
+            chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
+            
+            let html = '';
+            chapterQuestions.forEach(q => {
+                const uid = q.id;
+                const titleHtml = parseTextToHTML(q.title, 'title');
+                const descHtml = parseTextToHTML(q.desc, 'desc');
+                const sourceHtml = parseTextToHTML(q.source, 'source');
+                const ansHtml = parseTextToHTML(q.ans, 'ans');
+
+                html += `
+                <div class="card mb-4 editable-card" id="q_${uid}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')"><i class="fas fa-trash"></i> 删除</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-book me-2"></i>来源出处</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-lightbulb me-2"></i>解答</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+
+            if (window.MathJax && container.querySelectorAll('.editable-content').length) {
+                MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
+            }
+        }
+
+        function renderAll() {
+            renderChapter(1);
+            renderChapter(2);
+            renderChapter(3);
+            renderChapter(4);
+            document.getElementById('devModeSwitch').checked = devModeActive;
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+        }
+
+        // ======================== 编辑与删除 ============================
+        function toggleEdit(elementId) {
+            if (!devModeActive) return;
+            const contentDiv = document.getElementById(elementId);
+            if (!contentDiv) return;
+            const btn = contentDiv.parentElement.querySelector('.dev-edit-btn') || 
+                        contentDiv.previousElementSibling?.querySelector('.dev-edit-btn');
+            const type = contentDiv.getAttribute('data-type');
+            const raw = contentDiv.getAttribute('data-raw') || '';
+
+            if (contentDiv.tagName.toLowerCase() !== 'textarea') {
+                const textarea = document.createElement('textarea');
+                textarea.id = elementId;
+                textarea.className = 'form-control editable-content mb-2';
+                textarea.setAttribute('data-type', type);
+                textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
+                textarea.value = raw;
+                contentDiv.replaceWith(textarea);
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-success');
+                }
+            } else {
+                const currentText = contentDiv.value;
+                const id = elementId.split('_').slice(1).join('_');
+                const typeKey = elementId.split('_')[0];
+                const q = questionsData.questions.find(q => q.id === id);
+                if (q) {
+                    if (typeKey === 'title') q.title = currentText;
+                    else if (typeKey === 'desc') q.desc = currentText;
+                    else if (typeKey === 'source') q.source = currentText;
+                    else if (typeKey === 'ans') q.ans = currentText;
+                    saveQuestionsData(questionsData);
+                }
+                const newDiv = document.createElement('div');
+                newDiv.id = elementId;
+                newDiv.className = 'editable-content';
+                newDiv.setAttribute('data-type', type);
+                newDiv.setAttribute('data-raw', currentText);
+                if (type === 'title') newDiv.classList.add('problem-title', 'mb-4', 'fw-bold');
+                newDiv.innerHTML = parseTextToHTML(currentText, type);
+                contentDiv.replaceWith(newDiv);
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-edit"></i> 编辑';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-danger');
+                }
+                if (window.MathJax) {
+                    MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
+                }
+            }
+        }
+
+        function deleteQuestion(uid) {
+            if (!devModeActive) return;
+            if (!confirm(`确定要删除题目 "${uid}" 吗？此操作不可撤销。`)) return;
+            questionsData.questions = questionsData.questions.filter(q => q.id !== uid);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        function addNewQuestion(chapterId) {
+            if (!devModeActive) return;
+            const chapterNum = parseInt(chapterId.replace('chapter', ''));
+            const maxId = questionsData.questions
+                .filter(q => q.chapter === chapterNum)
+                .reduce((max, q) => {
+                    const num = parseInt(q.id.split('_')[1]);
+                    return num > max ? num : max;
+                }, 0);
+            const newId = `${chapterNum}_${maxId + 1}`;
+            
+            const newQ = {
+                id: newId,
+                chapter: chapterNum,
+                title: '新题目名称',
+                desc: '请在此直接输入题目文本及 LaTeX 公式，双换行（留一个空行）可以分段。',
+                source: '未指定参考书籍',
+                ans: '步骤1：输入内容。\n\n步骤2：空行后输入第二步公式：\\[ \\nabla \\cdot \\mathbf{E} = 0 \\]'
+            };
+            questionsData.questions.push(newQ);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        // ======================== 开发者认证 ============================
+        let passwordVisible = false;
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('devPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordVisible) {
+                pwdInput.type = 'password';
+                eyeIcon.className = 'fas fa-eye';
+                passwordVisible = false;
+            } else {
+                pwdInput.type = 'text';
+                eyeIcon.className = 'fas fa-eye-slash';
+                passwordVisible = true;
+            }
+        }
+
+        function openDevAuth() {
+            document.getElementById('devAuthOverlay').classList.add('active');
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('devAccount').value = '';
+            document.getElementById('devPassword').value = '';
+            if (passwordVisible) {
+                togglePasswordVisibility();
+            }
+            setTimeout(() => document.getElementById('devAccount').focus(), 100);
+        }
+
+        function closeDevAuth() {
+            document.getElementById('devAuthOverlay').classList.remove('active');
+            if (!devModeActive) {
+                document.getElementById('devModeSwitch').checked = false;
+            }
+        }
+
+        function verifyDevAuth() {
+            const account = document.getElementById('devAccount').value.trim();
+            const password = document.getElementById('devPassword').value.trim();
+            if (account === '2511392' && password === 'Jby021009') {
+                devModeActive = true;
+                document.getElementById('devAuthOverlay').classList.remove('active');
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+                sessionStorage.setItem('dev_authenticated', 'true');
+                document.getElementById('devPassword').value = '';
+            } else {
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('devPassword').value = '';
+                document.getElementById('devPassword').focus();
+            }
+        }
+
+        document.getElementById('devPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyDevAuth();
+            }
+        });
+        document.getElementById('devAccount').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('devPassword').focus();
+            }
+        });
+
+        document.getElementById('devAuthOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDevAuth();
+            }
+        });
+
+        // ======================== 开发者模式开关 ============================
+        document.getElementById('devModeSwitch').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                if (devModeActive) {
+                    document.querySelectorAll('.dev-tool').forEach(el => {
+                        el.style.display = 'inline-block';
+                    });
+                    return;
+                }
+                openDevAuth();
+                if (!devModeActive) {
+                    this.checked = false;
+                }
+            } else {
+                devModeActive = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+                sessionStorage.removeItem('dev_authenticated');
+            }
+        });
+
+        // ======================== 搜索与导航 ============================
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase().trim();
+            const allCards = document.querySelectorAll('.editable-card');
+            allCards.forEach(card => {
+                const contentElements = card.querySelectorAll('.editable-content');
+                let isMatch = false;
+                contentElements.forEach(el => {
+                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
+                    if (text.includes(keyword)) isMatch = true;
+                });
+                card.style.display = isMatch ? '' : 'none';
+            });
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                const cards = chapter.querySelectorAll('.editable-card');
+                let hasVisible = false;
+                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
+            });
+        });
+
+        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ======================== 用户登录相关 ============================
         function updateAuthUI() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             const username = localStorage.getItem('username');
@@ -453,34 +930,55 @@
                 userMenu.style.display = 'none';
             }
         }
-        
-        // 退出登录功能
+
         document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('username');
             window.location.href = 'index.html';
         });
-        
-        // 上传功能示例
+
+        // ======================== 上传功能 ============================
         document.getElementById('submitUpload')?.addEventListener('click', function() {
             const resourceName = document.getElementById('resourceName').value;
             const fileInput = document.getElementById('resourceFile');
             
             if(resourceName && fileInput.files.length > 0) {
                 alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                // 实际应用中这里应该有AJAX上传逻辑
                 var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
                 bootstrapModal.hide();
             } else {
                 alert('请填写完整信息并选择文件！');
             }
         });
-        
-        // 页面加载时更新UI
+
+        // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
+            if (sessionStorage.getItem('dev_authenticated') === 'true') {
+                devModeActive = true;
+            }
+            renderAll();
             updateAuthUI();
+            if (devModeActive) {
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+            } else {
+                document.getElementById('devModeSwitch').checked = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
         });
+
+        window.toggleEdit = toggleEdit;
+        window.addNewQuestion = addNewQuestion;
+        window.deleteQuestion = deleteQuestion;
+        window.openDevAuth = openDevAuth;
+        window.closeDevAuth = closeDevAuth;
+        window.verifyDevAuth = verifyDevAuth;
+        window.togglePasswordVisibility = togglePasswordVisibility;
     </script>
 </body>
 </html>

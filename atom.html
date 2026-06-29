@@ -69,10 +69,132 @@
                 height: auto;
             }
         }
+        textarea.editable-content {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #fdfdfd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .dev-edit-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .dev-delete-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 4px;
+        }
+        .sidebar-sticky {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        .sidebar-sticky::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dev-tool {
+            display: none;
+        }
+        /* 认证弹窗 */
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-overlay.active {
+            display: flex;
+        }
+        .auth-modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .auth-modal .form-label {
+            font-weight: 600;
+        }
+        .auth-modal .btn-primary {
+            background: var(--atomic-orange);
+            border: none;
+        }
+        .auth-modal .btn-primary:hover {
+            background: #e05a00;
+        }
+        .auth-error {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+        #authButtons {
+            display: none !important;
+        }
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle .toggle-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            background: none;
+            border: none;
+            padding: 0;
+            z-index: 5;
+        }
+        .password-toggle .toggle-eye:hover {
+            color: #333;
+        }
+        /* 资源上传按钮在开发者模式下隐藏 */
+        .upload-btn-wrapper .btn {
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
+    <!-- 开发者认证弹窗 -->
+    <div class="auth-overlay" id="devAuthOverlay">
+        <div class="auth-modal">
+            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--atomic-orange);"></i>开发者验证</h4>
+            <p class="text-muted small">请输入账号与密码以启用开发者模式</p>
+            <div class="mb-3">
+                <label class="form-label">账号</label>
+                <input type="text" class="form-control" id="devAccount" placeholder="请输入账号">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <div class="password-toggle">
+                    <input type="password" class="form-control" id="devPassword" placeholder="请输入密码">
+                    <button class="toggle-eye" type="button" onclick="togglePasswordVisibility()" tabindex="-1">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="auth-error" id="authError">账号或密码错误，请重试。</div>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-secondary" onclick="closeDevAuth()">取消</button>
+                <button class="btn btn-primary" onclick="verifyDevAuth()"><i class="fas fa-unlock me-1"></i> 验证并开启</button>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
@@ -90,29 +212,17 @@
                         <a class="nav-link active" href="atomic.html"><i class="fas fa-atom me-1"></i> 原子物理</a>
                     </li>
                 </ul>
-                <div class="d-flex">
-                    <div id="authButtons">
-                        <a href="login.html" class="btn btn-outline-primary me-2">登录</a>
-                        <a href="login.html#register" class="btn btn-primary">注册</a>
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch me-4 d-flex align-items-center" id="devModeSwitchContainer">
+                        <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;"><i class="fas fa-code"></i> 开发者模式</label>
                     </div>
-                    <div id="userMenu" style="display: none;">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i> <span id="usernameDisplay"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="quantum.html"><i class="fas fa-code me-1"></i> 开发者模式</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a></li>
-                            </ul>
-                        </div>
-                    </div>
+                    <div id="authButtons"></div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- 原子物理页头 -->
     <header class="atomic-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
@@ -122,179 +232,141 @@
         </div>
     </header>
 
-    <!-- 主要内容区 -->
     <div class="container">
         <div class="row">
-            <!-- 左侧导航 -->
             <div class="col-lg-3 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                <div class="sidebar-sticky">
+                    <!-- 搜索卡片 -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-search me-2"></i>搜索题目</h5>
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词 (如：散射)...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="list-group list-group-flush">
-                        <a href="#chapter1" class="list-group-item list-group-item-action active">1. 原子模型</a>
-                        <a href="#chapter2" class="list-group-item list-group-item-action">2. 氢原子光谱</a>
-                        <a href="#chapter3" class="list-group-item list-group-item-action">3. 多电子原子</a>
-                        <a href="#chapter4" class="list-group-item list-group-item-action">4. X射线</a>
-                        <a href="#chapter5" class="list-group-item list-group-item-action">5. 原子核物理基础</a>
-                    </div>
-                </div>
 
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                        </div>
+                        <div class="list-group list-group-flush" id="chapterNavbar">
+                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 原子模型</a>
+                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 氢原子光谱</a>
+                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 多电子原子</a>
+                            <a href="#chapter4" class="list-group-item list-group-item-action">4. X射线</a>
+                            <a href="#chapter5" class="list-group-item list-group-item-action">5. 原子核物理基础</a>
+                        </div>
                     </div>
-                    <div class="card-body text-center">
-                        <img src="atom.webp" alt="原子物理学" class="img-fluid book-cover mb-3">
-                        <h6>原子物理学</h6>
-                        <p class="text-muted small">杨福家</p>
-                    </div>
-                </div>
 
-                <!-- 资料库部分 -->
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="atom.webp" alt="原子物理学" class="img-fluid book-cover mb-3">
+                            <h6>原子物理学</h6>
+                            <p class="text-muted small mb-0">杨福家</p>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="resource-item">
-                            <a href="原子物理学笔记.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>QZQ笔记</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">原子物理学习笔记</small>
+
+                    <!-- 资料库（保留原样，但开发者模式下可编辑？保留原样） -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
                         </div>
-                        <div class="resource-item">
-                            <a href="原子物理学 by 杨福家 (z-lib.org).pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>原子物理学</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">杨福家</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="原子物理学.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>蒋泊远笔记</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">学习笔记</small>
-                        </div>
-                        <div class="text-center mt-3">
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                                <i class="fas fa-upload me-1"></i>上传资料
-                            </button>
+                        <div class="card-body">
+                            <div class="resource-item">
+                                <a href="原子物理学笔记.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>QZQ笔记</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">原子物理学习笔记</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/atom/原子物理学 by 杨福家 (z-lib.org).pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>原子物理学</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">杨福家</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/atom/原子物理学.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>蒋泊远笔记</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">学习笔记</small>
+                            </div>
+                            <div class="text-center mt-3">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                    <i class="fas fa-upload me-1"></i>上传资料
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 右侧内容 -->
             <div class="col-lg-9">
-                <!-- 第一章：原子模型 -->
-                <div class="mb-5" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-atom atomic-icon me-2"></i>第一章：原子模型
+                <!-- 章节1 -->
+                <div class="mb-5 chapter-container" id="chapter1">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-atom me-2 text-primary"></i>第一章：原子模型
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">15题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">卢瑟福 & 玻尔</span>
                     </div>
-
-                    <!-- 问题1.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题1.1 - 卢瑟福散射公式推导</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>推导卢瑟福散射公式，证明散射截面为：</p>
-                                <p>\[
-                                \frac{d\sigma}{d\Omega} = \left(\frac{Ze^2}{16\pi\epsilon_0 E}\right)^2 \frac{1}{\sin^4(\theta/2)}
-                                \]</p>
-                                <p>其中Z为靶核电荷数，E为入射粒子动能，θ为散射角。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> 考虑库仑相互作用力：</p>
-                                    <p>\[
-                                    F = \frac{Ze^2}{4\pi\epsilon_0 r^2}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 计算角动量守恒和能量守恒：</p>
-                                    <p>\[
-                                    b = \frac{Ze^2}{8\pi\epsilon_0 E} \cot(\theta/2)
-                                    \]</p>
-                                    <p>其中b为碰撞参数</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 散射截面定义：</p>
-                                    <p>\[
-                                    \frac{d\sigma}{d\Omega} = \left|\frac{b}{\sin\theta}\frac{db}{d\theta}\right|
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤4：</strong> 代入b的表达式得到卢瑟福公式：</p>
-                                    <p>\[
-                                    \frac{d\sigma}{d\Omega} = \left(\frac{Ze^2}{16\pi\epsilon_0 E}\right)^2 \frac{1}{\sin^4(\theta/2)}
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="1"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
+                        <i class="fas fa-plus mr-1"></i> 在第一章添加新题目
+                    </button>
                 </div>
 
-                <!-- 第二章：氢原子光谱 -->
-                <div class="mb-5" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-lightbulb atomic-icon me-2"></i>第二章：氢原子光谱
+                <!-- 章节2 -->
+                <div class="mb-5 chapter-container" id="chapter2">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-lightbulb me-2 text-primary"></i>第二章：氢原子光谱
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">12题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">巴尔末 & 里德伯</span>
                     </div>
+                    <div class="question-list" data-chapter="2"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
+                        <i class="fas fa-plus mr-1"></i> 在第二章添加新题目
+                    </button>
+                </div>
 
-                    <!-- 问题2.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.1 - 巴尔末系波长计算</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>计算氢原子巴尔末系前三条谱线的波长（n=3,4,5→n=2）。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> 里德伯公式：</p>
-                                    <p>\[
-                                    \frac{1}{\lambda} = R_H \left(\frac{1}{n_f^2} - \frac{1}{n_i^2}\right)
-                                    \]</p>
-                                    <p>其中R_H=1.097×10⁷ m⁻¹为里德伯常数</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 计算Hα线(n=3→2)：</p>
-                                    <p>\[
-                                    \frac{1}{\lambda} = 1.097\times10^7 \left(\frac{1}{2^2} - \frac{1}{3^2}\right) \Rightarrow \lambda = 656.3 \text{nm}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 计算Hβ线(n=4→2)：</p>
-                                    <p>\[
-                                    \lambda = 486.1 \text{nm}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤4：</strong> 计算Hγ线(n=5→2)：</p>
-                                    <p>\[
-                                    \lambda = 434.0 \text{nm}
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
+                <!-- 章节3 -->
+                <div class="mb-5 chapter-container" id="chapter3">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold"><i class="fas fa-layer-group me-2 text-primary"></i>3. 多电子原子</h2>
                     </div>
+                    <div class="question-list" data-chapter="3"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;"><i class="fas fa-plus"></i> 在第三章添加新题目</button>
+                </div>
+
+                <!-- 章节4 -->
+                <div class="mb-5 chapter-container" id="chapter4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold"><i class="fas fa-x-ray me-2 text-primary"></i>4. X射线</h2>
+                    </div>
+                    <div class="question-list" data-chapter="4"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;"><i class="fas fa-plus"></i> 在第四章添加新题目</button>
+                </div>
+
+                <!-- 章节5 -->
+                <div class="mb-5 chapter-container" id="chapter5">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold"><i class="fas fa-circle-nodes me-2 text-primary"></i>5. 原子核物理基础</h2>
+                    </div>
+                    <div class="question-list" data-chapter="5"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter5')" style="display: none;"><i class="fas fa-plus"></i> 在第五章添加新题目</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 上传资料的模态框 -->
+    <!-- 上传资料模态框（保留） -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -326,7 +398,6 @@
         </div>
     </div>
 
-    <!-- 页脚 -->
     <footer class="py-5 text-white" style="background: linear-gradient(135deg, var(--atomic-orange) 0%, var(--atomic-dark) 100%);">
         <div class="container">
             <div class="row">
@@ -356,50 +427,407 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
-        // 检查登录状态并更新UI
-        function updateAuthUI() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const username = localStorage.getItem('username');
-            const authButtons = document.getElementById('authButtons');
-            const userMenu = document.getElementById('userMenu');
+        // ======================== 数据层 (原子物理默认题目) ============================
+        const DEFAULT_DATA = {
+            questions: [
+                {
+                    id: '1_1',
+                    chapter: 1,
+                    title: '问题1.1 - 卢瑟福散射公式推导',
+                    desc: '推导卢瑟福散射公式，证明散射截面为：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left(\\frac{Ze^2}{16\\pi\\epsilon_0 E}\\right)^2 \\frac{1}{\\sin^4(\\theta/2)} \\]\n其中Z为靶核电荷数，E为入射粒子动能，θ为散射角。',
+                    source: '杨福家《原子物理学》第一章',
+                    ans: '步骤1：考虑库仑相互作用力：\n\\[ F = \\frac{Ze^2}{4\\pi\\epsilon_0 r^2} \\]\n\n步骤2：计算角动量守恒和能量守恒，得到碰撞参数b与散射角关系：\n\\[ b = \\frac{Ze^2}{8\\pi\\epsilon_0 E} \\cot(\\theta/2) \\]\n\n步骤3：散射截面定义：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left|\\frac{b}{\\sin\\theta}\\frac{db}{d\\theta}\\right| \\]\n\n步骤4：代入b的表达式得到卢瑟福公式。'
+                },
+                {
+                    id: '1_2',
+                    chapter: 1,
+                    title: '问题1.2 - 玻尔氢原子能级',
+                    desc: '根据玻尔模型推导氢原子能级公式，并计算基态能量。',
+                    source: '杨福家《原子物理学》第一章',
+                    ans: '步骤1：角动量量子化条件：\n\\[ mvr = n\\hbar \\]\n\n步骤2：库仑力提供向心力：\n\\[ \\frac{e^2}{4\\pi\\epsilon_0 r^2} = \\frac{mv^2}{r} \\]\n\n步骤3：联立解得轨道半径：\n\\[ r_n = n^2 a_0, \\quad a_0 = \\frac{4\\pi\\epsilon_0\\hbar^2}{me^2} \\]\n\n步骤4：能量：\n\\[ E_n = -\\frac{13.6}{n^2} \\text{eV} \\]，基态能量 -13.6 eV。'
+                },
+                {
+                    id: '2_1',
+                    chapter: 2,
+                    title: '问题2.1 - 巴尔末系波长计算',
+                    desc: '计算氢原子巴尔末系前三条谱线的波长（n=3,4,5→n=2）。',
+                    source: '杨福家《原子物理学》第二章',
+                    ans: '步骤1：里德伯公式：\n\\[ \\frac{1}{\\lambda} = R_H \\left(\\frac{1}{n_f^2} - \\frac{1}{n_i^2}\\right) \\]\n其中R_H=1.097×10⁷ m⁻¹\n\n步骤2：Hα线(n=3→2)：\n\\[ \\lambda = 656.3 \\text{nm} \\]\n\n步骤3：Hβ线(n=4→2)：\n\\[ \\lambda = 486.1 \\text{nm} \\]\n\n步骤4：Hγ线(n=5→2)：\n\\[ \\lambda = 434.0 \\text{nm} \\]'
+                }
+            ]
+        };
+
+        const STORAGE_KEY = 'atomic_questions_data';
+        let devModeActive = false;
+
+        function loadQuestionsData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && Array.isArray(parsed.questions)) {
+                        return parsed;
+                    }
+                } catch (e) {}
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+
+        function saveQuestionsData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        let questionsData = loadQuestionsData();
+
+        // ======================== 渲染引擎 ============================
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function parseTextToHTML(text, type) {
+            const trimmed = text.trim();
+            if (type === 'title') return trimmed;
+            if (type === 'source') {
+                if (!trimmed) return '';
+                return `<div class="alert alert-info mt-2 mb-0"><i class="fas fa-book me-2"></i>来源: ${trimmed}</div>`;
+            }
+            const blocks = trimmed.split(/\n\s*\n/);
+            let finalHTML = '';
+            blocks.forEach(block => {
+                if (!block.trim()) return;
+                const formattedBlock = block.replace(/\n/g, '<br>');
+                if (type === 'desc') {
+                    finalHTML += `<p>${formattedBlock}</p>`;
+                } else if (type === 'ans') {
+                    finalHTML += `<div class="solution-step"><p>${formattedBlock}</p></div>`;
+                }
+            });
+            return finalHTML || trimmed;
+        }
+
+        function renderChapter(chapterNum) {
+            const container = document.querySelector(`.chapter-container#chapter${chapterNum} .question-list`);
+            if (!container) return;
+            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
+            chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
             
-            if(isLoggedIn && username) {
-                authButtons.style.display = 'none';
-                userMenu.style.display = 'block';
-                document.getElementById('usernameDisplay').textContent = username;
-            } else {
-                authButtons.style.display = 'block';
-                userMenu.style.display = 'none';
+            let html = '';
+            chapterQuestions.forEach(q => {
+                const uid = q.id;
+                const titleHtml = parseTextToHTML(q.title, 'title');
+                const descHtml = parseTextToHTML(q.desc, 'desc');
+                const sourceHtml = parseTextToHTML(q.source, 'source');
+                const ansHtml = parseTextToHTML(q.ans, 'ans');
+
+                html += `
+                <div class="card mb-4 editable-card" id="q_${uid}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')"><i class="fas fa-trash"></i> 删除</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-book me-2"></i>来源出处</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-lightbulb me-2"></i>解答</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+
+            if (window.MathJax && container.querySelectorAll('.editable-content').length) {
+                MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
             }
         }
-        
-        // 退出登录功能
-        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('username');
-            window.location.href = 'index.html';
+
+        function renderAll() {
+            renderChapter(1);
+            renderChapter(2);
+            renderChapter(3);
+            renderChapter(4);
+            renderChapter(5);
+            document.getElementById('devModeSwitch').checked = devModeActive;
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+        }
+
+        // ======================== 编辑与删除 ============================
+        function toggleEdit(elementId) {
+            if (!devModeActive) return;
+            const contentDiv = document.getElementById(elementId);
+            if (!contentDiv) return;
+            const btn = contentDiv.parentElement.querySelector('.dev-edit-btn') || 
+                        contentDiv.previousElementSibling?.querySelector('.dev-edit-btn');
+            const type = contentDiv.getAttribute('data-type');
+            const raw = contentDiv.getAttribute('data-raw') || '';
+
+            if (contentDiv.tagName.toLowerCase() !== 'textarea') {
+                const textarea = document.createElement('textarea');
+                textarea.id = elementId;
+                textarea.className = 'form-control editable-content mb-2';
+                textarea.setAttribute('data-type', type);
+                textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
+                textarea.value = raw;
+                contentDiv.replaceWith(textarea);
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-success');
+                }
+            } else {
+                const currentText = contentDiv.value;
+                const id = elementId.split('_').slice(1).join('_');
+                const typeKey = elementId.split('_')[0];
+                const q = questionsData.questions.find(q => q.id === id);
+                if (q) {
+                    if (typeKey === 'title') q.title = currentText;
+                    else if (typeKey === 'desc') q.desc = currentText;
+                    else if (typeKey === 'source') q.source = currentText;
+                    else if (typeKey === 'ans') q.ans = currentText;
+                    saveQuestionsData(questionsData);
+                }
+                const newDiv = document.createElement('div');
+                newDiv.id = elementId;
+                newDiv.className = 'editable-content';
+                newDiv.setAttribute('data-type', type);
+                newDiv.setAttribute('data-raw', currentText);
+                if (type === 'title') newDiv.classList.add('problem-title', 'mb-4', 'fw-bold');
+                newDiv.innerHTML = parseTextToHTML(currentText, type);
+                contentDiv.replaceWith(newDiv);
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-edit"></i> 编辑';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-danger');
+                }
+                if (window.MathJax) {
+                    MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
+                }
+            }
+        }
+
+        function deleteQuestion(uid) {
+            if (!devModeActive) return;
+            if (!confirm(`确定要删除题目 "${uid}" 吗？此操作不可撤销。`)) return;
+            questionsData.questions = questionsData.questions.filter(q => q.id !== uid);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        function addNewQuestion(chapterId) {
+            if (!devModeActive) return;
+            const chapterNum = parseInt(chapterId.replace('chapter', ''));
+            const maxId = questionsData.questions
+                .filter(q => q.chapter === chapterNum)
+                .reduce((max, q) => {
+                    const num = parseInt(q.id.split('_')[1]);
+                    return num > max ? num : max;
+                }, 0);
+            const newId = `${chapterNum}_${maxId + 1}`;
+            
+            const newQ = {
+                id: newId,
+                chapter: chapterNum,
+                title: '新题目名称',
+                desc: '请在此直接输入题目文本及 LaTeX 公式，双换行（留一个空行）可以分段。',
+                source: '未指定参考书籍',
+                ans: '步骤1：输入内容。\n\n步骤2：空行后输入第二步公式：\\[ \\nabla \\cdot \\mathbf{E} = 0 \\]'
+            };
+            questionsData.questions.push(newQ);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        // ======================== 开发者认证 ============================
+        let passwordVisible = false;
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('devPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordVisible) {
+                pwdInput.type = 'password';
+                eyeIcon.className = 'fas fa-eye';
+                passwordVisible = false;
+            } else {
+                pwdInput.type = 'text';
+                eyeIcon.className = 'fas fa-eye-slash';
+                passwordVisible = true;
+            }
+        }
+
+        function openDevAuth() {
+            document.getElementById('devAuthOverlay').classList.add('active');
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('devAccount').value = '';
+            document.getElementById('devPassword').value = '';
+            if (passwordVisible) {
+                togglePasswordVisibility();
+            }
+            setTimeout(() => document.getElementById('devAccount').focus(), 100);
+        }
+
+        function closeDevAuth() {
+            document.getElementById('devAuthOverlay').classList.remove('active');
+            if (!devModeActive) {
+                document.getElementById('devModeSwitch').checked = false;
+            }
+        }
+
+        function verifyDevAuth() {
+            const account = document.getElementById('devAccount').value.trim();
+            const password = document.getElementById('devPassword').value.trim();
+            if (account === '2511392' && password === 'Jby021009') {
+                devModeActive = true;
+                document.getElementById('devAuthOverlay').classList.remove('active');
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+                sessionStorage.setItem('dev_authenticated', 'true');
+                document.getElementById('devPassword').value = '';
+            } else {
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('devPassword').value = '';
+                document.getElementById('devPassword').focus();
+            }
+        }
+
+        document.getElementById('devPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyDevAuth();
+            }
         });
-        
-        // 上传功能示例
+        document.getElementById('devAccount').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('devPassword').focus();
+            }
+        });
+
+        document.getElementById('devAuthOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDevAuth();
+            }
+        });
+
+        // ======================== 开发者模式开关 ============================
+        document.getElementById('devModeSwitch').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                if (devModeActive) {
+                    document.querySelectorAll('.dev-tool').forEach(el => {
+                        el.style.display = 'inline-block';
+                    });
+                    return;
+                }
+                openDevAuth();
+                if (!devModeActive) {
+                    this.checked = false;
+                }
+            } else {
+                devModeActive = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+                sessionStorage.removeItem('dev_authenticated');
+            }
+        });
+
+        // ======================== 搜索与导航 ============================
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase().trim();
+            const allCards = document.querySelectorAll('.editable-card');
+            allCards.forEach(card => {
+                const contentElements = card.querySelectorAll('.editable-content');
+                let isMatch = false;
+                contentElements.forEach(el => {
+                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
+                    if (text.includes(keyword)) isMatch = true;
+                });
+                card.style.display = isMatch ? '' : 'none';
+            });
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                const cards = chapter.querySelectorAll('.editable-card');
+                let hasVisible = false;
+                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
+            });
+        });
+
+        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ======================== 上传资料（保留原功能） ============================
         document.getElementById('submitUpload')?.addEventListener('click', function() {
             const resourceName = document.getElementById('resourceName').value;
             const fileInput = document.getElementById('resourceFile');
-            
             if(resourceName && fileInput.files.length > 0) {
                 alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                // 实际应用中这里应该有AJAX上传逻辑
                 var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
                 bootstrapModal.hide();
             } else {
                 alert('请填写完整信息并选择文件！');
             }
         });
-        
-        // 页面加载时更新UI
+
+        // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
-            updateAuthUI();
+            if (sessionStorage.getItem('dev_authenticated') === 'true') {
+                devModeActive = true;
+            }
+            renderAll();
+            if (devModeActive) {
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+            } else {
+                document.getElementById('devModeSwitch').checked = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
         });
+
+        window.toggleEdit = toggleEdit;
+        window.addNewQuestion = addNewQuestion;
+        window.deleteQuestion = deleteQuestion;
+        window.openDevAuth = openDevAuth;
+        window.closeDevAuth = closeDevAuth;
+        window.verifyDevAuth = verifyDevAuth;
+        window.togglePasswordVisibility = togglePasswordVisibility;
     </script>
 </body>
 </html>

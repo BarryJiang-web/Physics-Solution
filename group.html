@@ -28,6 +28,7 @@
         .problem-title {
             color: var(--grouptheory-red);
             border-bottom: 2px solid var(--grouptheory-red);
+            padding-bottom: 8px;
         }
         .nav-pills .nav-link.active {
             background-color: var(--grouptheory-red);
@@ -69,9 +70,163 @@
                 height: auto;
             }
         }
+        .sidebar-sticky {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        .sidebar-sticky::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dev-tool {
+            display: none;
+        }
+        textarea.editable-content {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #fdfdfd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            width: 100%;
+        }
+        .dev-edit-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .dev-delete-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 4px;
+        }
+        /* 认证弹窗 */
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-overlay.active {
+            display: flex;
+        }
+        .auth-modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .auth-modal .form-label {
+            font-weight: 600;
+        }
+        .auth-modal .btn-primary {
+            background: var(--grouptheory-red);
+            border: none;
+        }
+        .auth-modal .btn-primary:hover {
+            background: #c62828;
+        }
+        .auth-error {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle .toggle-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            background: none;
+            border: none;
+            padding: 0;
+            z-index: 5;
+        }
+        .password-toggle .toggle-eye:hover {
+            color: #333;
+        }
+        #authButtons {
+            display: none !important;
+        }
+        #devModeSwitchContainer {
+            display: flex;
+            align-items: center;
+        }
+        .editable-card .d-flex .btn {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+        }
+        .editable-card .d-flex .btn i {
+            margin-right: 2px;
+        }
+        .editable-content p:last-child {
+            margin-bottom: 0;
+        }
+        .editable-content .solution-step p:last-child {
+            margin-bottom: 0;
+        }
+        /* MathJax渲染优化 */
+        .editable-content .MathJax {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        .chapter-container .badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.65rem;
+        }
+        /* 导航栏中的开发者开关 */
+        .navbar .form-check {
+            margin-right: 1rem;
+        }
+        .navbar .form-check-label {
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+    <!-- 开发者认证弹窗 -->
+    <div class="auth-overlay" id="devAuthOverlay">
+        <div class="auth-modal">
+            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--grouptheory-red);"></i>开发者验证</h4>
+            <p class="text-muted small">请输入账号与密码以启用开发者模式</p>
+            <div class="mb-3">
+                <label class="form-label">账号</label>
+                <input type="text" class="form-control" id="devAccount" placeholder="请输入账号">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <div class="password-toggle">
+                    <input type="password" class="form-control" id="devPassword" placeholder="请输入密码">
+                    <button class="toggle-eye" type="button" onclick="togglePasswordVisibility()" tabindex="-1">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="auth-error" id="authError">账号或密码错误，请重试。</div>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-secondary" onclick="closeDevAuth()">取消</button>
+                <button class="btn btn-primary" onclick="verifyDevAuth()"><i class="fas fa-unlock me-1"></i> 验证并开启</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
@@ -90,19 +245,18 @@
                         <a class="nav-link active" href="group-theory.html"><i class="fas fa-superscript me-1"></i> 群论与物理</a>
                     </li>
                 </ul>
-                <div class="d-flex">
-                    <div id="authButtons">
-                        <a href="login.html" class="btn btn-outline-primary me-2">登录</a>
-                        <a href="login.html#register" class="btn btn-primary">注册</a>
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch me-3 d-flex align-items-center" id="devModeSwitchContainer">
+                        <input class="form-check-input me-1" type="checkbox" id="devModeSwitch">
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer; font-size: 0.85rem;"><i class="fas fa-code"></i> 开发者</label>
                     </div>
+                    <div id="authButtons"></div>
                     <div id="userMenu" style="display: none;">
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="userDropdown" data-bs-toggle="dropdown">
                                 <i class="fas fa-user me-1"></i> <span id="usernameDisplay"></span>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="quantum.html"><i class="fas fa-code me-1"></i> 开发者模式</a></li>
-                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a></li>
                             </ul>
                         </div>
@@ -127,68 +281,79 @@
         <div class="row">
             <!-- 左侧导航 -->
             <div class="col-lg-3 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                <div class="sidebar-sticky">
+                    <!-- 搜索框 -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-search me-2"></i>搜索题目</h5>
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="list-group list-group-flush">
-                        <a href="#chapter1" class="list-group-item list-group-item-action active">1. 群论基础</a>
-                        <a href="#chapter2" class="list-group-item list-group-item-action">2. 表示论</a>
-                        <a href="#chapter3" class="list-group-item list-group-item-action">3. 点群与空间群</a>
-                        <a href="#chapter4" class="list-group-item list-group-item-action">4. 李群与李代数</a>
-                        <a href="#chapter5" class="list-group-item list-group-item-action">5. 标准模型对称性</a>
-                    </div>
-                </div>
 
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                        </div>
+                        <div class="list-group list-group-flush" id="chapterNavbar">
+                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 群论基础</a>
+                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 表示论</a>
+                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 点群与空间群</a>
+                            <a href="#chapter4" class="list-group-item list-group-item-action">4. 李群与李代数</a>
+                        </div>
                     </div>
-                    <div class="card-body text-center">
-                        <img src="group.jpg" alt="物理学中的群论" class="img-fluid book-cover mb-3">
-                        <h6>物理学中的群论</h6>
-                        <p class="text-muted small">Wu-Ki Tung</p>
-                    </div>
-                </div>
 
-                <!-- 资料库部分 -->
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="group.jpg" alt="物理学中的群论" class="img-fluid book-cover mb-3">
+                            <h6>物理学中的群论</h6>
+                            <p class="text-muted small">Wu-Ki Tung</p>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="resource-item">
-                            <a href="物理学中群论.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>蒋泊远笔记</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典群论教材</small>
+
+                    <!-- 资料库部分 -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
                         </div>
-                        <div class="resource-item">
-                            <a href="群论(冯克勤).pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>群论</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">冯克勤</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="[现代物理基础丛书]8 物理学中的群论(马中骐).pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>物理学中的群论</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">马中骐</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="【北京大学物理学丛书】群论和量子力学中的对称性 - 朱洪元.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>群论与量子力学中对称性</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">北京大学经典群论教材</small>
-                        </div>
-                        <div class="text-center mt-3">
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                                <i class="fas fa-upload me-1"></i>上传资料
-                            </button>
+                        <div class="card-body">
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/group/物理学中群论.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>蒋泊远笔记</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典群论教材</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/group/群论(冯克勤).pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>群论</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">冯克勤</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/group/[现代物理基础丛书]8 物理学中的群论(马中骐).pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>物理学中的群论</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">马中骐</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/group/【北京大学物理学丛书】群论和量子力学中的对称性 - 朱洪元.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>群论与量子力学中对称性</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">北京大学经典群论教材</small>
+                            </div>
+                            <div class="text-center mt-3">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                    <i class="fas fa-upload me-1"></i>上传资料
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -196,656 +361,64 @@
 
             <!-- 右侧内容 -->
             <div class="col-lg-9">
-                <!-- 第一章：群论基础 -->
-                <div class="mb-5" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
+                <!-- 第一章 -->
+                <div class="mb-5 chapter-container" id="chapter1">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
                             <i class="fas fa-shapes group-icon me-2"></i>第一章：群论基础
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);">3题</span>
                     </div>
-
-                    <!-- 问题1.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题1.1 - 群的基本概念</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>a) 什么是群？并请举例。</p>
-                                <p>b) 请写出 D₃ 群={e, a, b, c, d, f}每个元素的阶和对应循环群，以及 D₃ 群的各个类？</p>
-                                <p>c) 请写出 D₃ 群的不变子群及其商群，这个商群与 Z₂ 群同构吗？为什么？</p>
-                                <p>d) D₃ 群是否与 Z₂ 群同态？如果是，请写出同态核。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>a) 群的定义：</strong></p>
-                                    <p>在规定了元素的"乘积"法则后，元素的集合G如果满足下面四个条件，则称为群：</p>
-                                    <p>1. 集合对乘积的封闭性。集合中任意两元素的乘积仍属此集合：</p>
-                                    <p>\[ RS \in G, \quad \forall R \text{和} S \in G \]</p>
-                                    <p>2. 乘积满足结合律：</p>
-                                    <p>\[ R(ST) = (RS)T, \quad \forall R, S, \text{和} T \in G \]</p>
-                                    <p>3. 集合中存在恒元E，用它左乘集合中的任意元素，保持该元素不变：</p>
-                                    <p>\[ E \in G, \quad \text{和} ER = R, \quad \forall R \in G \]</p>
-                                    <p>4. 任何元素R的逆R⁻¹存在于集合中：</p>
-                                    <p>\[ \forall R \in G, \quad \exists R^{-1} \in G, \quad \text{使} R^{-1}R = E \]</p>
-                                    <p><strong>举例：</strong> 以"乘法"作为乘积的所有正实数构成群；以"加法"作为乘积的所有实数构成群。</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>b) D₃群的元素阶、循环群和类：</strong></p>
-                                    <p>恒元的阶为1，三次轴转动元素d和f的阶为3，二次轴转动元素a、b、c的阶为2。</p>
-                                    <p>对应循环群：</p>
-                                    <p>\[ (e) \]</p>
-                                    <p>\[ (e, d, f) \]</p>
-                                    <p>\[ (e, a) \]</p>
-                                    <p>\[ (e, b) \]</p>
-                                    <p>\[ (e, c) \]</p>
-                                    <p>D₃群有三个类：</p>
-                                    <p>1. 恒元e构成一类</p>
-                                    <p>2. 三次轴转动d和f构成一类</p>
-                                    <p>3. 二次轴转动a、b、c构成一类</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>c) 不变子群与商群：</strong></p>
-                                    <p>不变子群：\( H = \{ e, d, f \} \)</p>
-                                    <p>商群：\( D_3/H = \{ H, aH \} \)，其中 \( aH = \{ a, b, c \} \)</p>
-                                    <p>可以验证 \( (aH)^2 = H \)，因此商群 \( D_3/H \) 与二阶循环群 Z₂ 同构。</p>
-                                    <p>同构映射 ψ: \( D_3/H \to Z_2 \) 定义为：</p>
-                                    <p>\[ ψ(H) = 1, \quad ψ(aH) = -1 \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>d) 同态关系：</strong></p>
-                                    <p>D₃群与二阶循环群 \( Z_2 = \{1, -1\} \) 同态。</p>
-                                    <p>同态核为 \( H = \{ e, d, f \} \)，即D₃的不变子群。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                                <!-- 问题1.2 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题1.2 - 同态核与商群</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>设群 \( G \) 与 \( F \) 同态，\(\phi : G \sim F\)，则 \( G \) 中与 \( F \) 的单位元 \( f_0 \) 对应的元素 \( h_\alpha \) 的集合 \( H = \{h_\alpha | \phi(h_\alpha) = f_0, h_\alpha \in G\} \) 称为同态核。</p>
-                                <p>设 \( G \) 群与 \( F \) 群同态，同态核为 \( H \)，证明：</p>
-                                <p>① \( H \) 是 \( G \) 的不变子群。\( H \prec G \)</p>
-                                <p>② 商群 \( G/H \) 与 \( F \) 同构，\( G/H \cong F \)。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>（1）证明 \( H \prec G \)：</strong></p>
-                                    <p>\(\forall g \in G, h \in H\), \(\phi\) 为 \(G\) 到 \(F\) 的同态映射，有：</p>
-                                    <p>\[
-                                    \phi(ghg^{-1}) = \phi(g) \circ f_0 \circ \phi(g^{-1}) = \phi(g) \circ [\phi(g)]^{-1} = f_0
-                                    \]</p>
-                                    <p>即 \(ghg^{-1} \in H\)，故 \( H \prec G \)，为不变子群。</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>（2）证明 \( G/H \cong F \)：</strong></p>
-                                    <p>定义映射 \( \psi: G/H \rightarrow F, \psi(gH) = \phi(g) \)</p>
-                                    <p><strong>a. 映射唯一性：</strong></p>
-                                    <p>设 \( h \in H, gh \in gH \)，则：</p>
-                                    <p>\[
-                                    \psi(gH) = \psi(ghH) = \phi(gh) = \phi(g) \circ \phi(h) = \phi(g) \circ f_0 = \phi(g)
-                                    \]</p>
-                                    <p>故映射 \( \psi \) 与代表元选取无关。</p>
-                                    <p><strong>b. 单射性：</strong></p>
-                                    <p>若 \( \psi(g_1H) = \psi(g_2H) \)，则 \( \phi(g_1) = \phi(g_2) \)，故 \( g_2^{-1}g_1 \in H \)，即 \( g_1H = g_2H \)。</p>
-                                    <p><strong>c. 满射性：</strong></p>
-                                    <p>\(\forall f_\alpha \in F, \exists g_\gamma \in G\) 使 \( \phi(g_\gamma) = f_\alpha \)，即 \( f_\alpha = \psi(g_\gamma H) \)。</p>
-                                    <p><strong>d. 同态性：</strong></p>
-                                    <p>\[
-                                    \psi(g_1Hg_2H) = \psi(g_1g_2H) = \phi(g_1g_2) = \phi(g_1) \circ \phi(g_2) = \psi(g_1H) \circ \psi(g_2H)
-                                    \]</p>
-                                    <p>综上，\( \psi \) 为同构映射，故 \( G/H \cong F \)。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                                <!-- 问题1.3 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题1.3 - 阿贝尔群性质</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>证明：除恒元外，每个元素的阶都是 2 的群一定是阿贝尔群。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p>任取群 \( G \) 中两个不同元素 \( R \) 和 \( S \)，设 \( RS = T \)。</p>
-                                    <p>由条件 \( R^2 = S^2 = E \)，则：</p>
-                                    <p>\[
-                                    TS = RS^2 = R, \quad TR = T^2S = S
-                                    \]</p>
-                                    <p>又因为 \( SR = TR^2 = T = RS \)，故任意元素乘积可交换，\( G \) 为阿贝尔群。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="1"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第一章添加新题目
+                    </button>
                 </div>
 
-                <!-- 第二章：表示论 -->
-                <div class="mb-5" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
+                <!-- 第二章 -->
+                <div class="mb-5 chapter-container" id="chapter2">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
                             <i class="fas fa-project-diagram group-icon me-2"></i>第二章：表示论
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);">6题</span>
                     </div>
-
-                                <!-- 问题2.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.1 - D₃群在函数空间中的表示</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>\( D_3 \) 在 \( x, y, z \) 的二次齐次函数空间中的表示，空间基为：</p>
-                                <p>\[
-                                \phi_1 = x^2, \phi_2 = y^2, \phi_3 = z^2, \phi_4 = xy, \phi_5 = yz, \phi_6 = xz
-                                \]</p>
-                                <p>求 \( D_3 \) 群元 \( d \) 的表示矩阵 \( A(d) \)。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p>计算各基函数在 \( d \) 作用下的变换：</p>
-                                    <p>\[
-                                    A(d)\phi_1 = \frac{1}{4}\phi_1 + \frac{3}{4}\phi_2 - \frac{\sqrt{3}}{2}\phi_4
-                                    \]</p>
-                                    <p>\[
-                                    A(d)\phi_2 = \frac{3}{4}\phi_1 + \frac{1}{4}\phi_2 + \frac{\sqrt{3}}{2}\phi_4
-                                    \]</p>
-                                    <p>\[
-                                    A(d)\phi_3 = \phi_3
-                                    \]</p>
-                                    <p>\[
-                                    A(d)\phi_4 = \frac{\sqrt{3}}{4}\phi_1 - \frac{\sqrt{3}}{4}\phi_2 - \frac{1}{2}\phi_4
-                                    \]</p>
-                                    <p>\[
-                                    A(d)\phi_5 = -\frac{1}{2}\phi_5 - \frac{\sqrt{3}}{2}\phi_6
-                                    \]</p>
-                                    <p>\[
-                                    A(d)\phi_6 = -\frac{\sqrt{3}}{2}\phi_5 - \frac{1}{2}\phi_6
-                                    \]</p>
-                                    <p>因此表示矩阵为：</p>
-                                    <p>\[
-                                    A(d) = \begin{pmatrix}
-                                    \frac{1}{4} & \frac{3}{4} & 0 & \frac{\sqrt{3}}{4} & 0 & 0 \\
-                                    \frac{3}{4} & \frac{1}{4} & 0 & -\frac{\sqrt{3}}{4} & 0 & 0 \\
-                                    0 & 0 & 1 & 0 & 0 & 0 \\
-                                    -\frac{\sqrt{3}}{2} & \frac{\sqrt{3}}{2} & 0 & -\frac{1}{2} & 0 & 0 \\
-                                    0 & 0 & 0 & 0 & -\frac{1}{2} & -\frac{\sqrt{3}}{2} \\
-                                    0 & 0 & 0 & 0 & \frac{\sqrt{3}}{2} & -\frac{1}{2}
-                                    \end{pmatrix}
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 问题2.2 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.2 - 立方体对称群O群的特征标表</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>立方体对称群O群具有24个元素，其特征标表如下，请回答：</p>
-                                <p>a) O群有几个类？每个类中分别包括什么元素？</p>
-                                <p>b) 每个类所对应的对称操作是什么？</p>
-                                <p>c) O群有几个不等价不可约表示，分别维数是多少？</p>
-                                <p>d) 请填写完整O群的特征标表，并写出详细的计算过程。</p>
-                                <p>\[
-                                \begin{array}{cccccc}
-                                 & E & 3C_4^2 & 8C_3^2 & 6C_4 & 6C_2^2 \\
-                                A_1 & 1 & 1 & 1 & 1 & 1 \\
-                                A_2 & 1 & 1 & 1 & -1 & -1 \\
-                                E & 2 & 2 & \square & \square & \square \\
-                                T_1 & 3 & -1 & \square & \square & \square \\
-                                T_2 & 3 & -1 & \square & \square & \square \\
-                                \end{array}
-                                \]</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>a) 和 b) O群的类和对称操作：</strong></p>
-                                    <p>O群包含5个类：</p>
-                                    <p>1. 恒元E构成一类</p>
-                                    <p>2. 绕三个四次轴转动π角的元素 \( C_4^2 \) 构成一类（3个元素）</p>
-                                    <p>3. 绕四个三次轴转动±2π/3角的元素 \( C_3^2 \) 构成一类（8个元素）</p>
-                                    <p>4. 绕三个四次轴转动±π/2角的元素 \( C_4 \) 构成一类（6个元素）</p>
-                                    <p>5. 绕六个二次轴转动π角的元素 \( C_2 \) 构成一类（6个元素）</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>c) 不等价不可约表示：</strong></p>
-                                    <p>O群有24个元素，5个自逆类，因此有5个不等价不可约表示：</p>
-                                    <p>2个一维表示（A₁和A₂）</p>
-                                    <p>1个二维表示（E）</p>
-                                    <p>2个三维表示（T₁和T₂）</p>
-                                    <p>维数平方和验证：</p>
-                                    <p>\[ 1^2 + 1^2 + 2^2 + 3^2 + 3^2 = 24 \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>d) 完整的特征标表：</strong></p>
-                                    <p>\[
-                                    \begin{array}{c|cccccc}
-                                    O & E & 3C_4^2 & 8C_3^2 & 6C_4 & 6C_2 \\
-                                    \hline
-                                    A_1 & 1 & 1 & 1 & 1 & 1 \\
-                                    A_2 & 1 & 1 & 1 & -1 & -1 \\
-                                    E & 2 & 2 & -1 & 0 & 0 \\
-                                    T_1 & 3 & -1 & 0 & 1 & -1 \\
-                                    T_2 & 3 & -1 & 0 & -1 & 1 \\
-                                    \end{array}
-                                    \]</p>
-                                    <p>计算过程：</p>
-                                    <p>1. 利用正交关系计算各表示的特征标</p>
-                                    <p>2. 利用类的大小和特征标的正交性填充缺失值</p>
-                                    <p>3. 验证特征标满足正交关系</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 问题2.3 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.3 - 第一类点群基本定理</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>根据第一类点群基本定理：</p>
-                                <p>\[
-                                \sum_{i=1}^{l} \left(n - \frac{n}{n_i}\right) = 2(n-1)
-                                \]</p>
-                                <p>请回答：</p>
-                                <p>a) 证明极点的轨道数目只能是多少？</p>
-                                <p>b) 与轨道数相对应的第一类点群的分类？</p>
-                                <p>c) 并写出每一类中极点轨道对应的对称操作是什么？</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>a) 极点轨道数目：</strong></p>
-                                    <p>对于非平凡情况，G群的阶n≥2</p>
-                                    <p>\[
-                                    \sum_{i=1}^{l} \left(n - \frac{n}{n_i}\right) = 2(n-1) \rightarrow \sum_{i=1}^{l} \left(1 - \frac{1}{n_i}\right) = 2\left(1 - \frac{1}{n}\right)
-                                    \]</p>
-                                    <p>因为 \( 1 \leq 2\left(1 - \frac{1}{n}\right) < 2 \) 且 \( \frac{1}{2} \leq \sum_{i=1}^{l} \left(1 - \frac{1}{n_i}\right) < l \)</p>
-                                    <p>所以 \( 1 < l < 4 \)，即极点轨道数目只能是 l=2 或 l=3</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>b) 第一类点群分类：</strong></p>
-                                    <p>1. l=2，\( n_1 = n_2 = n \)，对应 Cₙ 群（n=2,3,4,...）</p>
-                                    <p>2. l=3，\( n_1 = 2 \)，\( n_2 = 2 \)，\( n_3 = n/2 \)，对应 Dₙ 群（n=4,6,8,...）</p>
-                                    <p>3. l=3，\( n_1 = 2 \)，\( n_2 = n_3 = 3 \)，n=12，对应四面体群 T</p>
-                                    <p>4. l=3，\( n_1 = 2 \)，\( n_2 = 3 \)，\( n_3 = 4 \)，n=24，对应八面体 O 群</p>
-                                    <p>5. l=3，\( n_1 = 2 \)，\( n_2 = 3 \)，\( n_3 = 5 \)，n=60，对应十二面体 I 群</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>c) 各类点群的极点轨道与对称操作：</strong></p>
-                                    <p><strong>Cₙ群：</strong> 全部极点分为两个轨道，每个轨道仅有一点，对应一个n阶转动轴</p>
-                                    <p><strong>Dₙ群：</strong> 3条极点轨道：</p>
-                                    <p>- 第1、2条轨道各有n个极点，各对应一个二重轴</p>
-                                    <p>- 第3轨道有2个极点，各对应一个n重轴</p>
-                                    <p><strong>T群：</strong> 3条极点轨道：</p>
-                                    <p>- 第1轨道有6个极点，对应3个二重轴</p>
-                                    <p>- 第2、3轨道各有4个极点，对应4个三重轴</p>
-                                    <p><strong>O群：</strong> 3条极点轨道：</p>
-                                    <p>- 第1轨道有12个极点，对应6个二阶轴</p>
-                                    <p>- 第2轨道有8个极点，对应4个三阶轴</p>
-                                    <p>- 第3轨道有6个极点，对应3个四阶轴</p>
-                                    <p><strong>I群：</strong> 3条极点轨道：</p>
-                                    <p>- 第1轨道有30个极点，对应15条二重轴</p>
-                                    <p>- 第2轨道有20个极点，对应10条三重轴</p>
-                                    <p>- 第3轨道有12个极点，对应6条五重轴</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                                <!-- 问题2.4 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.4 - 12阶群的性质分析</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>群 \( G \) 由12个元素组成，给定乘法表：</p>
-                                <p>(1) 找出各元素的逆元；(2) 指出可与所有元素对易的元素；(3) 列出各元素的周期和阶；(4) 找出群的类；(5) 找出不变子群及其商群；(6) 判断是否与 \( T \) 或 \( D_6 \) 同构。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>(1) 逆元：</strong></p>
-                                    <p>\[
-                                    E^{-1}=E, A^{-1}=A, B^{-1}=F, C^{-1}=I, D^{-1}=J, K^{-1}=L, M^{-1}=N
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>(2) 可对易元素：</strong> \( E \) 和 \( A \)</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>(3) 周期和阶：</strong></p>
-                                    <p>- 阶数1：\( E \)<br>
-                                    - 阶数2：\( A \)<br>
-                                    - 阶数3：\( M, N \)<br>
-                                    - 阶数4：\( B, C, D, F, I, J \)<br>
-                                    - 阶数6：\( K, L \)</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>(4) 共轭类：</strong></p>
-                                    <p>\[
-                                    \{E\}, \{A\}, \{M,N\}, \{K,L\}, \{B,C,D\}, \{F,I,J\}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>(5) 不变子群：</strong></p>
-                                    <p>- \( \{E,A\} \)，商群同构于 \( D_3 \)<br>
-                                    - \( \{E,M,N\} \)，商群同构于 \( C_4 \)<br>
-                                    - \( \{E,K,N,A,M,L\} \)，商群同构于 \( V_2 \)</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>(6) 同构判断：</strong></p>
-                                    <p>与 \( T \) 和 \( D_6 \) 都不同构，因 \( T \) 无6阶元，\( D_6 \) 无4阶元。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                                <!-- 问题2.5 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.5 - 表示的构造</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>设 \( G \) 是非阿贝尔群，\( D(G) \) 是其不可约表示。判断以下矩阵集合是否构成 \( G \) 的表示：</p>
-                                <p>(1) \( D(R)^T \) (2) \( D(R)^\dagger \) (3) \( D(R^{-1}) \)<br>
-                                (4) \( D(R)^* \) (5) \( D(R^{-1})^T \) (6) det \( D(R) \) (7) tr \( D(R) \)</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>判断依据：</strong> 是否满足 \( D(RS) = D(R)D(S) \)</p>
-                                    <p>(1) 不是表示：\( D(R)^T D(S)^T \neq D(RS)^T \)</p>
-                                    <p>(2) 不是表示：\( D(R)^\dagger D(S)^\dagger \neq D(RS)^\dagger \)</p>
-                                    <p>(3) 不是表示：\( D(R^{-1})D(S^{-1}) \neq D((RS)^{-1}) \)</p>
-                                    <p>(4) 是表示：\( D(R)^* D(S)^* = D(RS)^* \)</p>
-                                    <p>(5) 是表示：\( D(R^{-1})^T D(S^{-1})^T = D((RS)^{-1})^T \)</p>
-                                    <p>(6) 是表示：det \( D(R) \) det \( D(S) \) = det \( D(RS) \)</p>
-                                    <p>(7) 不是表示：tr \( D(R) \) tr \( D(S) \) ≠ tr \( D(RS) \)</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 问题2.6 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.6 - 函数空间的表示矩阵</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>由基 \( \psi_1(x,y)=x^2 \), \( \psi_2(x,y)=xy \), \( \psi_3(x,y)=y^2 \) 构成的三维函数空间，对变换 \( R \)：</p>
-                                <p>\[
-                                \begin{pmatrix}x'\\y'\end{pmatrix} = R\begin{pmatrix}x\\y\end{pmatrix}
-                                \]</p>
-                                <p>计算 \( P_R \) 的矩阵表示 \( D(R) \)：</p>
-                                <p>(1) \( R = \begin{pmatrix}1&0\\0&-1\end{pmatrix} \)<br>
-                                (2) \( R = \frac{1}{2}\begin{pmatrix}-1&-\sqrt{3}\\\sqrt{3}&-1\end{pmatrix} \)<br>
-                                (3) \( R = \begin{pmatrix}\cos\alpha&-\sin\alpha\\\sin\alpha&\cos\alpha\end{pmatrix} \)</p>
-                                <p>再将基 \( \psi_2 \) 换成 \( \sqrt{2}xy \)，重新计算。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>(1) 原基：</strong></p>
-                                    <p>\[
-                                    D(R) = \begin{pmatrix}1&0&0\\0&-1&0\\0&0&1\end{pmatrix}
-                                    \]</p>
-                                    <p><strong>新基：</strong> 矩阵不变</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>(2) 原基：</strong></p>
-                                    <p>\[
-                                    D(R) = \frac{1}{4}\begin{pmatrix}
-                                    1 & \sqrt{3} & 3 \\
-                                    -2\sqrt{3} & -2 & 2\sqrt{3} \\
-                                    3 & -\sqrt{3} & 1
-                                    \end{pmatrix}
-                                    \]</p>
-                                    <p><strong>新基：</strong></p>
-                                    <p>\[
-                                    \overline{D}(R) = \frac{1}{4}\begin{pmatrix}
-                                    1 & \sqrt{6} & 3 \\
-                                    -\sqrt{6} & -2 & \sqrt{6} \\
-                                    3 & -\sqrt{6} & 1
-                                    \end{pmatrix}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>(3) 原基：</strong></p>
-                                    <p>\[
-                                    D(R) = \frac{1}{2}\begin{pmatrix}
-                                    2\cos^2\alpha & -\sin(2\alpha) & 2\sin^2\alpha \\
-                                    2\sin(2\alpha) & 2\cos(2\alpha) & -2\sin(2\alpha) \\
-                                    2\sin^2\alpha & \sin(2\alpha) & 2\cos^2\alpha
-                                    \end{pmatrix}
-                                    \]</p>
-                                    <p><strong>新基：</strong></p>
-                                    <p>\[
-                                    \overline{D}(R) = \frac{1}{\sqrt{2}}\begin{pmatrix}
-                                    \sqrt{2}\cos^2\alpha & -\sin(2\alpha) & \sqrt{2}\sin^2\alpha \\
-                                    \sin(2\alpha) & \sqrt{2}\cos(2\alpha) & -\sin(2\alpha) \\
-                                    \sqrt{2}\sin^2\alpha & \sin(2\alpha) & \sqrt{2}\cos^2\alpha
-                                    \end{pmatrix}
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="2"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第二章添加新题目
+                    </button>
                 </div>
 
-                <!-- 第三章：点群与空间群 -->
-                <div class="mb-5" id="chapter3">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
+                <!-- 第三章 -->
+                <div class="mb-5 chapter-container" id="chapter3">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
                             <i class="fas fa-cube group-icon me-2"></i>第三章：点群与空间群
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);">2题</span>
                     </div>
-
-                    <!-- 问题3.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题3.1 - 杨图与置换群</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>对于下图所对应的杨图，请问：</p>
-                                <p>a) 其对应的置换群 Sₙ 群的阶数是多少？</p>
-                                <p>b) 该杨图对应几个轮换，这些轮换分别是几维？</p>
-                                <p>c) 请问此杨图对应的所有标准盘的个数是多少？</p>
-                                <p>d) 请分别写出标准盘中的 T₄ 和 T₆ 的形式。</p>
-                                <p>e) 并写出 T₄ → T₆ 的置换变换。</p>
-                                <p>\[
-                                \begin{array}{|c|c|c|c|c|}
-                                \hline
-                                 & & & & \\
-                                \hline
-                                 & & & & \\
-                                \hline
-                                 & & & & \\
-                                \hline
-                                \end{array}
-                                \]</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>a) 置换群阶数：</strong></p>
-                                    <p>杨图对应 S₉ 置换群，阶数为 9! = 362880</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>b) 轮换类型：</strong></p>
-                                    <p>杨图对应的轮换类型为 (1¹, 2¹, 3²)</p>
-                                    <p>即有1个一维轮换，1个二维轮换，2个三维轮换</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>c) 标准盘个数：</strong></p>
-                                    <p>正则杨表的钩型数 hᵢⱼ 计算：</p>
-                                    <p>\[
-                                    d_{[4,3,2]} = \frac{9!}{6 \times 5 \times 3 \times 1 \times 4 \times 3 \times 1 \times 2 \times 1} = 168
-                                    \]</p>
-                                    <p>因此标准盘个数为168个</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>d) 标准盘形式：</strong></p>
-                                    <p>\[
-                                    T_4 = \begin{array}{|c|c|c|c|}
-                                    \hline
-                                    1 & 2 & 3 & 4 \\
-                                    \hline
-                                    5 & 7 & 8 & \\
-                                    \hline
-                                    6 & 9 & & \\
-                                    \hline
-                                    \end{array}, \quad 
-                                    T_6 = \begin{array}{|c|c|c|c|}
-                                    \hline
-                                    1 & 2 & 3 & 4 \\
-                                    \hline
-                                    5 & 8 & 9 & \\
-                                    \hline
-                                    6 & 7 & & \\
-                                    \hline
-                                    \end{array}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>e) 置换变换：</strong></p>
-                                    <p>\[ T_6 = (789)T_4 \]</p>
-                                    <p>即通过置换(789)将T₄变换为T₆</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                                <!-- 问题3.2 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题3.2 - 直积群的表示</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>若群 \( G = H_1 \otimes H_2 \)，证明 \( G \) 的不等价不可约表示都可表为两子群不等价不可约表示的直积。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>证明：</strong></p>
-                                    <p>1. 设 \( D^{(1)}(H_1) \) 和 \( D^{(2)}(H_2) \) 分别为子群的不可约表示，构造：</p>
-                                    <p>\[
-                                    D(RS) = D^{(1)}(R) \otimes D^{(2)}(S), \quad R \in H_1, S \in H_2
-                                    \]</p>
-                                    <p>2. 验证表示性质：</p>
-                                    <p>\[
-                                    D(RS)D(R'S') = [D^{(1)}(R) \otimes D^{(2)}(S)][D^{(1)}(R') \otimes D^{(2)}(S')] = D^{(1)}(RR') \otimes D^{(2)}(SS') = D(RR'SS')
-                                    \]</p>
-                                    <p>3. 不可约性：若表示空间存在不变子空间，则必须同时是 \( D^{(1)} \) 和 \( D^{(2)} \) 的不变子空间，矛盾。</p>
-                                    <p>4. 完备性：不等价表示的直积产生不等价表示，且数量匹配类数。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="3"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第三章添加新题目
+                    </button>
                 </div>
 
-                <!-- 第四章：李群与李代数 -->
-                <div class="mb-5" id="chapter4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
+                <!-- 第四章 -->
+                <div class="mb-5 chapter-container" id="chapter4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
                             <i class="fas fa-infinity group-icon me-2"></i>第四章：李群与李代数
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);">1题</span>
                     </div>
-
-                    <!-- 问题4.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题4.1 - 函数空间的变换矩阵</h4>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>由函数基 \( \Psi_1(x,y)=x^2 \)，\( \Psi_2(x,y)=xy \)，\( \Psi_3(x,y)=y^2 \) 架设的三维函数空间（二次齐次函数空间）对下列二维空间转动变换 R 保持不变，试计算变换 R 对应的标量函数换号算符 \( P_R \) 在此函数基中的矩阵形式为 \( D(R) \)：</p>
-                                <p>a) \( R = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix} \)</p>
-                                <p>b) \( R = \frac{1}{2} \begin{pmatrix} -1 & -\sqrt{3} \\ \sqrt{3} & -1 \end{pmatrix} \)</p>
-                                <p>c) \( R = \begin{pmatrix} \cos \alpha & -\sin \alpha \\ \sin \alpha & \cos \alpha \end{pmatrix} \)</p>
-                                <p>如果再把基 \( \Psi_2(x,y) \) 换成 \( \sqrt{2}xy \)，请重新计算 \( P_R \) 算符的矩阵形式。</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>a) 变换矩阵：</strong></p>
-                                    <p>\[
-                                    P_R \psi_1(x,y) = x^2 = \psi_1(x,y) \\
-                                    P_R \psi_2(x,y) = -xy = -\psi_2(x,y) \\
-                                    P_R \psi_3(x,y) = y^2 = \psi_3(x,y) \\
-                                    D(R) = \begin{pmatrix}
-                                    1 & 0 & 0 \\
-                                    0 & -1 & 0 \\
-                                    0 & 0 & 1 \\
-                                    \end{pmatrix}
-                                    \]</p>
-                                    <p>基变换后矩阵不变：\( \overline{D}(R) = D(R) \)</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>b) 变换矩阵：</strong></p>
-                                    <p>\[
-                                    P_R \psi_1(x,y) = \frac{1}{4} [\psi_1(x,y) - 2\sqrt{3}\psi_2(x,y) + 3\psi_3(x,y)] \\
-                                    P_R \psi_2(x,y) = \frac{1}{4} [\sqrt{3}\psi_1(x,y) - 2\psi_2(x,y) - \sqrt{3}\psi_3(x,y)] \\
-                                    P_R \psi_3(x,y) = \frac{1}{4} [3\psi_1(x,y) + 2\sqrt{3}\psi_2(x,y) + \psi_3(x,y)] \\
-                                    D(R) = \frac{1}{4} \begin{pmatrix}
-                                    1 & \sqrt{3} & 3 \\
-                                    -2\sqrt{3} & -2 & 2\sqrt{3} \\
-                                    3 & -\sqrt{3} & 1 \\
-                                    \end{pmatrix}
-                                    \]</p>
-                                    <p>基变换后矩阵：</p>
-                                    <p>\[
-                                    \overline{D}(R) = \frac{1}{4} \begin{pmatrix}
-                                    1 & \sqrt{6} & 3 \\
-                                    -\sqrt{6} & -2 & \sqrt{6} \\
-                                    3 & -\sqrt{6} & 1 \\
-                                    \end{pmatrix}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>c) 变换矩阵：</strong></p>
-                                    <p>\[
-                                    P_R \psi_1(x,y) = \cos^2 \alpha \psi_1(x,y) + \sin(2\alpha)\psi_2(x,y) + \sin^2 \alpha \psi_3(x,y) \\
-                                    P_R \psi_2(x,y) = -\sin \alpha \cos \alpha \psi_1(x,y) + \cos(2\alpha)\psi_2(x,y) + \sin \alpha \cos \alpha \psi_3(x,y) \\
-                                    P_R \psi_3(x,y) = \sin^2 \alpha \psi_1(x,y) - \sin(2\alpha)\psi_2(x,y) + \cos^2 \alpha \psi_3(x,y) \\
-                                    D(R) = \frac{1}{2} \begin{pmatrix}
-                                    2\cos^2 \alpha & -\sin(2\alpha) & 2\sin^2 \alpha \\
-                                    2\sin(2\alpha) & 2\cos(2\alpha) & -2\sin(2\alpha) \\
-                                    2\sin^2 \alpha & \sin(2\alpha) & 2\cos^2 \alpha \\
-                                    \end{pmatrix}
-                                    \]</p>
-                                    <p>基变换后矩阵：</p>
-                                    <p>\[
-                                    \overline{D}(R) = \frac{1}{\sqrt{2}} \begin{pmatrix}
-                                    \sqrt{2}\cos^2 \alpha & -\sin(2\alpha) & \sqrt{2}\sin^2 \alpha \\
-                                    \sin(2\alpha) & \sqrt{2}\cos(2\alpha) & -2\sin(2\alpha) \\
-                                    \sqrt{2}\sin^2 \alpha & \sin(2\alpha) & \sqrt{2}\cos^2 \alpha \\
-                                    \end{pmatrix}
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="4"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第四章添加新题目
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
-
-  
 
     <!-- 上传资料的模态框 -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
@@ -909,7 +482,504 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
-        // 检查登录状态并更新UI
+        // ======================== 数据层 ============================
+        const DEFAULT_DATA = {
+            questions: [
+                // 第一章：群论基础
+                {
+                    id: '1_1',
+                    chapter: 1,
+                    title: '问题1.1 - 群的基本概念',
+                    desc: 'a) 什么是群？并请举例。\n\nb) 请写出 D₃ 群={e, a, b, c, d, f}每个元素的阶和对应循环群，以及 D₃ 群的各个类？\n\nc) 请写出 D₃ 群的不变子群及其商群，这个商群与 Z₂ 群同构吗？为什么？\n\nd) D₃ 群是否与 Z₂ 群同态？如果是，请写出同态核。',
+                    source: '经典群论教材',
+                    ans: 'a) 群的定义：在规定了元素的"乘积"法则后，元素的集合G如果满足下面四个条件，则称为群：\n\n1. 集合对乘积的封闭性。集合中任意两元素的乘积仍属此集合：\\( RS \\in G, \\forall R \\text{和} S \\in G \\)\n\n2. 乘积满足结合律：\\( R(ST) = (RS)T, \\forall R, S, \\text{和} T \\in G \\)\n\n3. 集合中存在恒元E，用它左乘集合中的任意元素，保持该元素不变：\\( E \\in G, \\text{和} ER = R, \\forall R \\in G \\)\n\n4. 任何元素R的逆R⁻¹存在于集合中：\\( \\forall R \\in G, \\exists R^{-1} \\in G, \\text{使} R^{-1}R = E \\)\n\n举例：以"乘法"作为乘积的所有正实数构成群；以"加法"作为乘积的所有实数构成群。\n\nb) D₃群的元素阶、循环群和类：恒元的阶为1，三次轴转动元素d和f的阶为3，二次轴转动元素a、b、c的阶为2。\n\n对应循环群：\\( (e), (e,d,f), (e,a), (e,b), (e,c) \\)\n\nD₃群有三个类：1. 恒元e构成一类 2. 三次轴转动d和f构成一类 3. 二次轴转动a、b、c构成一类\n\nc) 不变子群：\\( H = \\{ e, d, f \\} \\)，商群：\\( D_3/H = \\{ H, aH \\} \\)，其中 \\( aH = \\{ a, b, c \\} \\)。可以验证 \\( (aH)^2 = H \\)，因此商群 \\( D_3/H \\) 与二阶循环群 Z₂ 同构。\n\nd) D₃群与二阶循环群 \\( Z_2 = \\{1, -1\\} \\) 同态，同态核为 \\( H = \\{ e, d, f \\} \\)，即D₃的不变子群。'
+                },
+                {
+                    id: '1_2',
+                    chapter: 1,
+                    title: '问题1.2 - 同态核与商群',
+                    desc: '设群 \\( G \\) 与 \\( F \\) 同态，\\(\\phi : G \\sim F\\)，则 \\( G \\) 中与 \\( F \\) 的单位元 \\( f_0 \\) 对应的元素 \\( h_\\alpha \\) 的集合 \\( H = \\{h_\\alpha | \\phi(h_\\alpha) = f_0, h_\\alpha \\in G\\} \\) 称为同态核。\n\n设 \\( G \\) 群与 \\( F \\) 群同态，同态核为 \\( H \\)，证明：① \\( H \\) 是 \\( G \\) 的不变子群。\\( H \\prec G \\) ② 商群 \\( G/H \\) 与 \\( F \\) 同构，\\( G/H \\cong F \\)。',
+                    source: '群论基础习题',
+                    ans: '（1）证明 \\( H \\prec G \\)：\\(\\forall g \\in G, h \\in H\\)，\\(\\phi\\) 为 \\(G\\) 到 \\(F\\) 的同态映射，有：\n\n\\[ \\phi(ghg^{-1}) = \\phi(g) \\circ f_0 \\circ \\phi(g^{-1}) = \\phi(g) \\circ [\\phi(g)]^{-1} = f_0 \\]\n\n即 \\(ghg^{-1} \\in H\\)，故 \\( H \\prec G \\)，为不变子群。\n\n（2）证明 \\( G/H \\cong F \\)：定义映射 \\( \\psi: G/H \\rightarrow F, \\psi(gH) = \\phi(g) \\)\n\na. 映射唯一性：设 \\( h \\in H, gh \\in gH \\)，则 \\( \\psi(gH) = \\psi(ghH) = \\phi(gh) = \\phi(g) \\circ \\phi(h) = \\phi(g) \\circ f_0 = \\phi(g) \\)，故映射 \\( \\psi \\) 与代表元选取无关。\n\nb. 单射性：若 \\( \\psi(g_1H) = \\psi(g_2H) \\)，则 \\( \\phi(g_1) = \\phi(g_2) \\)，故 \\( g_2^{-1}g_1 \\in H \\)，即 \\( g_1H = g_2H \\)。\n\nc. 满射性：\\(\\forall f_\\alpha \\in F, \\exists g_\\gamma \\in G\\) 使 \\( \\phi(g_\\gamma) = f_\\alpha \\)，即 \\( f_\\alpha = \\psi(g_\\gamma H) \\)。\n\nd. 同态性：\\[ \\psi(g_1Hg_2H) = \\psi(g_1g_2H) = \\phi(g_1g_2) = \\phi(g_1) \\circ \\phi(g_2) = \\psi(g_1H) \\circ \\psi(g_2H) \\]\n\n综上，\\( \\psi \\) 为同构映射，故 \\( G/H \\cong F \\)。'
+                },
+                {
+                    id: '1_3',
+                    chapter: 1,
+                    title: '问题1.3 - 阿贝尔群性质',
+                    desc: '证明：除恒元外，每个元素的阶都是 2 的群一定是阿贝尔群。',
+                    source: '群论基础习题',
+                    ans: '任取群 \\( G \\) 中两个不同元素 \\( R \\) 和 \\( S \\)，设 \\( RS = T \\)。\n\n由条件 \\( R^2 = S^2 = E \\)，则：\n\n\\[ TS = RS^2 = R, \\quad TR = T^2S = S \\]\n\n又因为 \\( SR = TR^2 = T = RS \\)，故任意元素乘积可交换，\\( G \\) 为阿贝尔群。'
+                },
+                // 第二章：表示论
+                {
+                    id: '2_1',
+                    chapter: 2,
+                    title: '问题2.1 - D₃群在函数空间中的表示',
+                    desc: '\\( D_3 \\) 在 \\( x, y, z \\) 的二次齐次函数空间中的表示，空间基为：\n\n\\[ \\phi_1 = x^2, \\phi_2 = y^2, \\phi_3 = z^2, \\phi_4 = xy, \\phi_5 = yz, \\phi_6 = xz \\]\n\n求 \\( D_3 \\) 群元 \\( d \\) 的表示矩阵 \\( A(d) \\)。',
+                    source: '群论表示论习题',
+                    ans: '计算各基函数在 \\( d \\) 作用下的变换：\n\n\\[ A(d)\\phi_1 = \\frac{1}{4}\\phi_1 + \\frac{3}{4}\\phi_2 - \\frac{\\sqrt{3}}{2}\\phi_4 \\]\n\\[ A(d)\\phi_2 = \\frac{3}{4}\\phi_1 + \\frac{1}{4}\\phi_2 + \\frac{\\sqrt{3}}{2}\\phi_4 \\]\n\\[ A(d)\\phi_3 = \\phi_3 \\]\n\\[ A(d)\\phi_4 = \\frac{\\sqrt{3}}{4}\\phi_1 - \\frac{\\sqrt{3}}{4}\\phi_2 - \\frac{1}{2}\\phi_4 \\]\n\\[ A(d)\\phi_5 = -\\frac{1}{2}\\phi_5 - \\frac{\\sqrt{3}}{2}\\phi_6 \\]\n\\[ A(d)\\phi_6 = -\\frac{\\sqrt{3}}{2}\\phi_5 - \\frac{1}{2}\\phi_6 \\]\n\n因此表示矩阵为：\n\n\\[ A(d) = \\begin{pmatrix}\n\\frac{1}{4} & \\frac{3}{4} & 0 & \\frac{\\sqrt{3}}{4} & 0 & 0 \\\\\n\\frac{3}{4} & \\frac{1}{4} & 0 & -\\frac{\\sqrt{3}}{4} & 0 & 0 \\\\\n0 & 0 & 1 & 0 & 0 & 0 \\\\\n-\\frac{\\sqrt{3}}{2} & \\frac{\\sqrt{3}}{2} & 0 & -\\frac{1}{2} & 0 & 0 \\\\\n0 & 0 & 0 & 0 & -\\frac{1}{2} & -\\frac{\\sqrt{3}}{2} \\\\\n0 & 0 & 0 & 0 & \\frac{\\sqrt{3}}{2} & -\\frac{1}{2}\n\\end{pmatrix} \\]'
+                },
+                {
+                    id: '2_2',
+                    chapter: 2,
+                    title: '问题2.2 - 立方体对称群O群的特征标表',
+                    desc: '立方体对称群O群具有24个元素，其特征标表如下，请回答：\n\na) O群有几个类？每个类中分别包括什么元素？\n\nb) 每个类所对应的对称操作是什么？\n\nc) O群有几个不等价不可约表示，分别维数是多少？\n\nd) 请填写完整O群的特征标表，并写出详细的计算过程。\n\n\\[ \\begin{array}{cccccc} & E & 3C_4^2 & 8C_3^2 & 6C_4 & 6C_2^2 \\\\ A_1 & 1 & 1 & 1 & 1 & 1 \\\\ A_2 & 1 & 1 & 1 & -1 & -1 \\\\ E & 2 & 2 & \\square & \\square & \\square \\\\ T_1 & 3 & -1 & \\square & \\square & \\square \\\\ T_2 & 3 & -1 & \\square & \\square & \\square \\end{array} \\]',
+                    source: '群论表示论习题',
+                    ans: 'a) 和 b) O群的类和对称操作：O群包含5个类：1. 恒元E构成一类 2. 绕三个四次轴转动π角的元素 \\( C_4^2 \\) 构成一类（3个元素）3. 绕四个三次轴转动±2π/3角的元素 \\( C_3^2 \\) 构成一类（8个元素）4. 绕三个四次轴转动±π/2角的元素 \\( C_4 \\) 构成一类（6个元素）5. 绕六个二次轴转动π角的元素 \\( C_2 \\) 构成一类（6个元素）\n\nc) 不等价不可约表示：O群有24个元素，5个自逆类，因此有5个不等价不可约表示：2个一维表示（A₁和A₂），1个二维表示（E），2个三维表示（T₁和T₂）。维数平方和验证：\\( 1^2 + 1^2 + 2^2 + 3^2 + 3^2 = 24 \\)\n\nd) 完整的特征标表：\n\n\\[ \\begin{array}{c|cccccc} O & E & 3C_4^2 & 8C_3^2 & 6C_4 & 6C_2 \\\\ \\hline A_1 & 1 & 1 & 1 & 1 & 1 \\\\ A_2 & 1 & 1 & 1 & -1 & -1 \\\\ E & 2 & 2 & -1 & 0 & 0 \\\\ T_1 & 3 & -1 & 0 & 1 & -1 \\\\ T_2 & 3 & -1 & 0 & -1 & 1 \\end{array} \\]'
+                },
+                {
+                    id: '2_3',
+                    chapter: 2,
+                    title: '问题2.3 - 第一类点群基本定理',
+                    desc: '根据第一类点群基本定理：\n\n\\[ \\sum_{i=1}^{l} \\left(n - \\frac{n}{n_i}\\right) = 2(n-1) \\]\n\n请回答：a) 证明极点的轨道数目只能是多少？b) 与轨道数相对应的第一类点群的分类？c) 并写出每一类中极点轨道对应的对称操作是什么？',
+                    source: '群论点群习题',
+                    ans: 'a) 极点轨道数目：对于非平凡情况，G群的阶n≥2\n\n\\[ \\sum_{i=1}^{l} \\left(n - \\frac{n}{n_i}\\right) = 2(n-1) \\rightarrow \\sum_{i=1}^{l} \\left(1 - \\frac{1}{n_i}\\right) = 2\\left(1 - \\frac{1}{n}\\right) \\]\n\n因为 \\( 1 \\leq 2\\left(1 - \\frac{1}{n}\\right) < 2 \\) 且 \\( \\frac{1}{2} \\leq \\sum_{i=1}^{l} \\left(1 - \\frac{1}{n_i}\\right) < l \\)，所以 \\( 1 < l < 4 \\)，即极点轨道数目只能是 l=2 或 l=3\n\nb) 第一类点群分类：1. l=2，\\( n_1 = n_2 = n \\)，对应 Cₙ 群（n=2,3,4,...）2. l=3，\\( n_1 = 2 \\)，\\( n_2 = 2 \\)，\\( n_3 = n/2 \\)，对应 Dₙ 群（n=4,6,8,...）3. l=3，\\( n_1 = 2 \\)，\\( n_2 = n_3 = 3 \\)，n=12，对应四面体群 T 4. l=3，\\( n_1 = 2 \\)，\\( n_2 = 3 \\)，\\( n_3 = 4 \\)，n=24，对应八面体 O 群 5. l=3，\\( n_1 = 2 \\)，\\( n_2 = 3 \\)，\\( n_3 = 5 \\)，n=60，对应十二面体 I 群'
+                },
+                {
+                    id: '2_4',
+                    chapter: 2,
+                    title: '问题2.4 - 12阶群的性质分析',
+                    desc: '群 \\( G \\) 由12个元素组成，给定乘法表：(1) 找出各元素的逆元；(2) 指出可与所有元素对易的元素；(3) 列出各元素的周期和阶；(4) 找出群的类；(5) 找出不变子群及其商群；(6) 判断是否与 \\( T \\) 或 \\( D_6 \\) 同构。',
+                    source: '群论习题',
+                    ans: '(1) 逆元：\\( E^{-1}=E, A^{-1}=A, B^{-1}=F, C^{-1}=I, D^{-1}=J, K^{-1}=L, M^{-1}=N \\)\n\n(2) 可对易元素：\\( E \\) 和 \\( A \\)\n\n(3) 周期和阶：阶数1：\\( E \\)，阶数2：\\( A \\)，阶数3：\\( M, N \\)，阶数4：\\( B, C, D, F, I, J \\)，阶数6：\\( K, L \\)\n\n(4) 共轭类：\\( \\{E\\}, \\{A\\}, \\{M,N\\}, \\{K,L\\}, \\{B,C,D\\}, \\{F,I,J\\} \\)\n\n(5) 不变子群：\\( \\{E,A\\} \\)，商群同构于 \\( D_3 \\)；\\( \\{E,M,N\\} \\)，商群同构于 \\( C_4 \\)；\\( \\{E,K,N,A,M,L\\} \\)，商群同构于 \\( V_2 \\)\n\n(6) 与 \\( T \\) 和 \\( D_6 \\) 都不同构，因 \\( T \\) 无6阶元，\\( D_6 \\) 无4阶元。'
+                },
+                {
+                    id: '2_5',
+                    chapter: 2,
+                    title: '问题2.5 - 表示的构造',
+                    desc: '设 \\( G \\) 是非阿贝尔群，\\( D(G) \\) 是其不可约表示。判断以下矩阵集合是否构成 \\( G \\) 的表示：\n\n(1) \\( D(R)^T \\) (2) \\( D(R)^\\dagger \\) (3) \\( D(R^{-1}) \\) (4) \\( D(R)^* \\) (5) \\( D(R^{-1})^T \\) (6) det \\( D(R) \\) (7) tr \\( D(R) \\)',
+                    source: '群论表示论习题',
+                    ans: '判断依据：是否满足 \\( D(RS) = D(R)D(S) \\)\n\n(1) 不是表示：\\( D(R)^T D(S)^T \\neq D(RS)^T \\)\n(2) 不是表示：\\( D(R)^\\dagger D(S)^\\dagger \\neq D(RS)^\\dagger \\)\n(3) 不是表示：\\( D(R^{-1})D(S^{-1}) \\neq D((RS)^{-1}) \\)\n(4) 是表示：\\( D(R)^* D(S)^* = D(RS)^* \\)\n(5) 是表示：\\( D(R^{-1})^T D(S^{-1})^T = D((RS)^{-1})^T \\)\n(6) 是表示：det \\( D(R) \\) det \\( D(S) \\) = det \\( D(RS) \\)\n(7) 不是表示：tr \\( D(R) \\) tr \\( D(S) \\) ≠ tr \\( D(RS) \\)'
+                },
+                {
+                    id: '2_6',
+                    chapter: 2,
+                    title: '问题2.6 - 函数空间的表示矩阵',
+                    desc: '由基 \\( \\psi_1(x,y)=x^2 \\), \\( \\psi_2(x,y)=xy \\), \\( \\psi_3(x,y)=y^2 \\) 构成的三维函数空间，对变换 \\( R \\)：\n\n\\[ \\begin{pmatrix}x\'\\\\y\'\\end{pmatrix} = R\\begin{pmatrix}x\\\\y\\end{pmatrix} \\]\n\n计算 \\( P_R \\) 的矩阵表示 \\( D(R) \\)：\n\n(1) \\( R = \\begin{pmatrix}1&0\\\\0&-1\\end{pmatrix} \\) (2) \\( R = \\frac{1}{2}\\begin{pmatrix}-1&-\\sqrt{3}\\\\\\sqrt{3}&-1\\end{pmatrix} \\) (3) \\( R = \\begin{pmatrix}\\cos\\alpha&-\\sin\\alpha\\\\\\sin\\alpha&\\cos\\alpha\\end{pmatrix} \\)\n\n再将基 \\( \\psi_2 \\) 换成 \\( \\sqrt{2}xy \\)，重新计算。',
+                    source: '群论表示论习题',
+                    ans: '(1) 原基：\\( D(R) = \\begin{pmatrix}1&0&0\\\\0&-1&0\\\\0&0&1\\end{pmatrix} \\)，新基：矩阵不变\n\n(2) 原基：\\( D(R) = \\frac{1}{4}\\begin{pmatrix}1 & \\sqrt{3} & 3 \\\\ -2\\sqrt{3} & -2 & 2\\sqrt{3} \\\\ 3 & -\\sqrt{3} & 1\\end{pmatrix} \\)\n\n新基：\\( \\overline{D}(R) = \\frac{1}{4}\\begin{pmatrix}1 & \\sqrt{6} & 3 \\\\ -\\sqrt{6} & -2 & \\sqrt{6} \\\\ 3 & -\\sqrt{6} & 1\\end{pmatrix} \\)\n\n(3) 原基：\\( D(R) = \\frac{1}{2}\\begin{pmatrix}2\\cos^2\\alpha & -\\sin(2\\alpha) & 2\\sin^2\\alpha \\\\ 2\\sin(2\\alpha) & 2\\cos(2\\alpha) & -2\\sin(2\\alpha) \\\\ 2\\sin^2\\alpha & \\sin(2\\alpha) & 2\\cos^2\\alpha\\end{pmatrix} \\)\n\n新基：\\( \\overline{D}(R) = \\frac{1}{\\sqrt{2}}\\begin{pmatrix}\\sqrt{2}\\cos^2\\alpha & -\\sin(2\\alpha) & \\sqrt{2}\\sin^2\\alpha \\\\ \\sin(2\\alpha) & \\sqrt{2}\\cos(2\\alpha) & -\\sin(2\\alpha) \\\\ \\sqrt{2}\\sin^2\\alpha & \\sin(2\\alpha) & \\sqrt{2}\\cos^2\\alpha\\end{pmatrix} \\)'
+                },
+                // 第三章：点群与空间群
+                {
+                    id: '3_1',
+                    chapter: 3,
+                    title: '问题3.1 - 杨图与置换群',
+                    desc: '对于下图所对应的杨图，请问：a) 其对应的置换群 Sₙ 群的阶数是多少？b) 该杨图对应几个轮换，这些轮换分别是几维？c) 请问此杨图对应的所有标准盘的个数是多少？d) 请分别写出标准盘中的 T₄ 和 T₆ 的形式。e) 并写出 T₄ → T₆ 的置换变换。\n\n\\[ \\begin{array}{|c|c|c|c|c|} \\hline & & & & \\\\ \\hline & & & & \\\\ \\hline & & & & \\\\ \\hline \\end{array} \\]',
+                    source: '群论点群习题',
+                    ans: 'a) 杨图对应 S₉ 置换群，阶数为 9! = 362880\n\nb) 杨图对应的轮换类型为 (1¹, 2¹, 3²)，即有1个一维轮换，1个二维轮换，2个三维轮换\n\nc) 正则杨表的钩型数计算：\\( d_{[4,3,2]} = \\frac{9!}{6 \\times 5 \\times 3 \\times 1 \\times 4 \\times 3 \\times 1 \\times 2 \\times 1} = 168 \\)，因此标准盘个数为168个\n\nd) 标准盘形式：\\( T_4 = \\begin{array}{|c|c|c|c|} \\hline 1 & 2 & 3 & 4 \\\\ \\hline 5 & 7 & 8 & \\\\ \\hline 6 & 9 & & \\\\ \\hline \\end{array} \\)，\\( T_6 = \\begin{array}{|c|c|c|c|} \\hline 1 & 2 & 3 & 4 \\\\ \\hline 5 & 8 & 9 & \\\\ \\hline 6 & 7 & & \\\\ \\hline \\end{array} \\)\n\ne) 置换变换：\\( T_6 = (789)T_4 \\)，即通过置换(789)将T₄变换为T₆'
+                },
+                {
+                    id: '3_2',
+                    chapter: 3,
+                    title: '问题3.2 - 直积群的表示',
+                    desc: '若群 \\( G = H_1 \\otimes H_2 \\)，证明 \\( G \\) 的不等价不可约表示都可表为两子群不等价不可约表示的直积。',
+                    source: '群论习题',
+                    ans: '证明：1. 设 \\( D^{(1)}(H_1) \\) 和 \\( D^{(2)}(H_2) \\) 分别为子群的不可约表示，构造：\n\n\\[ D(RS) = D^{(1)}(R) \\otimes D^{(2)}(S), \\quad R \\in H_1, S \\in H_2 \\]\n\n2. 验证表示性质：\n\n\\[ D(RS)D(R\'S\') = [D^{(1)}(R) \\otimes D^{(2)}(S)][D^{(1)}(R\') \\otimes D^{(2)}(S\')] = D^{(1)}(RR\') \\otimes D^{(2)}(SS\') = D(RR\'SS\') \\]\n\n3. 不可约性：若表示空间存在不变子空间，则必须同时是 \\( D^{(1)} \\) 和 \\( D^{(2)} \\) 的不变子空间，矛盾。\n\n4. 完备性：不等价表示的直积产生不等价表示，且数量匹配类数。'
+                },
+                // 第四章：李群与李代数
+                {
+                    id: '4_1',
+                    chapter: 4,
+                    title: '问题4.1 - 函数空间的变换矩阵',
+                    desc: '由函数基 \\( \\Psi_1(x,y)=x^2 \\)，\\( \\Psi_2(x,y)=xy \\)，\\( \\Psi_3(x,y)=y^2 \\) 架设的三维函数空间（二次齐次函数空间）对下列二维空间转动变换 R 保持不变，试计算变换 R 对应的标量函数换号算符 \\( P_R \\) 在此函数基中的矩阵形式为 \\( D(R) \\)：\n\na) \\( R = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix} \\)\n\nb) \\( R = \\frac{1}{2} \\begin{pmatrix} -1 & -\\sqrt{3} \\\\ \\sqrt{3} & -1 \\end{pmatrix} \\)\n\nc) \\( R = \\begin{pmatrix} \\cos \\alpha & -\\sin \\alpha \\\\ \\sin \\alpha & \\cos \\alpha \\end{pmatrix} \\)\n\n如果再把基 \\( \\Psi_2(x,y) \\) 换成 \\( \\sqrt{2}xy \\)，请重新计算 \\( P_R \\) 算符的矩阵形式。',
+                    source: '李群与李代数习题',
+                    ans: 'a) 变换矩阵：\\( P_R \\psi_1(x,y) = x^2 = \\psi_1(x,y) \\)，\\( P_R \\psi_2(x,y) = -xy = -\\psi_2(x,y) \\)，\\( P_R \\psi_3(x,y) = y^2 = \\psi_3(x,y) \\)\n\n\\( D(R) = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & -1 & 0 \\\\ 0 & 0 & 1 \\end{pmatrix} \\)，基变换后矩阵不变\n\nb) 变换矩阵：\n\n\\( P_R \\psi_1(x,y) = \\frac{1}{4} [\\psi_1(x,y) - 2\\sqrt{3}\\psi_2(x,y) + 3\\psi_3(x,y)] \\)\n\\( P_R \\psi_2(x,y) = \\frac{1}{4} [\\sqrt{3}\\psi_1(x,y) - 2\\psi_2(x,y) - \\sqrt{3}\\psi_3(x,y)] \\)\n\\( P_R \\psi_3(x,y) = \\frac{1}{4} [3\\psi_1(x,y) + 2\\sqrt{3}\\psi_2(x,y) + \\psi_3(x,y)] \\)\n\n\\( D(R) = \\frac{1}{4} \\begin{pmatrix} 1 & \\sqrt{3} & 3 \\\\ -2\\sqrt{3} & -2 & 2\\sqrt{3} \\\\ 3 & -\\sqrt{3} & 1 \\end{pmatrix} \\)\n\n基变换后矩阵：\\( \\overline{D}(R) = \\frac{1}{4} \\begin{pmatrix} 1 & \\sqrt{6} & 3 \\\\ -\\sqrt{6} & -2 & \\sqrt{6} \\\\ 3 & -\\sqrt{6} & 1 \\end{pmatrix} \\)\n\nc) 变换矩阵：\n\n\\( P_R \\psi_1(x,y) = \\cos^2 \\alpha \\psi_1(x,y) + \\sin(2\\alpha)\\psi_2(x,y) + \\sin^2 \\alpha \\psi_3(x,y) \\)\n\\( P_R \\psi_2(x,y) = -\\sin \\alpha \\cos \\alpha \\psi_1(x,y) + \\cos(2\\alpha)\\psi_2(x,y) + \\sin \\alpha \\cos \\alpha \\psi_3(x,y) \\)\n\\( P_R \\psi_3(x,y) = \\sin^2 \\alpha \\psi_1(x,y) - \\sin(2\\alpha)\\psi_2(x,y) + \\cos^2 \\alpha \\psi_3(x,y) \\)\n\n\\( D(R) = \\frac{1}{2} \\begin{pmatrix} 2\\cos^2 \\alpha & -\\sin(2\\alpha) & 2\\sin^2 \\alpha \\\\ 2\\sin(2\\alpha) & 2\\cos(2\\alpha) & -2\\sin(2\\alpha) \\\\ 2\\sin^2 \\alpha & \\sin(2\\alpha) & 2\\cos^2 \\alpha \\end{pmatrix} \\)\n\n基变换后矩阵：\\( \\overline{D}(R) = \\frac{1}{\\sqrt{2}} \\begin{pmatrix} \\sqrt{2}\\cos^2 \\alpha & -\\sin(2\\alpha) & \\sqrt{2}\\sin^2 \\alpha \\\\ \\sin(2\\alpha) & \\sqrt{2}\\cos(2\\alpha) & -\\sin(2\\alpha) \\\\ \\sqrt{2}\\sin^2 \\alpha & \\sin(2\\alpha) & \\sqrt{2}\\cos^2 \\alpha \\end{pmatrix} \\)'
+                }
+            ]
+        };
+
+        const STORAGE_KEY = 'grouptheory_questions_data';
+        let devModeActive = false;
+
+        function loadQuestionsData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && Array.isArray(parsed.questions)) {
+                        return parsed;
+                    }
+                } catch (e) {}
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+
+        function saveQuestionsData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        let questionsData = loadQuestionsData();
+
+        // ======================== 渲染引擎 ============================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function parseTextToHTML(text, type) {
+            const trimmed = (text || '').trim();
+            if (type === 'title') return trimmed;
+            if (type === 'source') {
+                if (!trimmed) return '';
+                return `<div class="alert alert-info mt-2 mb-0"><i class="fas fa-book me-2"></i>来源: ${trimmed}</div>`;
+            }
+            const blocks = trimmed.split(/\n\s*\n/);
+            let finalHTML = '';
+            blocks.forEach(block => {
+                if (!block.trim()) return;
+                const formattedBlock = block.replace(/\n/g, '<br>');
+                if (type === 'desc') {
+                    finalHTML += `<p>${formattedBlock}</p>`;
+                } else if (type === 'ans') {
+                    finalHTML += `<div class="solution-step"><p>${formattedBlock}</p></div>`;
+                }
+            });
+            return finalHTML || trimmed;
+        }
+
+        function renderChapter(chapterNum) {
+            const container = document.querySelector(`.chapter-container#chapter${chapterNum} .question-list`);
+            if (!container) return;
+            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
+            chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
+            
+            let html = '';
+            chapterQuestions.forEach(q => {
+                const uid = q.id;
+                const titleHtml = parseTextToHTML(q.title, 'title');
+                const descHtml = parseTextToHTML(q.desc, 'desc');
+                const sourceHtml = parseTextToHTML(q.source, 'source');
+                const ansHtml = parseTextToHTML(q.ans, 'ans');
+
+                html += `
+                <div class="card mb-4 editable-card" id="q_${uid}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
+                            <div class="flex-shrink-0">
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')"><i class="fas fa-trash"></i> 删除</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-book me-2"></i>来源出处</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-lightbulb me-2"></i>解答</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // 更新章节题数
+            const badge = document.querySelector(`#chapter${chapterNum} .badge`);
+            if (badge) {
+                badge.textContent = chapterQuestions.length + '题';
+            }
+
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+
+            // 重新渲染MathJax
+            if (window.MathJax && container.querySelectorAll('.editable-content').length) {
+                MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
+            }
+        }
+
+        function renderAll() {
+            renderChapter(1);
+            renderChapter(2);
+            renderChapter(3);
+            renderChapter(4);
+            document.getElementById('devModeSwitch').checked = devModeActive;
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+        }
+
+        // ======================== 编辑与删除 ============================
+        function toggleEdit(elementId) {
+            if (!devModeActive) return;
+            const contentDiv = document.getElementById(elementId);
+            if (!contentDiv) return;
+            const type = contentDiv.getAttribute('data-type');
+            const raw = contentDiv.getAttribute('data-raw') || '';
+
+            if (contentDiv.tagName.toLowerCase() !== 'textarea') {
+                const textarea = document.createElement('textarea');
+                textarea.id = elementId;
+                textarea.className = 'form-control editable-content mb-2';
+                textarea.setAttribute('data-type', type);
+                textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
+                textarea.value = raw;
+                // 查找按钮并替换
+                const parentDiv = contentDiv.parentElement;
+                // 如果是标题，需要特殊处理
+                if (type === 'title') {
+                    const card = contentDiv.closest('.editable-card');
+                    const titleContainer = card.querySelector('.d-flex.justify-content-between');
+                    if (titleContainer) {
+                        // 替换标题内容
+                        const titleWrap = document.createElement('div');
+                        titleWrap.className = 'flex-grow-1 me-2';
+                        titleWrap.appendChild(textarea);
+                        // 保留按钮
+                        const btnDiv = titleContainer.querySelector('.flex-shrink-0');
+                        titleContainer.innerHTML = '';
+                        titleContainer.appendChild(titleWrap);
+                        titleContainer.appendChild(btnDiv);
+                        // 更新按钮
+                        const btn = btnDiv.querySelector('.dev-edit-btn');
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+                            btn.classList.remove('btn-outline-danger');
+                            btn.classList.add('btn-success');
+                        }
+                    }
+                } else {
+                    contentDiv.replaceWith(textarea);
+                    const card = textarea.closest('.editable-card');
+                    if (card) {
+                        const btn = card.querySelector(`[onclick*="toggleEdit('${elementId}')"]`);
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+                            btn.classList.remove('btn-outline-danger');
+                            btn.classList.add('btn-success');
+                        }
+                    }
+                }
+            } else {
+                const currentText = contentDiv.value;
+                const id = elementId.split('_').slice(1).join('_');
+                const typeKey = elementId.split('_')[0];
+                const q = questionsData.questions.find(q => q.id === id);
+                if (q) {
+                    if (typeKey === 'title') q.title = currentText;
+                    else if (typeKey === 'desc') q.desc = currentText;
+                    else if (typeKey === 'source') q.source = currentText;
+                    else if (typeKey === 'ans') q.ans = currentText;
+                    saveQuestionsData(questionsData);
+                }
+                
+                // 创建新的显示元素
+                const newDiv = document.createElement('div');
+                newDiv.id = elementId;
+                newDiv.className = 'editable-content';
+                newDiv.setAttribute('data-type', type);
+                newDiv.setAttribute('data-raw', currentText);
+                if (type === 'title') {
+                    newDiv.classList.add('problem-title', 'mb-0', 'fw-bold');
+                    // 标题特殊处理：替换标题内容
+                    const card = contentDiv.closest('.editable-card');
+                    const titleContainer = card.querySelector('.d-flex.justify-content-between');
+                    if (titleContainer) {
+                        const titleWrap = titleContainer.querySelector('.flex-grow-1');
+                        if (titleWrap) {
+                            titleWrap.innerHTML = '';
+                            titleWrap.appendChild(newDiv);
+                        }
+                        const btn = titleContainer.querySelector('.dev-edit-btn');
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-edit"></i> 编辑';
+                            btn.classList.remove('btn-success');
+                            btn.classList.add('btn-outline-danger');
+                        }
+                    }
+                } else {
+                    contentDiv.replaceWith(newDiv);
+                    const card = newDiv.closest('.editable-card');
+                    if (card) {
+                        const btn = card.querySelector(`[onclick*="toggleEdit('${elementId}')"]`);
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-edit"></i> 编辑';
+                            btn.classList.remove('btn-success');
+                            btn.classList.add('btn-outline-danger');
+                        }
+                    }
+                }
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
+                }
+            }
+        }
+
+        function deleteQuestion(uid) {
+            if (!devModeActive) return;
+            if (!confirm(`确定要删除题目 "${uid}" 吗？此操作不可撤销。`)) return;
+            questionsData.questions = questionsData.questions.filter(q => q.id !== uid);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        function addNewQuestion(chapterId) {
+            if (!devModeActive) return;
+            const chapterNum = parseInt(chapterId.replace('chapter', ''));
+            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
+            const maxId = chapterQuestions.reduce((max, q) => {
+                const num = parseInt(q.id.split('_')[1]);
+                return num > max ? num : max;
+            }, 0);
+            const newId = `${chapterNum}_${maxId + 1}`;
+            
+            const newQ = {
+                id: newId,
+                chapter: chapterNum,
+                title: '新题目名称',
+                desc: '请在此直接输入题目文本及 LaTeX 公式，双换行（留一个空行）可以分段。',
+                source: '未指定参考书籍',
+                ans: '步骤1：输入内容。\n\n步骤2：空行后输入第二步公式：\\[ \\nabla \\cdot \\mathbf{E} = 0 \\]'
+            };
+            questionsData.questions.push(newQ);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        // ======================== 开发者认证 ============================
+        let passwordVisible = false;
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('devPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordVisible) {
+                pwdInput.type = 'password';
+                eyeIcon.className = 'fas fa-eye';
+                passwordVisible = false;
+            } else {
+                pwdInput.type = 'text';
+                eyeIcon.className = 'fas fa-eye-slash';
+                passwordVisible = true;
+            }
+        }
+
+        function openDevAuth() {
+            document.getElementById('devAuthOverlay').classList.add('active');
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('devAccount').value = '';
+            document.getElementById('devPassword').value = '';
+            if (passwordVisible) {
+                togglePasswordVisibility();
+            }
+            setTimeout(() => document.getElementById('devAccount').focus(), 100);
+        }
+
+        function closeDevAuth() {
+            document.getElementById('devAuthOverlay').classList.remove('active');
+            if (!devModeActive) {
+                document.getElementById('devModeSwitch').checked = false;
+            }
+        }
+
+        function verifyDevAuth() {
+            const account = document.getElementById('devAccount').value.trim();
+            const password = document.getElementById('devPassword').value.trim();
+            if (account === '2511392' && password === 'Jby021009') {
+                devModeActive = true;
+                document.getElementById('devAuthOverlay').classList.remove('active');
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+                sessionStorage.setItem('dev_authenticated', 'true');
+                document.getElementById('devPassword').value = '';
+            } else {
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('devPassword').value = '';
+                document.getElementById('devPassword').focus();
+            }
+        }
+
+        document.getElementById('devPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyDevAuth();
+            }
+        });
+        document.getElementById('devAccount').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('devPassword').focus();
+            }
+        });
+
+        document.getElementById('devAuthOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDevAuth();
+            }
+        });
+
+        // ======================== 开发者模式开关 ============================
+        document.getElementById('devModeSwitch').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                if (devModeActive) {
+                    document.querySelectorAll('.dev-tool').forEach(el => {
+                        el.style.display = 'inline-block';
+                    });
+                    return;
+                }
+                openDevAuth();
+                if (!devModeActive) {
+                    this.checked = false;
+                }
+            } else {
+                devModeActive = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+                sessionStorage.removeItem('dev_authenticated');
+            }
+        });
+
+        // ======================== 搜索与导航 ============================
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase().trim();
+            const allCards = document.querySelectorAll('.editable-card');
+            allCards.forEach(card => {
+                const contentElements = card.querySelectorAll('.editable-content');
+                let isMatch = false;
+                contentElements.forEach(el => {
+                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
+                    if (text.includes(keyword)) isMatch = true;
+                });
+                card.style.display = isMatch ? '' : 'none';
+            });
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                const cards = chapter.querySelectorAll('.editable-card');
+                let hasVisible = false;
+                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
+            });
+        });
+
+        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ======================== 登录状态管理 ============================
         function updateAuthUI() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             const username = localStorage.getItem('username');
@@ -925,34 +995,56 @@
                 userMenu.style.display = 'none';
             }
         }
-        
-        // 退出登录功能
+
         document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('username');
             window.location.href = 'index.html';
         });
-        
-        // 上传功能示例
+
+        // ======================== 上传功能 ============================
         document.getElementById('submitUpload')?.addEventListener('click', function() {
             const resourceName = document.getElementById('resourceName').value;
             const fileInput = document.getElementById('resourceFile');
             
             if(resourceName && fileInput.files.length > 0) {
                 alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                // 实际应用中这里应该有AJAX上传逻辑
                 var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
                 bootstrapModal.hide();
             } else {
                 alert('请填写完整信息并选择文件！');
             }
         });
-        
-        // 页面加载时更新UI
+
+        // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
+            if (sessionStorage.getItem('dev_authenticated') === 'true') {
+                devModeActive = true;
+            }
+            renderAll();
             updateAuthUI();
+            if (devModeActive) {
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+            } else {
+                document.getElementById('devModeSwitch').checked = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
         });
+
+        // 暴露全局函数
+        window.toggleEdit = toggleEdit;
+        window.addNewQuestion = addNewQuestion;
+        window.deleteQuestion = deleteQuestion;
+        window.openDevAuth = openDevAuth;
+        window.closeDevAuth = closeDevAuth;
+        window.verifyDevAuth = verifyDevAuth;
+        window.togglePasswordVisibility = togglePasswordVisibility;
     </script>
 </body>
 </html>

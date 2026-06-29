@@ -65,9 +65,130 @@
                 height: auto;
             }
         }
+        textarea.editable-content {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #fdfdfd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .dev-edit-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .dev-delete-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 4px;
+        }
+        .sidebar-sticky {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        .sidebar-sticky::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .sidebar-sticky::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dev-tool {
+            display: none;
+        }
+        /* 认证弹窗 */
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-overlay.active {
+            display: flex;
+        }
+        .auth-modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .auth-modal .form-label {
+            font-weight: 600;
+        }
+        .auth-modal .btn-primary {
+            background: var(--qft-color);
+            border: none;
+        }
+        .auth-modal .btn-primary:hover {
+            background: #b85a1a;
+        }
+        .auth-error {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+        /* 密码输入框切换显示 */
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle .toggle-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            background: none;
+            border: none;
+            padding: 0;
+            z-index: 5;
+        }
+        .password-toggle .toggle-eye:hover {
+            color: #333;
+        }
+        /* 保留原登录按钮隐藏 */
+        #authButtons {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
+    <!-- 开发者认证弹窗 -->
+    <div class="auth-overlay" id="devAuthOverlay">
+        <div class="auth-modal">
+            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--qft-color);"></i>开发者验证</h4>
+            <p class="text-muted small">请输入账号与密码以启用开发者模式</p>
+            <div class="mb-3">
+                <label class="form-label">账号</label>
+                <input type="text" class="form-control" id="devAccount" placeholder="请输入账号">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <div class="password-toggle">
+                    <input type="password" class="form-control" id="devPassword" placeholder="请输入密码">
+                    <button class="toggle-eye" type="button" onclick="togglePasswordVisibility()" tabindex="-1">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="auth-error" id="authError">账号或密码错误，请重试。</div>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-secondary" onclick="closeDevAuth()">取消</button>
+                <button class="btn btn-primary" onclick="verifyDevAuth()"><i class="fas fa-unlock me-1"></i> 验证并开启</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
@@ -86,23 +207,12 @@
                         <a class="nav-link active" href="quantum-field.html"><i class="fas fa-quantum me-1"></i> 量子场论</a>
                     </li>
                 </ul>
-                <div class="d-flex">
-                    <div id="authButtons">
-                        <a href="login.html" class="btn btn-outline-primary me-2">登录</a>
-                        <a href="login.html#register" class="btn btn-primary">注册</a>
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch me-4 d-flex align-items-center" id="devModeSwitchContainer">
+                        <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;"><i class="fas fa-code"></i> 开发者模式</label>
                     </div>
-                    <div id="userMenu" style="display: none;">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i> <span id="usernameDisplay"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="quantum.html"><i class="fas fa-code me-1"></i> 开发者模式</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a></li>
-                            </ul>
-                        </div>
-                    </div>
+                    <div id="authButtons"></div>
                 </div>
             </div>
         </div>
@@ -123,137 +233,150 @@
         <div class="row">
             <!-- 左侧导航 -->
             <div class="col-lg-3 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                <div class="sidebar-sticky">
+                    
+                    <!-- 搜索框 -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-search me-2"></i>搜索题目</h5>
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="list-group list-group-flush">
-                        <a href="#chapter1" class="list-group-item list-group-item-action active">1. 自由场量子化</a>
-                        <a href="#chapter2" class="list-group-item list-group-item-action">2. 相互作用场</a>
-                        <a href="#chapter3" class="list-group-item list-group-item-action">3. 路径积分方法</a>
-                        <a href="#chapter4" class="list-group-item list-group-item-action">4. 重正化理论</a>
-                    </div>
-                </div>
 
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                        </div>
+                        <div class="list-group list-group-flush" id="chapterNavbar">
+                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 自由场量子化</a>
+                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 相互作用场</a>
+                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 路径积分方法</a>
+                            <a href="#chapter4" class="list-group-item list-group-item-action">4. 重正化理论</a>
+                        </div>
                     </div>
-                    <div class="card-body text-center">
-                        <img src="qft.webp" alt="量子场论导论" class="img-fluid book-cover mb-3">
-                        <h6>量子场论导论</h6>
-                        <p class="text-muted small">M. Peskin & D. Schroeder</p>
-                    </div>
-                </div>
 
-                <!-- 资料库部分 -->
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="qft.webp" alt="量子场论导论" class="img-fluid book-cover mb-3">
+                            <h6>量子场论导论</h6>
+                            <p class="text-muted small">M. Peskin & D. Schroeder</p>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="resource-item">
-                            <a href="pdfs/peskin-qft.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>Peskin《量子场论》完整版</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">经典教材，全面系统</small>
+
+                    <!-- 资料库部分 -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
                         </div>
-                        <div class="resource-item">
-                            <a href="pdfs/weinberg-qft.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>Weinberg《量子场论》第一卷</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">现代观点，深入严谨</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="pdfs/zee-qft.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>Zee《简明量子场论》</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">物理直观，通俗易懂</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="qft2005.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>清华大学量子场论讲义</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="现代量子场论导引-裘忠平-华中师范大学出版社-1992.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>现代量子场论导引-裘忠平-华中师范大学出版社-1992</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
-                        </div>
-                         <div class="resource-item">
-                            <a href="量子场论(上册)-[法]C.依捷克森＆J.B.祖柏尔-科学出版社.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论（上册） C.依捷克森＆J</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="量子场论(下册)-[法]C.依捷克森＆J.B.祖柏尔-科学出版社-1986.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论（下册） C.依捷克森＆J</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="量子场论-第二部分：规范理论（英文）--南开大学Yi Liao的笔记.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论-第二部分：规范理论（英文）--南开大学Yi Liao的笔记</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="量子场论简明教程-乔从丰-2008.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论简明教程-乔从丰-2008</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="量子场论导引(上册)-杨炳麟.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论（上册）</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">-杨炳麟</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="量子场论导引(下册)-杨炳麟.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论(下册)</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">-杨炳麟</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="量子场论引论-[英]F.Mandl-程国均(编译)-四川大学出版社-1989.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论引论</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">F.mandl 编译版</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="量子场论纲要-殷鹏程-上海科学技术出版社-1986.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>量子场论纲要</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">殷鹏程-上海科学技术出版社-1986</small>
-                        </div>
-                        <div class="resource-item">
-                            <a href="Quantum Field Theory：From Operators to Path Integrals, 2ed, Revised and Enlarged（量子场论：从算子到路径积分 第2版修订增补版）, Kerson Huang(黄克孙), Wiley, 2010.pdf" target="_blank" class="d-flex align-items-center">
-                                <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                <span>从算符至路径积分</span>
-                            </a>
-                            <small class="text-muted d-block mt-1">教材</small>
-                        </div>
-                        <div class="text-center mt-3">
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                                <i class="fas fa-upload me-1"></i>上传资料
-                            </button>
+                        <div class="card-body">
+                            <div class="resource-item">
+                                <a href="pdfs/peskin-qft.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>Peskin《量子场论》完整版</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">经典教材，全面系统</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="pdfs/weinberg-qft.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>Weinberg《量子场论》第一卷</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">现代观点，深入严谨</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="pdfs/zee-qft.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>Zee《简明量子场论》</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">物理直观，通俗易懂</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/qft2005.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>清华大学量子场论讲义</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/现代量子场论导引-裘忠平-华中师范大学出版社-1992.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>现代量子场论导引-裘忠平-华中师范大学出版社-1992</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
+                            </div>
+                             <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论(上册)-[法]C.依捷克森＆J.B.祖柏尔-科学出版社.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论（上册） C.依捷克森＆J</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论(下册)-[法]C.依捷克森＆J.B.祖柏尔-科学出版社-1986.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论（下册） C.依捷克森＆J</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论-第二部分：规范理论（英文）--南开大学Yi Liao的笔记.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论-第二部分：规范理论（英文）--南开大学Yi Liao的笔记</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论简明教程-乔从丰-2008.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论简明教程-乔从丰-2008</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">多所高校讲义汇总</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论导引(上册)-杨炳麟.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论（上册）</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">-杨炳麟</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论导引(下册)-杨炳麟.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论(下册)</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">-杨炳麟</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论引论-[英]F.Mandl-程国均(编译)-四川大学出版社-1989.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论引论</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">F.mandl 编译版</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/量子场论纲要-殷鹏程-上海科学技术出版社-1986.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>量子场论纲要</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">殷鹏程-上海科学技术出版社-1986</small>
+                            </div>
+                            <div class="resource-item">
+                                <a href="../物理系教材解答网站尝试/source/qft/Quantum Field Theory：From Operators to Path Integrals, 2ed, Revised and Enlarged（量子场论：从算子到路径积分 第2版修订增补版）, Kerson Huang(黄克孙), Wiley, 2010.pdf" target="_blank" class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                    <span>从算符至路径积分</span>
+                                </a>
+                                <small class="text-muted d-block mt-1">教材</small>
+                            </div>
+                            <div class="text-center mt-3">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                    <i class="fas fa-upload me-1"></i>上传资料
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -262,236 +385,59 @@
             <!-- 右侧内容 -->
             <div class="col-lg-9">
                 <!-- 第一章：自由场量子化 -->
-                <div class="mb-5" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-atom me-2"></i>第一章：自由场量子化
+                <div class="mb-5 chapter-container" id="chapter1">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-atom me-2 text-primary"></i>第一章：自由场量子化
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--qft-color);">20题</span>
                     </div>
-
-                    <!-- 问题1.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题1.1 - 克莱因-戈登场量子化</h4>
-                            
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>推导自由实标量场(克莱因-戈登场)的正则量子化过程，包括场算符的展开和对易关系。</p>
-                                <div class="alert alert-info mt-3">
-                                    <i class="fas fa-book me-2"></i>来源: Peskin《量子场论导论》第二章
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> 克莱因-戈登场的拉氏量密度：</p>
-                                    <p>\[
-                                    \mathcal{L} = \frac{1}{2}(\partial_\mu\phi)(\partial^\mu\phi) - \frac{1}{2}m^2\phi^2
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 正则动量：</p>
-                                    <p>\[
-                                    \pi(x) = \frac{\partial\mathcal{L}}{\partial\dot{\phi}} = \dot{\phi}(x)
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 哈密顿量密度：</p>
-                                    <p>\[
-                                    \mathcal{H} = \pi\dot{\phi} - \mathcal{L} = \frac{1}{2}\pi^2 + \frac{1}{2}(\nabla\phi)^2 + \frac{1}{2}m^2\phi^2
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤4：</strong> 场算符的傅里叶展开：</p>
-                                    <p>\[
-                                    \phi(x) = \int \frac{d^3p}{(2\pi)^3}\frac{1}{\sqrt{2E_p}}(a_p e^{-ip\cdot x} + a_p^\dagger e^{ip\cdot x})
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤5：</strong> 对易关系：</p>
-                                    <p>\[
-                                    [a_p, a_{p'}^\dagger] = (2\pi)^3 \delta^{(3)}(\mathbf{p}-\mathbf{p}')
-                                    \]</p>
-                                    <p>\[
-                                    [\phi(x), \pi(y)] = i\delta^{(3)}(\mathbf{x}-\mathbf{y})
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 问题1.2 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题1.2 - 费米场量子化</h4>
-                            
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>解释为什么费米场需要反对易关系而不是对易关系进行量子化。</p>
-                            </div>
-
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>原因1：</strong> 自旋统计定理要求半整数自旋粒子服从费米-狄拉克统计。</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>原因2：</strong> 使用对易关系会导致负能态问题，违反正能量条件。</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>原因3：</strong> 反对易关系自然地实现了泡利不相容原理。</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>数学表达：</strong></p>
-                                    <p>\[
-                                    \{\psi_a(x), \psi_b^\dagger(y)\} = \delta^{(3)}(\mathbf{x}-\mathbf{y})\delta_{ab}
-                                    \]</p>
-                                    <p>其中 \(\{\cdot,\cdot\}\) 表示反对易子。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="1"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第一章添加新题目
+                    </button>
                 </div>
 
                 <!-- 第二章：相互作用场 -->
-                <div class="mb-5" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-project-diagram me-2"></i>第二章：相互作用场
+                <div class="mb-5 chapter-container" id="chapter2">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-project-diagram me-2 text-primary"></i>第二章：相互作用场
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--qft-color);">18题</span>
                     </div>
-
-                    <!-- 问题2.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题2.1 - φ⁴理论微扰展开</h4>
-                            
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>计算φ⁴理论中两点关联函数的一阶微扰修正：</p>
-                                <p>\[
-                                \mathcal{L} = \frac{1}{2}(\partial_\mu\phi)^2 - \frac{1}{2}m^2\phi^2 - \frac{\lambda}{4!}\phi^4
-                                \]</p>
-                            </div>
-
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> 相互作用项：</p>
-                                    <p>\[
-                                    H_{\text{int}} = \int d^3x \frac{\lambda}{4!}\phi^4
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 一阶修正表达式：</p>
-                                    <p>\[
-                                    \langle \Omega|T\{\phi(x)\phi(y)\}|\Omega\rangle^{(1)} = -i\lambda \int d^4z D_F(x-z)D_F(z-z)D_F(z-y)
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 费曼图表示：</p>
-                                    <p>这是一个"蝌蚪图"贡献，包含一个自能圈。</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤4：</strong> 动量空间表达式：</p>
-                                    <p>\[
-                                    \tilde{G}^{(1)}(p) = \tilde{D}_F(p) \cdot (-i\lambda) \left[\int \frac{d^4k}{(2\pi)^4} \frac{i}{k^2-m^2+i\epsilon}\right] \cdot \tilde{D}_F(p)
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="2"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第二章添加新题目
+                    </button>
                 </div>
 
                 <!-- 第三章：路径积分方法 -->
-                <div class="mb-5" id="chapter3">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-random me-2"></i>第三章：路径积分方法
+                <div class="mb-5 chapter-container" id="chapter3">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-random me-2 text-primary"></i>第三章：路径积分方法
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--qft-color);">15题</span>
                     </div>
-
-                    <!-- 问题3.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题3.1 - 自由场生成泛函</h4>
-                            
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>计算自由标量场的生成泛函 \(Z_0[J]\)，并推导两点关联函数。</p>
-                            </div>
-
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> 生成泛函定义：</p>
-                                    <p>\[
-                                    Z_0[J] = \int \mathcal{D}\phi \exp\left[i\int d^4x \left(\mathcal{L}_0 + J\phi\right)\right]
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 高斯积分计算：</p>
-                                    <p>\[
-                                    Z_0[J] = Z_0[0] \exp\left[-\frac{1}{2}\int d^4x d^4y J(x)D_F(x-y)J(y)\right]
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 两点关联函数：</p>
-                                    <p>\[
-                                    \langle 0|T\{\phi(x)\phi(y)\}|0\rangle = \left.\frac{1}{i^2}\frac{\delta^2 Z_0[J]}{\delta J(x)\delta J(y)}\right|_{J=0} = D_F(x-y)
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="3"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第三章添加新题目
+                    </button>
                 </div>
 
                 <!-- 第四章：重正化理论 -->
-                <div class="mb-5" id="chapter4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-infinity me-2"></i>第四章：重正化理论
+                <div class="mb-5 chapter-container" id="chapter4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            <i class="fas fa-infinity me-2 text-primary"></i>第四章：重正化理论
                         </h2>
                         <span class="badge rounded-pill" style="background-color: var(--qft-color);">12题</span>
                     </div>
-
-                    <!-- 问题4.1 -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h4 class="problem-title mb-4">问题4.1 - 单圈重正化</h4>
-                            
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <p>计算φ⁴理论中标量场质量的重正化常数 \(Z_m\) 到单圈阶。</p>
-                            </div>
-
-                            <div class="mb-4">
-                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <div class="solution-step">
-                                    <p><strong>步骤1：</strong> 自能图贡献：</p>
-                                    <p>\[
-                                    -i\Sigma(p^2) = \frac{-i\lambda}{2} \int \frac{d^dk}{(2\pi)^d} \frac{i}{k^2-m^2+i\epsilon}
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤2：</strong> 维度正规化计算：</p>
-                                    <p>\[
-                                    \Sigma(p^2) = \frac{\lambda m^2}{32\pi^2}\left[\frac{2}{\epsilon} + \text{有限项}\right], \quad \epsilon = 4-d
-                                    \]</p>
-                                </div>
-                                <div class="solution-step">
-                                    <p><strong>步骤3：</strong> 重正化常数：</p>
-                                    <p>\[
-                                    Z_m = 1 + \frac{\lambda}{32\pi^2\epsilon}
-                                    \]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="question-list" data-chapter="4"></div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">
+                        <i class="fas fa-plus me-1"></i> 在第四章添加新题目
+                    </button>
                 </div>
             </div>
         </div>
@@ -559,50 +505,426 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
-        // 检查登录状态并更新UI
-        function updateAuthUI() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const username = localStorage.getItem('username');
-            const authButtons = document.getElementById('authButtons');
-            const userMenu = document.getElementById('userMenu');
+        // ======================== 数据层 ============================
+        const DEFAULT_DATA = {
+            questions: [
+                {
+                    id: '1_1',
+                    chapter: 1,
+                    title: '问题1.1 - 克莱因-戈登场量子化',
+                    desc: '推导自由实标量场(克莱因-戈登场)的正则量子化过程，包括场算符的展开和对易关系。',
+                    source: 'Peskin《量子场论导论》第二章',
+                    ans: '步骤1：克莱因-戈登场的拉氏量密度：\n\\[ \\mathcal{L} = \\frac{1}{2}(\\partial_\\mu\\phi)(\\partial^\\mu\\phi) - \\frac{1}{2}m^2\\phi^2 \\]\n\n步骤2：正则动量：\n\\[ \\pi(x) = \\frac{\\partial\\mathcal{L}}{\\partial\\dot{\\phi}} = \\dot{\\phi}(x) \\]\n\n步骤3：哈密顿量密度：\n\\[ \\mathcal{H} = \\pi\\dot{\\phi} - \\mathcal{L} = \\frac{1}{2}\\pi^2 + \\frac{1}{2}(\\nabla\\phi)^2 + \\frac{1}{2}m^2\\phi^2 \\]\n\n步骤4：场算符的傅里叶展开：\n\\[ \\phi(x) = \\int \\frac{d^3p}{(2\\pi)^3}\\frac{1}{\\sqrt{2E_p}}(a_p e^{-ip\\cdot x} + a_p^\\dagger e^{ip\\cdot x}) \\]\n\n步骤5：对易关系：\n\\[ [a_p, a_{p\'}^\\dagger] = (2\\pi)^3 \\delta^{(3)}(\\mathbf{p}-\\mathbf{p}\') \\]\n\\[ [\\phi(x), \\pi(y)] = i\\delta^{(3)}(\\mathbf{x}-\\mathbf{y}) \\]'
+                },
+                {
+                    id: '1_2',
+                    chapter: 1,
+                    title: '问题1.2 - 费米场量子化',
+                    desc: '解释为什么费米场需要反对易关系而不是对易关系进行量子化。',
+                    source: 'Peskin《量子场论导论》第三章',
+                    ans: '原因1：自旋统计定理要求半整数自旋粒子服从费米-狄拉克统计。\n\n原因2：使用对易关系会导致负能态问题，违反正能量条件。\n\n原因3：反对易关系自然地实现了泡利不相容原理。\n\n数学表达：\n\\[ \\{\\psi_a(x), \\psi_b^\\dagger(y)\\} = \\delta^{(3)}(\\mathbf{x}-\\mathbf{y})\\delta_{ab} \\]\n其中 \\(\\{\\cdot,\\cdot\\}\\) 表示反对易子。'
+                },
+                {
+                    id: '2_1',
+                    chapter: 2,
+                    title: '问题2.1 - φ⁴理论微扰展开',
+                    desc: '计算φ⁴理论中两点关联函数的一阶微扰修正：\n\\[ \\mathcal{L} = \\frac{1}{2}(\\partial_\\mu\\phi)^2 - \\frac{1}{2}m^2\\phi^2 - \\frac{\\lambda}{4!}\\phi^4 \\]',
+                    source: 'Peskin《量子场论导论》第四章',
+                    ans: '步骤1：相互作用项：\n\\[ H_{\\text{int}} = \\int d^3x \\frac{\\lambda}{4!}\\phi^4 \\]\n\n步骤2：一阶修正表达式：\n\\[ \\langle \\Omega|T\\{\\phi(x)\\phi(y)\\}|\\Omega\\rangle^{(1)} = -i\\lambda \\int d^4z D_F(x-z)D_F(z-z)D_F(z-y) \\]\n\n步骤3：费曼图表示：\n这是一个"蝌蚪图"贡献，包含一个自能圈。\n\n步骤4：动量空间表达式：\n\\[ \\tilde{G}^{(1)}(p) = \\tilde{D}_F(p) \\cdot (-i\\lambda) \\left[\\int \\frac{d^4k}{(2\\pi)^4} \\frac{i}{k^2-m^2+i\\epsilon}\\right] \\cdot \\tilde{D}_F(p) \\]'
+                },
+                {
+                    id: '3_1',
+                    chapter: 3,
+                    title: '问题3.1 - 自由场生成泛函',
+                    desc: '计算自由标量场的生成泛函 \\(Z_0[J]\\)，并推导两点关联函数。',
+                    source: 'Peskin《量子场论导论》第九章',
+                    ans: '步骤1：生成泛函定义：\n\\[ Z_0[J] = \\int \\mathcal{D}\\phi \\exp\\left[i\\int d^4x \\left(\\mathcal{L}_0 + J\\phi\\right)\\right] \\]\n\n步骤2：高斯积分计算：\n\\[ Z_0[J] = Z_0[0] \\exp\\left[-\\frac{1}{2}\\int d^4x d^4y J(x)D_F(x-y)J(y)\\right] \\]\n\n步骤3：两点关联函数：\n\\[ \\langle 0|T\\{\\phi(x)\\phi(y)\\}|0\\rangle = \\left.\\frac{1}{i^2}\\frac{\\delta^2 Z_0[J]}{\\delta J(x)\\delta J(y)}\\right|_{J=0} = D_F(x-y) \\]'
+                },
+                {
+                    id: '4_1',
+                    chapter: 4,
+                    title: '问题4.1 - 单圈重正化',
+                    desc: '计算φ⁴理论中标量场质量的重正化常数 \\(Z_m\\) 到单圈阶。',
+                    source: 'Peskin《量子场论导论》第十章',
+                    ans: '步骤1：自能图贡献：\n\\[ -i\\Sigma(p^2) = \\frac{-i\\lambda}{2} \\int \\frac{d^dk}{(2\\pi)^d} \\frac{i}{k^2-m^2+i\\epsilon} \\]\n\n步骤2：维度正规化计算：\n\\[ \\Sigma(p^2) = \\frac{\\lambda m^2}{32\\pi^2}\\left[\\frac{2}{\\epsilon} + \\text{有限项}\\right], \\quad \\epsilon = 4-d \\]\n\n步骤3：重正化常数：\n\\[ Z_m = 1 + \\frac{\\lambda}{32\\pi^2\\epsilon} \\]'
+                }
+            ]
+        };
+
+        const STORAGE_KEY = 'qft_questions_data';
+        let devModeActive = false;
+
+        function loadQuestionsData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && Array.isArray(parsed.questions)) {
+                        return parsed;
+                    }
+                } catch (e) {}
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+
+        function saveQuestionsData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        let questionsData = loadQuestionsData();
+
+        // ======================== 渲染引擎 ============================
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function parseTextToHTML(text, type) {
+            const trimmed = text.trim();
+            if (type === 'title') return trimmed;
+            if (type === 'source') {
+                if (!trimmed) return '';
+                return `<div class="alert alert-info mt-2 mb-0"><i class="fas fa-book me-2"></i>来源: ${trimmed}</div>`;
+            }
+            const blocks = trimmed.split(/\n\s*\n/);
+            let finalHTML = '';
+            blocks.forEach(block => {
+                if (!block.trim()) return;
+                const formattedBlock = block.replace(/\n/g, '<br>');
+                if (type === 'desc') {
+                    finalHTML += `<p>${formattedBlock}</p>`;
+                } else if (type === 'ans') {
+                    finalHTML += `<div class="solution-step"><p>${formattedBlock}</p></div>`;
+                }
+            });
+            return finalHTML || trimmed;
+        }
+
+        function renderChapter(chapterNum) {
+            const container = document.querySelector(`.chapter-container#chapter${chapterNum} .question-list`);
+            if (!container) return;
+            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
+            chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
             
-            if(isLoggedIn && username) {
-                authButtons.style.display = 'none';
-                userMenu.style.display = 'block';
-                document.getElementById('usernameDisplay').textContent = username;
-            } else {
-                authButtons.style.display = 'block';
-                userMenu.style.display = 'none';
+            let html = '';
+            chapterQuestions.forEach(q => {
+                const uid = q.id;
+                const titleHtml = parseTextToHTML(q.title, 'title');
+                const descHtml = parseTextToHTML(q.desc, 'desc');
+                const sourceHtml = parseTextToHTML(q.source, 'source');
+                const ansHtml = parseTextToHTML(q.ans, 'ans');
+
+                html += `
+                <div class="card mb-4 editable-card" id="q_${uid}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')"><i class="fas fa-trash"></i> 删除</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-book me-2"></i>来源出处</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-lightbulb me-2"></i>解答</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                            </div>
+                            <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+
+            if (window.MathJax && container.querySelectorAll('.editable-content').length) {
+                MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
             }
         }
-        
-        // 退出登录功能
-        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('username');
-            window.location.href = 'index.html';
+
+        function renderAll() {
+            renderChapter(1);
+            renderChapter(2);
+            renderChapter(3);
+            renderChapter(4);
+            document.getElementById('devModeSwitch').checked = devModeActive;
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+        }
+
+        // ======================== 编辑与删除 ============================
+        function toggleEdit(elementId) {
+            if (!devModeActive) return;
+            const contentDiv = document.getElementById(elementId);
+            if (!contentDiv) return;
+            const btn = contentDiv.parentElement.querySelector('.dev-edit-btn') || 
+                        contentDiv.previousElementSibling?.querySelector('.dev-edit-btn');
+            const type = contentDiv.getAttribute('data-type');
+            const raw = contentDiv.getAttribute('data-raw') || '';
+
+            if (contentDiv.tagName.toLowerCase() !== 'textarea') {
+                const textarea = document.createElement('textarea');
+                textarea.id = elementId;
+                textarea.className = 'form-control editable-content mb-2';
+                textarea.setAttribute('data-type', type);
+                textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
+                textarea.value = raw;
+                contentDiv.replaceWith(textarea);
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-success');
+                }
+            } else {
+                const currentText = contentDiv.value;
+                const id = elementId.split('_').slice(1).join('_');
+                const typeKey = elementId.split('_')[0];
+                const q = questionsData.questions.find(q => q.id === id);
+                if (q) {
+                    if (typeKey === 'title') q.title = currentText;
+                    else if (typeKey === 'desc') q.desc = currentText;
+                    else if (typeKey === 'source') q.source = currentText;
+                    else if (typeKey === 'ans') q.ans = currentText;
+                    saveQuestionsData(questionsData);
+                }
+                const newDiv = document.createElement('div');
+                newDiv.id = elementId;
+                newDiv.className = 'editable-content';
+                newDiv.setAttribute('data-type', type);
+                newDiv.setAttribute('data-raw', currentText);
+                if (type === 'title') newDiv.classList.add('problem-title', 'mb-4', 'fw-bold');
+                newDiv.innerHTML = parseTextToHTML(currentText, type);
+                contentDiv.replaceWith(newDiv);
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-edit"></i> 编辑';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-danger');
+                }
+                if (window.MathJax) {
+                    MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
+                }
+            }
+        }
+
+        function deleteQuestion(uid) {
+            if (!devModeActive) return;
+            if (!confirm(`确定要删除题目 "${uid}" 吗？此操作不可撤销。`)) return;
+            questionsData.questions = questionsData.questions.filter(q => q.id !== uid);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        function addNewQuestion(chapterId) {
+            if (!devModeActive) return;
+            const chapterNum = parseInt(chapterId.replace('chapter', ''));
+            const maxId = questionsData.questions
+                .filter(q => q.chapter === chapterNum)
+                .reduce((max, q) => {
+                    const num = parseInt(q.id.split('_')[1]);
+                    return num > max ? num : max;
+                }, 0);
+            const newId = `${chapterNum}_${maxId + 1}`;
+            
+            const newQ = {
+                id: newId,
+                chapter: chapterNum,
+                title: '新题目名称',
+                desc: '请在此直接输入题目文本及 LaTeX 公式，双换行（留一个空行）可以分段。',
+                source: '未指定参考书籍',
+                ans: '步骤1：输入内容。\n\n步骤2：空行后输入第二步公式：\\[ \\nabla \\cdot \\mathbf{E} = 0 \\]'
+            };
+            questionsData.questions.push(newQ);
+            saveQuestionsData(questionsData);
+            renderAll();
+        }
+
+        // ======================== 开发者认证 ============================
+        let passwordVisible = false;
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('devPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordVisible) {
+                pwdInput.type = 'password';
+                eyeIcon.className = 'fas fa-eye';
+                passwordVisible = false;
+            } else {
+                pwdInput.type = 'text';
+                eyeIcon.className = 'fas fa-eye-slash';
+                passwordVisible = true;
+            }
+        }
+
+        function openDevAuth() {
+            document.getElementById('devAuthOverlay').classList.add('active');
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('devAccount').value = '';
+            document.getElementById('devPassword').value = '';
+            if (passwordVisible) {
+                togglePasswordVisibility();
+            }
+            setTimeout(() => document.getElementById('devAccount').focus(), 100);
+        }
+
+        function closeDevAuth() {
+            document.getElementById('devAuthOverlay').classList.remove('active');
+            if (!devModeActive) {
+                document.getElementById('devModeSwitch').checked = false;
+            }
+        }
+
+        function verifyDevAuth() {
+            const account = document.getElementById('devAccount').value.trim();
+            const password = document.getElementById('devPassword').value.trim();
+            if (account === '2511392' && password === 'Jby021009') {
+                devModeActive = true;
+                document.getElementById('devAuthOverlay').classList.remove('active');
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+                sessionStorage.setItem('dev_authenticated', 'true');
+                document.getElementById('devPassword').value = '';
+            } else {
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('devPassword').value = '';
+                document.getElementById('devPassword').focus();
+            }
+        }
+
+        document.getElementById('devPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyDevAuth();
+            }
         });
-        
-        // 上传功能示例
+        document.getElementById('devAccount').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('devPassword').focus();
+            }
+        });
+
+        document.getElementById('devAuthOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDevAuth();
+            }
+        });
+
+        // ======================== 开发者模式开关 ============================
+        document.getElementById('devModeSwitch').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                if (devModeActive) {
+                    document.querySelectorAll('.dev-tool').forEach(el => {
+                        el.style.display = 'inline-block';
+                    });
+                    return;
+                }
+                openDevAuth();
+                if (!devModeActive) {
+                    this.checked = false;
+                }
+            } else {
+                devModeActive = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+                sessionStorage.removeItem('dev_authenticated');
+            }
+        });
+
+        // ======================== 搜索与导航 ============================
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase().trim();
+            const allCards = document.querySelectorAll('.editable-card');
+            allCards.forEach(card => {
+                const contentElements = card.querySelectorAll('.editable-content');
+                let isMatch = false;
+                contentElements.forEach(el => {
+                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
+                    if (text.includes(keyword)) isMatch = true;
+                });
+                card.style.display = isMatch ? '' : 'none';
+            });
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                const cards = chapter.querySelectorAll('.editable-card');
+                let hasVisible = false;
+                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
+            });
+        });
+
+        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ======================== 上传功能 ============================
         document.getElementById('submitUpload')?.addEventListener('click', function() {
             const resourceName = document.getElementById('resourceName').value;
             const fileInput = document.getElementById('resourceFile');
             
             if(resourceName && fileInput.files.length > 0) {
                 alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                // 实际应用中这里应该有AJAX上传逻辑
                 var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
                 bootstrapModal.hide();
+                document.getElementById('resourceName').value = '';
+                document.getElementById('resourceFile').value = '';
+                document.getElementById('resourceDescription').value = '';
             } else {
                 alert('请填写完整信息并选择文件！');
             }
         });
-        
-        // 页面加载时更新UI
+
+        // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
-            updateAuthUI();
+            if (sessionStorage.getItem('dev_authenticated') === 'true') {
+                devModeActive = true;
+            }
+            renderAll();
+            if (devModeActive) {
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+            } else {
+                document.getElementById('devModeSwitch').checked = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
         });
+
+        window.toggleEdit = toggleEdit;
+        window.addNewQuestion = addNewQuestion;
+        window.deleteQuestion = deleteQuestion;
+        window.openDevAuth = openDevAuth;
+        window.closeDevAuth = closeDevAuth;
+        window.verifyDevAuth = verifyDevAuth;
+        window.togglePasswordVisibility = togglePasswordVisibility;
     </script>
 </body>
 </html>
