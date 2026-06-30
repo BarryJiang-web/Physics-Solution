@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>光学 | PhysicsSolution Hub</title>
+    <title>高等统计力学 | PhysicsSolution Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         :root {
-            --optics-blue: #1a73e8;
-            --optics-indigo: #0d47a1;
+            --advanced-stat-color: #8e44ad;
+            --advanced-stat-dark: #6c3483;
             --physics-blue: #2b5fdc;
         }
-        .optics-header {
-            background: linear-gradient(135deg, var(--optics-blue) 0%, var(--optics-indigo) 100%);
+        .advanced-header {
+            background: linear-gradient(135deg, var(--advanced-stat-color) 0%, var(--advanced-stat-dark) 100%);
             color: white;
         }
         .chapter-card {
-            border-left: 4px solid var(--optics-blue);
+            border-left: 4px solid var(--advanced-stat-color);
             transition: all 0.3s;
         }
         .chapter-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(26, 115, 232, 0.1);
+            box-shadow: 0 10px 20px rgba(142, 68, 173, 0.1);
         }
         .problem-title {
-            color: var(--optics-blue);
-            border-bottom: 2px solid var(--optics-blue);
+            color: var(--advanced-stat-color);
+            border-bottom: 2px solid var(--advanced-stat-color);
         }
         .nav-pills .nav-link.active {
-            background-color: var(--optics-blue);
+            background-color: var(--advanced-stat-color);
         }
         .book-cover {
             max-height: 250px;
@@ -41,7 +41,7 @@
         .solution-step {
             margin-bottom: 15px;
             padding-left: 15px;
-            border-left: 3px solid var(--optics-blue);
+            border-left: 3px solid var(--advanced-stat-color);
         }
         .resource-item {
             border-left: 3px solid var(--physics-blue);
@@ -58,9 +58,6 @@
         }
         .resource-item a:hover {
             color: var(--physics-blue);
-        }
-        .optics-icon {
-            color: var(--optics-blue);
         }
         @media (max-width: 768px) {
             .book-cover {
@@ -128,20 +125,17 @@
             font-weight: 600;
         }
         .auth-modal .btn-primary {
-            background: var(--optics-blue);
+            background: var(--advanced-stat-color);
             border: none;
         }
         .auth-modal .btn-primary:hover {
-            background: #1557b0;
+            background: #7d3c98;
         }
         .auth-error {
             color: #dc3545;
             font-size: 0.9rem;
             margin-top: 8px;
             display: none;
-        }
-        #authButtons {
-            display: none !important;
         }
         /* 密码输入框切换显示 */
         .password-toggle {
@@ -162,10 +156,19 @@
         .password-toggle .toggle-eye:hover {
             color: #333;
         }
-        /* 保持原有UI风格，调整开发者开关容器 */
-        #devModeSwitchContainer {
+        .resource-item .file-link {
             display: flex;
             align-items: center;
+            gap: 8px;
+        }
+        .resource-item .file-link i {
+            font-size: 1.2rem;
+        }
+        .resource-item .file-link span {
+            word-break: break-word;
+        }
+        .chapter-container .add-q-btn {
+            display: none;
         }
     </style>
 </head>
@@ -173,7 +176,7 @@
     <!-- 开发者认证弹窗 -->
     <div class="auth-overlay" id="devAuthOverlay">
         <div class="auth-modal">
-            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--optics-blue);"></i>开发者验证</h4>
+            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--advanced-stat-color);"></i>开发者验证</h4>
             <p class="text-muted small">请输入账号与密码以启用开发者模式</p>
             <div class="mb-3">
                 <label class="form-label">账号</label>
@@ -200,7 +203,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <i class="fas fa-lightbulb me-2"></i>PhysicsSolution Hub
+                <i class="fas fa-chart-pie me-2"></i>PhysicsSolution Hub
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -211,7 +214,7 @@
                         <a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i> 首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="optics.html"><i class="fas fa-lightbulb me-1"></i> 光学</a>
+                        <a class="nav-link active" href="advanced-statistical.html"><i class="fas fa-chart-pie me-1"></i> 高等统计力学</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
@@ -219,26 +222,29 @@
                         <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
                         <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;"><i class="fas fa-code"></i> 开发者模式</label>
                     </div>
-                    <div id="authButtons"></div>
+                    <div id="authButtons">
+                        <a href="login.html" class="btn btn-outline-primary me-2">登录</a>
+                        <a href="login.html#register" class="btn btn-primary">注册</a>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- 光学页头 -->
-    <header class="optics-header py-5 mb-5">
+    <!-- 高等统计力学页头 -->
+    <header class="advanced-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
-                <i class="fas fa-lightbulb me-2"></i>光学习题解答库
+                <i class="fas fa-chart-pie me-2"></i>高等统计力学习题解答库
             </h1>
-            <p class="lead mb-0">涵盖几何光学、波动光学、干涉与衍射、偏振光学、量子光学等核心内容</p>
+            <p class="lead mb-0">涵盖量子统计、格林函数、相变与临界现象等高级专题</p>
         </div>
     </header>
 
     <!-- 主要内容区 -->
     <div class="container">
         <div class="row">
-            <!-- 左侧导航（粘性） -->
+            <!-- 左侧导航 - 粘性侧边栏 -->
             <div class="col-lg-3 mb-4">
                 <div class="sidebar-sticky">
                     <!-- 搜索框 -->
@@ -246,7 +252,7 @@
                         <div class="card-body">
                             <h5 class="card-title mb-3"><i class="fas fa-search me-2"></i>搜索题目</h5>
                             <div class="input-group">
-                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词 (如：干涉)...">
+                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词 (如：格林函数)...">
                             </div>
                         </div>
                     </div>
@@ -256,11 +262,11 @@
                             <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
                         </div>
                         <div class="list-group list-group-flush" id="chapterNavbar">
-                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 几何光学</a>
-                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 波动光学</a>
-                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 干涉与衍射</a>
-                            <a href="#chapter4" class="list-group-item list-group-item-action">4. 偏振光学</a>
-                            <a href="#chapter5" class="list-group-item list-group-item-action">5. 量子光学</a>
+                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 量子统计基础</a>
+                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 格林函数方法</a>
+                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 相变与临界现象</a>
+                            <a href="#chapter4" class="list-group-item list-group-item-action">4. 重整化群</a>
+                            <a href="#chapter5" class="list-group-item list-group-item-action">5. 非平衡统计</a>
                         </div>
                     </div>
 
@@ -269,9 +275,9 @@
                             <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
                         </div>
                         <div class="card-body text-center">
-                            <img src="optical.png" alt="光学" class="img-fluid book-cover mb-3">
-                            <h6>光学</h6>
-                            <p class="text-muted small">Eugene Hecht</p>
+                            <img src="adv-statis.jpg" alt="高等统计力学" class="img-fluid book-cover mb-3" onerror="this.style.display='none'">
+                            <h6>高等统计力学</h6>
+                            <p class="text-muted small">M. Plischke & B. Bergersen</p>
                         </div>
                     </div>
 
@@ -282,67 +288,18 @@
                         </div>
                         <div class="card-body">
                             <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/光学.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>蒋泊远笔记</span>
+                                <a href="../source/advanced-statistical/量子统计格林函数.pdf" target="_blank" class="file-link">
+                                    <i class="fas fa-file-pdf text-danger"></i>
+                                    <span>量子统计格林函数</span>
                                 </a>
-                                <small class="text-muted d-block mt-1">光学经典教材</small>
+                                <small class="text-muted d-block mt-1">格林函数方法在凝聚态中的应用</small>
                             </div>
                             <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/OPTICS光学 第3版_14321482.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>光学</span>
+                                <a href="../source/advanced-statistical/相变与临界现象.pdf" target="_blank" class="file-link">
+                                    <i class="fas fa-file-pdf text-danger"></i>
+                                    <span>相变与临界现象</span>
                                 </a>
-                                <small class="text-muted d-block mt-1">经典教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/光学_母国光 战元龄.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>光学</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">光学_母国光</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/光学原理：光的传播、干涉和衍射的电磁理论（第7版）清晰版.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>光学原理</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">光学原理：光的传播、干涉和衍射的电磁理论（第7版）清晰版</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/【北京大学物理学丛书】非线性光学物理【叶佩弦】.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>非线性光学</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">北京大学非线性光学经典教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/量子光学导论.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>量子光学导论</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">量子光学导论</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/衍射、傅里叶光学及成像.pdf by 衍射、傅里叶光学及成像.pdf (z-lib.org).pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>衍射、傅里叶光学及成像</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">傅里叶光学教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/研究生教学用书-激光光学：光束描述、传输变换与光腔技术物理（第3版）-吕百达-高等教育出版社-2003.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>激光原理</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">研究生教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/optical/新概念物理教程 光学.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>光学</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">新概念物理系列</small>
+                                <small class="text-muted d-block mt-1">Landau-Ginzburg 理论与标度律</small>
                             </div>
                             <div class="text-center mt-3">
                                 <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
@@ -354,75 +311,75 @@
                 </div>
             </div>
 
-            <!-- 右侧内容（动态渲染） -->
+            <!-- 右侧内容 -->
             <div class="col-lg-9">
-                <!-- 章节1 -->
+                <!-- 第一章：量子统计基础 -->
                 <div class="mb-5 chapter-container" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            <i class="fas fa-ruler-combined me-2 text-primary"></i>第一章：几何光学
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h3 mb-0">
+                            <i class="fas fa-atom me-2"></i>第一章：量子统计基础
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--optics-blue);">几何光学</span>
+                        <span class="badge rounded-pill" style="background-color: var(--advanced-stat-color);">12题</span>
                     </div>
                     <div class="question-list" data-chapter="1"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第一章添加新题目
+                        <i class="fas fa-plus me-1"></i> 在第一章添加新题目
                     </button>
                 </div>
 
-                <!-- 章节2 -->
+                <!-- 第二章：格林函数方法 -->
                 <div class="mb-5 chapter-container" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            <i class="fas fa-water me-2 text-primary"></i>第二章：波动光学
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h3 mb-0">
+                            <i class="fas fa-wave-square me-2"></i>第二章：格林函数方法
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--optics-blue);">波动光学</span>
+                        <span class="badge rounded-pill" style="background-color: var(--advanced-stat-color);">10题</span>
                     </div>
                     <div class="question-list" data-chapter="2"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第二章添加新题目
+                        <i class="fas fa-plus me-1"></i> 在第二章添加新题目
                     </button>
                 </div>
 
-                <!-- 章节3 -->
+                <!-- 第三章：相变与临界现象 -->
                 <div class="mb-5 chapter-container" id="chapter3">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            <i class="fas fa-wave-square me-2 text-primary"></i>第三章：干涉与衍射
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h3 mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>第三章：相变与临界现象
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--optics-blue);">干涉与衍射</span>
+                        <span class="badge rounded-pill" style="background-color: var(--advanced-stat-color);">8题</span>
                     </div>
                     <div class="question-list" data-chapter="3"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第三章添加新题目
+                        <i class="fas fa-plus me-1"></i> 在第三章添加新题目
                     </button>
                 </div>
 
-                <!-- 章节4 -->
+                <!-- 第四章：重整化群 -->
                 <div class="mb-5 chapter-container" id="chapter4">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            <i class="fas fa-circle-notch me-2 text-primary"></i>第四章：偏振光学
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h3 mb-0">
+                            <i class="fas fa-sync-alt me-2"></i>第四章：重整化群
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--optics-blue);">偏振</span>
+                        <span class="badge rounded-pill" style="background-color: var(--advanced-stat-color);">6题</span>
                     </div>
                     <div class="question-list" data-chapter="4"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第四章添加新题目
+                        <i class="fas fa-plus me-1"></i> 在第四章添加新题目
                     </button>
                 </div>
 
-                <!-- 章节5 -->
+                <!-- 第五章：非平衡统计 -->
                 <div class="mb-5 chapter-container" id="chapter5">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            <i class="fas fa-atom me-2 text-primary"></i>第五章：量子光学
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h3 mb-0">
+                            <i class="fas fa-clock me-2"></i>第五章：非平衡统计
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--optics-blue);">量子光学</span>
+                        <span class="badge rounded-pill" style="background-color: var(--advanced-stat-color);">8题</span>
                     </div>
                     <div class="question-list" data-chapter="5"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter5')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第五章添加新题目
+                        <i class="fas fa-plus me-1"></i> 在第五章添加新题目
                     </button>
                 </div>
             </div>
@@ -462,12 +419,12 @@
     </div>
 
     <!-- 页脚 -->
-    <footer class="py-5 text-white" style="background: linear-gradient(135deg, var(--optics-blue) 0%, var(--optics-indigo) 100%);">
+    <footer class="py-5 text-white" style="background: linear-gradient(135deg, var(--advanced-stat-color) 0%, var(--advanced-stat-dark) 100%);">
         <div class="container">
             <div class="row">
                 <div class="col-md-6 mb-4">
-                    <h5><i class="fas fa-lightbulb me-2"></i>光学</h5>
-                    <p class="mt-3">探索光的本质、传播规律及其与物质的相互作用</p>
+                    <h5><i class="fas fa-chart-pie me-2"></i>高等统计力学</h5>
+                    <p class="mt-3">深入探索多体系统的统计行为</p>
                     <a href="index.html" class="btn btn-outline-light mt-2">
                         <i class="fas fa-arrow-left me-1"></i> 返回首页
                     </a>
@@ -475,15 +432,15 @@
                 <div class="col-md-6 mb-4">
                     <h5>相关学科</h5>
                     <div class="d-flex flex-wrap">
-                        <a href="electrodynamics.html" class="btn btn-sm btn-outline-light m-1">电动力学</a>
                         <a href="quantum.html" class="btn btn-sm btn-outline-light m-1">量子力学</a>
+                        <a href="statistical.html" class="btn btn-sm btn-outline-light m-1">统计力学</a>
                         <a href="solid-state.html" class="btn btn-sm btn-outline-light m-1">固体物理</a>
                     </div>
                 </div>
             </div>
             <hr class="my-4 bg-light">
             <div class="text-center">
-                <p class="mb-0">© 2023 PhysicsSolution Hub 光学分部</p>
+                <p class="mb-0">© 2023 PhysicsSolution Hub 高等统计力学分部</p>
             </div>
         </div>
     </footer>
@@ -494,28 +451,90 @@
         // ======================== 数据层 ============================
         const DEFAULT_DATA = {
             questions: [
-                // 第一章
                 {
                     id: '1_1',
                     chapter: 1,
-                    title: '问题1.1 - 薄透镜成像公式',
-                    desc: '推导薄透镜的高斯成像公式：\n\\[ \\frac{1}{f} = \\frac{1}{u} + \\frac{1}{v} \\]\n其中f为焦距，u为物距，v为像距。',
-                    source: 'Hecht《光学》第五章',
-                    ans: '步骤1：考虑光线通过透镜的折射：\n\\[ \\frac{n_1}{s_o} + \\frac{n_2}{s_i} = \\frac{n_2 - n_1}{R} \\]\n\n步骤2：对于薄透镜，前后表面共同作用：\n\\[ \\frac{1}{f} = (n-1)\\left(\\frac{1}{R_1} - \\frac{1}{R_2}\\right) \\]\n\n步骤3：结合两表面的折射公式，在空气中(n=1)：\n\\[ \\frac{1}{u} + \\frac{1}{v} = \\frac{1}{f} \\]\n\n步骤4：这就是薄透镜的高斯成像公式，符号约定遵循笛卡尔符号规则。'
+                    title: '问题1.1 - 理想玻色气体的凝聚温度',
+                    desc: '推导三维简谐势阱中理想玻色气体的玻色-爱因斯坦凝聚温度 \\( T_c \\)。',
+                    source: '量子统计基础习题',
+                    ans: '步骤1：态密度在三维简谐势阱中为 \\( g(\\varepsilon) = \\frac{\\varepsilon^2}{2(\\hbar\\omega)^3} \\)。\n\n步骤2：粒子数方程 \\( N = \\int_0^\\infty \\frac{g(\\varepsilon)}{e^{\\beta(\\varepsilon-\\mu)}-1} d\\varepsilon \\)。\n\n步骤3：在临界温度 \\( T_c \\) 时，化学势 \\( \\mu = 0 \\)，得到 \\( N = \\frac{(k_B T_c)^3}{2(\\hbar\\omega)^3} \\Gamma(3) \\zeta(3) \\)。\n\n步骤4：解得 \\( k_B T_c = \\hbar\\omega \\left( \\frac{N}{\\zeta(3)} \\right)^{1/3} \\)。'
                 },
-                // 第二章
+                {
+                    id: '1_2',
+                    chapter: 1,
+                    title: '问题1.2 - 费米气体的低温性质',
+                    desc: '计算三维自由费米气体在低温下的比热容，并给出 \\( T \\ll T_F \\) 时的渐进表达式。',
+                    source: '量子统计基础习题',
+                    ans: '步骤1：低温下，费米分布函数在 \\( \\varepsilon_F \\) 附近展开：\n\\[ n(\\varepsilon) = \\theta(\\mu-\\varepsilon) + \\frac{\\pi^2}{6}(k_B T)^2 \\delta\'(\\varepsilon-\\mu) + \\cdots \\]\n\n步骤2：比热容 \\( C_V = \\frac{\\pi^2}{2} N k_B \\frac{T}{T_F} \\)。\n\n步骤3：因此低温比热容与温度成正比：\n\\[ C_V = \\frac{\\pi^2}{2} N k_B \\frac{T}{T_F} \\]'
+                },
                 {
                     id: '2_1',
                     chapter: 2,
-                    title: '问题2.1 - 麦克斯韦方程组与电磁波',
-                    desc: '从麦克斯韦方程组出发，推导真空中的电磁波方程，并证明光速 \\( c = \\frac{1}{\\sqrt{\\mu_0 \\epsilon_0}} \\)。',
-                    source: 'Hecht《光学》第二章',
-                    ans: '步骤1：麦克斯韦方程组在真空中：\n\\[ \\nabla \\cdot \\mathbf{E} = 0, \\quad \\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t} \\]\n\\[ \\nabla \\cdot \\mathbf{B} = 0, \\quad \\nabla \\times \\mathbf{B} = \\mu_0 \\epsilon_0 \\frac{\\partial \\mathbf{E}}{\\partial t} \\]\n\n步骤2：对第三个方程取旋度：\n\\[ \\nabla \\times (\\nabla \\times \\mathbf{E}) = -\\frac{\\partial}{\\partial t}(\\nabla \\times \\mathbf{B}) \\]\n\n步骤3：使用矢量恒等式并代入第四个方程：\n\\[ \\nabla^2 \\mathbf{E} = \\mu_0 \\epsilon_0 \\frac{\\partial^2 \\mathbf{E}}{\\partial t^2} \\]\n\n步骤4：这是波动方程，波速为：\n\\[ v = \\frac{1}{\\sqrt{\\mu_0 \\epsilon_0}} = c \\]'
+                    title: '问题2.1 - 单粒子格林函数',
+                    desc: '推导非相互作用费米子系统的推迟格林函数 \\( G^R(\\mathbf{k}, \\omega) \\)。',
+                    source: '格林函数方法习题',
+                    ans: '步骤1：推迟格林函数定义为 \\( G^R(\\mathbf{k}, t) = -i\\theta(t) \\langle \\{ c_\\mathbf{k}(t), c_\\mathbf{k}^\\dagger(0) \\} \\rangle \\)。\n\n步骤2：运动方程为 \\( i\\partial_t G^R(\\mathbf{k}, t) = \\delta(t) + \\varepsilon_\\mathbf{k} G^R(\\mathbf{k}, t) \\)。\n\n步骤3：傅里叶变换到频域：\n\\[ G^R(\\mathbf{k}, \\omega) = \\frac{1}{\\omega - \\varepsilon_\\mathbf{k} + i0^+} \\]'
+                },
+                {
+                    id: '2_2',
+                    chapter: 2,
+                    title: '问题2.2 - 久保公式',
+                    desc: '推导线性响应理论中的久保公式，给出电导率的表达式。',
+                    source: '格林函数方法习题',
+                    ans: '步骤1：线性响应理论中，对外场的响应为 \\( \\langle A(t) \\rangle = \\int_{-\\infty}^t dt\' \\chi_{AB}(t-t\') F(t\') \\)。\n\n步骤2：响应函数 \\( \\chi_{AB}(t) = -i\\theta(t) \\langle [A(t), B(0)] \\rangle \\)。\n\n步骤3：电导率 \\( \\sigma(\\omega) = \\frac{i}{\\omega} \\chi_{JJ}(\\omega) \\)，其中 \\( J \\) 是电流算符。'
+                },
+                {
+                    id: '3_1',
+                    chapter: 3,
+                    title: '问题3.1 - Landau-Ginzburg 理论',
+                    desc: '从 Landau-Ginzburg 自由能出发，推导临界温度附近序参量的行为。',
+                    source: '相变与临界现象习题',
+                    ans: '步骤1：Landau-Ginzburg 自由能：\n\\[ F = \\int d^d r \\left[ \\frac{a}{2} \\phi^2 + \\frac{b}{4} \\phi^4 + \\frac{c}{2} (\\nabla \\phi)^2 \\right] \\]\n\n步骤2：均匀情况下，自由能极小条件 \\( \\partial F/\\partial \\phi = 0 \\)：\n\\[ a\\phi + b\\phi^3 = 0 \\]\n\n步骤3：当 \\( a < 0 \\) 时，有非零解 \\( \\phi = \\sqrt{-a/b} \\)。\n\n步骤4：取 \\( a = a_0(T - T_c) \\)，得到 \\( \\phi \\propto (T_c - T)^{1/2} \\)。'
+                },
+                {
+                    id: '3_2',
+                    chapter: 3,
+                    title: '问题3.2 - 临界指数',
+                    desc: '定义并解释 Ising 模型的临界指数 \\( \\alpha, \\beta, \\gamma, \\delta \\)。',
+                    source: '相变与临界现象习题',
+                    ans: '步骤1：\\( \\alpha \\) 为比热容临界指数：\\( C \\propto |T-T_c|^{-\\alpha} \\)。\n\n步骤2：\\( \\beta \\) 为序参量临界指数：\\( \\phi \\propto (T_c-T)^\\beta \\)。\n\n步骤3：\\( \\gamma \\) 为磁化率临界指数：\\( \\chi \\propto |T-T_c|^{-\\gamma} \\)。\n\n步骤4：\\( \\delta \\) 为临界等温线的指数：\\( H \\propto \\phi^\\delta \\)。\n\n步骤5：在平均场理论中，这些指数取值为 \\( \\alpha=0, \\beta=1/2, \\gamma=1, \\delta=3 \\)。'
+                },
+                {
+                    id: '4_1',
+                    chapter: 4,
+                    title: '问题4.1 - 重整化群方程',
+                    desc: '写出 \\( \\phi^4 \\) 理论在动量壳层重整化方案下的 \\( \\beta \\) 函数。',
+                    source: '重整化群习题',
+                    ans: '步骤1：\\( \\phi^4 \\) 理论的 \\( \\beta \\) 函数在微扰论中计算为：\n\\[ \\beta(g) = \\frac{dg}{d\\ln \\Lambda} = \\frac{d-4}{2} g + \\frac{3}{16\\pi^2} g^2 + \\mathcal{O}(g^3) \\]\n\n步骤2：在 \\( d = 4 - \\epsilon \\) 维空间中：\n\\[ \\beta(g) = -\\frac{\\epsilon}{2} g + \\frac{3}{16\\pi^2} g^2 + \\mathcal{O}(g^3) \\]\n\n步骤3：Wilson-Fisher 固定点为 \\( g^* = \\frac{8\\pi^2}{3} \\epsilon \\)。'
+                },
+                {
+                    id: '4_2',
+                    chapter: 4,
+                    title: '问题4.2 - 标度律',
+                    desc: '证明临界指数满足 Widom 标度律 \\( \\alpha + 2\\beta + \\gamma = 2 \\)。',
+                    source: '重整化群习题',
+                    ans: '步骤1：从热力学势的齐次性出发：\n\\[ F_s(t, h) = |t|^{2-\\alpha} f_{\\pm}(h/|t|^{\\Delta}) \\]\n\n步骤2：其中 \\( \\Delta = \\beta\\delta \\)，且 \\( \\gamma = \\nu(2-\\eta) \\)。\n\n步骤3：利用标度关系，可以得到 \\( \\alpha + 2\\beta + \\gamma = 2 \\)。'
+                },
+                {
+                    id: '5_1',
+                    chapter: 5,
+                    title: '问题5.1 - 玻尔兹曼方程',
+                    desc: '写出非平衡统计中的玻尔兹曼方程，并解释其各项物理意义。',
+                    source: '非平衡统计习题',
+                    ans: '步骤1：玻尔兹曼方程的一般形式：\n\\[ \\frac{\\partial f}{\\partial t} + \\mathbf{v} \\cdot \\nabla_\\mathbf{r} f + \\mathbf{F} \\cdot \\nabla_\\mathbf{p} f = \\left( \\frac{\\partial f}{\\partial t} \\right)_{\\text{coll}} \\]\n\n步骤2：左边第一项为时间变化率，第二项为对流项，第三项为外力项。\n\n步骤3：右边为碰撞项，描述粒子间的相互作用导致的分布函数变化。'
+                },
+                {
+                    id: '5_2',
+                    chapter: 5,
+                    title: '问题5.2 - 流体力学极限',
+                    desc: '从玻尔兹曼方程出发，推导流体力学方程（连续性方程、Navier-Stokes 方程）。',
+                    source: '非平衡统计习题',
+                    ans: '步骤1：通过对速度空间矩积分，可以从玻尔兹曼方程得到流体力学方程。\n\n步骤2：第0阶矩（粒子数守恒）给出连续性方程：\n\\[ \\partial_t \\rho + \\nabla \\cdot (\\rho \\mathbf{u}) = 0 \\]\n\n步骤3：第1阶矩（动量守恒）给出 Navier-Stokes 方程：\n\\[ \\partial_t (\\rho \\mathbf{u}) + \\nabla \\cdot (\\rho \\mathbf{u}\\mathbf{u}) = -\\nabla P + \\nabla \\cdot \\boldsymbol{\\tau} \\]'
                 }
             ]
         };
 
-        const STORAGE_KEY = 'optics_questions_data';
+        const STORAGE_KEY = 'advanced_statistical_questions_data';
         let devModeActive = false;
 
         function loadQuestionsData() {
@@ -637,6 +656,17 @@
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
+            updateChapterBadges();
+        }
+
+        function updateChapterBadges() {
+            for (let i = 1; i <= 5; i++) {
+                const count = questionsData.questions.filter(q => q.chapter === i).length;
+                const badge = document.querySelector(`#chapter${i} .badge`);
+                if (badge) {
+                    badge.textContent = count + '题';
+                }
+            }
         }
 
         // ======================== 编辑与删除 ============================
@@ -847,6 +877,43 @@
             });
         });
 
+        // ======================== 原有登录功能 ============================
+        function updateAuthUI() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const username = localStorage.getItem('username');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            if(isLoggedIn && username) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'block';
+                document.getElementById('usernameDisplay').textContent = username;
+            } else {
+                authButtons.style.display = 'block';
+                userMenu.style.display = 'none';
+            }
+        }
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            window.location.href = 'index.html';
+        });
+        
+        document.getElementById('submitUpload')?.addEventListener('click', function() {
+            const resourceName = document.getElementById('resourceName').value;
+            const fileInput = document.getElementById('resourceFile');
+            
+            if(resourceName && fileInput.files.length > 0) {
+                alert(`文件 ${fileInput.files[0].name} 上传成功！`);
+                var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                bootstrapModal.hide();
+            } else {
+                alert('请填写完整信息并选择文件！');
+            }
+        });
+
         // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
             if (sessionStorage.getItem('dev_authenticated') === 'true') {
@@ -864,6 +931,7 @@
                     el.style.display = 'none';
                 });
             }
+            updateAuthUI();
         });
 
         window.toggleEdit = toggleEdit;
@@ -873,19 +941,6 @@
         window.closeDevAuth = closeDevAuth;
         window.verifyDevAuth = verifyDevAuth;
         window.togglePasswordVisibility = togglePasswordVisibility;
-
-        // 上传功能（保留原有）
-        document.getElementById('submitUpload')?.addEventListener('click', function() {
-            const resourceName = document.getElementById('resourceName').value;
-            const fileInput = document.getElementById('resourceFile');
-            if(resourceName && fileInput.files.length > 0) {
-                alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
-                bootstrapModal.hide();
-            } else {
-                alert('请填写完整信息并选择文件！');
-            }
-        });
     </script>
 </body>
 </html>
