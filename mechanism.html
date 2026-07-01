@@ -1,17 +1,45 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>理论力学 | PhysicsSolution Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
+        /* ================= 主题变量 ================= */
         :root {
             --mechanics-green: #28a745;
             --mechanics-dark: #218838;
             --physics-blue: #2b5fdc;
+            --bg-body: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-main: #212529;
+            --border-color: rgba(0,0,0,0.125);
         }
+
+        [data-bs-theme="dark"] {
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --text-main: #e0e0e0;
+            --border-color: #333333;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .card { background-color: var(--bg-card); border-color: var(--border-color); }
+        .card-header, .border-bottom { border-color: var(--border-color) !important; }
+        .form-control { background-color: var(--bg-card); color: var(--text-main); border-color: var(--border-color); }
+        .form-control:focus { background-color: var(--bg-card); color: var(--text-main); }
+        .list-group-item { background-color: transparent; color: var(--text-main); border-color: var(--border-color); transition: all 0.2s;}
+        .navbar.bg-white { background-color: var(--bg-card) !important; }
+        .text-dark { color: var(--text-main) !important; }
+        .text-secondary { color: #888 !important; }
+
         .mechanics-header {
             background: linear-gradient(135deg, var(--mechanics-green) 0%, var(--mechanics-dark) 100%);
             color: white;
@@ -37,6 +65,7 @@
             object-fit: contain;
             padding: 15px;
             background: #fff;
+            border-radius: 8px;
         }
         .solution-step {
             margin-bottom: 15px;
@@ -50,10 +79,10 @@
             transition: all 0.2s;
         }
         .resource-item:hover {
-            background-color: #f8f9fa;
+            background-color: rgba(0,0,0,0.05);
         }
         .resource-item a {
-            color: #333;
+            color: var(--text-main);
             text-decoration: none;
         }
         .resource-item a:hover {
@@ -65,12 +94,28 @@
                 height: auto;
             }
         }
+
+        /* 侧边栏固定样式 */
+        .sidebar-sticky {
+            position: sticky;
+            top: 85px;
+            z-index: 100;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .sidebar-sticky::-webkit-scrollbar { width: 4px; }
+        .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 4px; }
+        [data-bs-theme="dark"] .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); }
+        .sidebar-sticky::-webkit-scrollbar-track { background: transparent; }
+
         textarea.editable-content {
             font-family: 'Courier New', Courier, monospace;
-            background-color: #fdfdfd;
+            background-color: rgba(0,0,0,0.02);
+            color: var(--text-main);
             font-size: 0.95rem;
             line-height: 1.6;
         }
+        [data-bs-theme="dark"] textarea.editable-content { background-color: rgba(255,255,255,0.05); }
         .dev-edit-btn {
             padding: 0.2rem 0.5rem;
             font-size: 0.8rem;
@@ -80,99 +125,87 @@
             font-size: 0.8rem;
             margin-left: 4px;
         }
-        .sidebar-sticky {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-        }
-        .sidebar-sticky::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar-sticky::-webkit-scrollbar-thumb {
-            background-color: rgba(0,0,0,0.1);
-            border-radius: 4px;
-        }
-        .sidebar-sticky::-webkit-scrollbar-track {
-            background: transparent;
-        }
         .dev-tool {
             display: none;
         }
+
+        /* ================= 新增功能样式 ================= */
+        .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 1060; }
+        .progress-bar { height: 4px; background: var(--mechanics-green); width: 0%; transition: width 0.1s ease-out; }
+        
+        .action-btn { background: transparent; border: none; color: var(--text-main); opacity: 0.7; transition: all 0.2s; padding: 5px 10px; border-radius: 6px; }
+        .action-btn:hover { opacity: 1; background-color: rgba(40, 167, 69, 0.1); color: var(--mechanics-green); }
+
+        .focus-mode .sidebar-col { display: none !important; }
+        .focus-mode .content-col { width: 100% !important; max-width: 900px; margin: 0 auto; transition: all 0.3s ease; }
+
+        #backToTop {
+            position: fixed; bottom: 30px; right: 30px; z-index: 99;
+            width: 50px; height: 50px; border-radius: 50%;
+            background-color: var(--mechanics-green); color: white; border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
+            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+        #backToTop.show { opacity: 1; pointer-events: auto; }
+        #backToTop:hover { transform: translateY(-5px); }
+
+        .chapter-container { scroll-margin-top: 80px; }
+
         /* 认证弹窗 */
         .auth-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
         }
-        .auth-overlay.active {
-            display: flex;
-        }
+        .auth-overlay.active { display: flex; }
         .auth-modal {
-            background: #fff;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 420px;
-            width: 90%;
+            background: var(--bg-card); color: var(--text-main);
+            border-radius: 16px; padding: 2rem; max-width: 420px; width: 90%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
-        .auth-modal .form-label {
-            font-weight: 600;
-        }
-        .auth-modal .btn-primary {
-            background: var(--mechanics-green);
-            border: none;
-        }
-        .auth-modal .btn-primary:hover {
-            background: #1e7e34;
-        }
-        .auth-error {
-            color: #dc3545;
-            font-size: 0.9rem;
-            margin-top: 8px;
-            display: none;
-        }
-        #authButtons {
-            display: none !important;
-        }
-        /* 密码输入框切换显示 */
-        .password-toggle {
-            position: relative;
-        }
+        .auth-modal .form-label { font-weight: 600; }
+        .auth-modal .btn-primary { background: var(--mechanics-green); border: none; }
+        .auth-modal .btn-primary:hover { background: #1e7e34; }
+        .auth-error { color: #dc3545; font-size: 0.9rem; margin-top: 8px; display: none; }
+        #authButtons { display: none !important; }
+        .password-toggle { position: relative; }
         .password-toggle .toggle-eye {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: #6c757d; background: none; border: none; padding: 0; z-index: 5;
+        }
+        .password-toggle .toggle-eye:hover { color: var(--text-main); }
+        #devModeSwitchContainer {
+            display: flex;
+            align-items: center;
+        }
+        .editable-card .d-flex .btn {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+        }
+        .editable-card .d-flex .btn i {
+            margin-right: 2px;
+        }
+        .editable-content p:last-child {
+            margin-bottom: 0;
+        }
+        .editable-content .solution-step p:last-child {
+            margin-bottom: 0;
+        }
+        .editable-content .MathJax {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        .chapter-container .badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.65rem;
+        }
+        .navbar .form-check {
+            margin-right: 1rem;
+        }
+        .navbar .form-check-label {
+            font-size: 0.85rem;
             cursor: pointer;
-            color: #6c757d;
-            background: none;
-            border: none;
-            padding: 0;
-            z-index: 5;
         }
-        .password-toggle .toggle-eye:hover {
-            color: #333;
-        }
-        /* 保留原始UI中的userMenu */
-        #userMenu {
-            display: none !important;
-        }
-        #usernameDisplay {
-            display: none;
-        }
-        #logoutBtn {
-            display: none;
-        }
-        #userDropdown {
-            display: none !important;
-        }
-        /* 资料库上传按钮样式保留 */
         .resource-item .btn-outline-primary {
             color: var(--mechanics-green);
             border-color: var(--mechanics-green);
@@ -181,13 +214,18 @@
             background: var(--mechanics-green);
             color: #fff;
         }
+
+        .upload-btn-wrapper .btn { margin-top: 8px; }
     </style>
 </head>
 <body>
+    <!-- 阅读进度条 -->
+    <div class="progress-container"><div class="progress-bar" id="readingProgress"></div></div>
+
     <!-- 开发者认证弹窗 -->
     <div class="auth-overlay" id="devAuthOverlay">
         <div class="auth-modal">
-            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--mechanics-green);"></i>开发者验证</h4>
+            <h4 class="mb-3">开发者验证</h4>
             <p class="text-muted small">请输入账号与密码以启用开发者模式</p>
             <div class="mb-3">
                 <label class="form-label">账号</label>
@@ -205,16 +243,16 @@
             <div class="auth-error" id="authError">账号或密码错误，请重试。</div>
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-secondary" onclick="closeDevAuth()">取消</button>
-                <button class="btn btn-primary" onclick="verifyDevAuth()"><i class="fas fa-unlock me-1"></i> 验证并开启</button>
+                <button class="btn btn-primary" onclick="verifyDevAuth()">验证并开启</button>
             </div>
         </div>
     </div>
 
     <!-- 导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <i class="fas fa-atom me-2"></i>PhysicsSolution Hub
+            <a class="navbar-brand text-dark" href="index.html">
+                PhysicsSolution Hub
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -222,16 +260,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i> 首页</a>
+                        <a class="nav-link" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="mechanics.html"><i class="fas fa-atom me-1"></i> 理论力学</a>
+                        <a class="nav-link active" href="mechanics.html">理论力学</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    <div class="form-check form-switch me-4 d-flex align-items-center" id="devModeSwitchContainer">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn action-btn" id="focusToggle" title="沉浸/授课模式 (隐藏侧边栏)">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="btn action-btn" id="themeToggle" title="切换夜间模式">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="form-check form-switch d-flex align-items-center ms-2 mb-0" id="devModeSwitchContainer">
                         <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
-                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;"><i class="fas fa-code"></i> 开发者模式</label>
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer; font-size: 0.85rem;">开发者模式</label>
                     </div>
                     <div id="authButtons"></div>
                 </div>
@@ -243,7 +287,7 @@
     <header class="mechanics-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
-                <i class="fas fa-atom me-2"></i>理论力学习题解答库
+                理论力学习题解答库
             </h1>
             <p class="lead mb-0">涵盖拉格朗日力学、哈密顿力学、刚体运动等核心内容</p>
         </div>
@@ -252,13 +296,13 @@
     <!-- 主要内容区 -->
     <div class="container">
         <div class="row">
-            <!-- 左侧导航 (加搜索 + sticky) -->
-            <div class="col-lg-3 mb-4">
+            <!-- 左侧导航 -->
+            <div class="col-lg-3 mb-4 sidebar-col">
                 <div class="sidebar-sticky">
                     <!-- 搜索框 -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
-                            <h5 class="card-title mb-3"><i class="fas fa-search me-2"></i>搜索题目</h5>
+                            <h5 class="card-title mb-3">搜索题目</h5>
                             <div class="input-group">
                                 <input type="text" id="searchInput" class="form-control" placeholder="输入关键词 (如：拉格朗日)...">
                             </div>
@@ -266,8 +310,8 @@
                     </div>
 
                     <div class="card shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">章节导航</h5>
                         </div>
                         <div class="list-group list-group-flush" id="chapterNavbar">
                             <a href="#chapter1" class="list-group-item list-group-item-action active">1. 牛顿力学</a>
@@ -279,11 +323,11 @@
                     </div>
 
                     <div class="card shadow-sm mt-4">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">推荐教材</h5>
                         </div>
                         <div class="card-body text-center">
-                            <img src="mechanics.jpg" alt="理论力学教程" class="img-fluid book-cover mb-3">
+                            <img src="mechanics.jpg" alt="理论力学教程" class="img-fluid book-cover mb-3" onerror="this.style.display='none'">
                             <h6>理论力学教程</h6>
                             <p class="text-muted small">周衍柏</p>
                         </div>
@@ -291,54 +335,32 @@
 
                     <!-- 资料库部分 -->
                     <div class="card shadow-sm mt-4">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">资料库</h5>
+                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addResource()" style="display:none;">
+                                添加
+                            </button>
                         </div>
-                        <div class="card-body">
-                            <div class="resource-item">
-                                <a href="pdfs/goldstein-mechanics.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>Goldstein《经典力学》</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">经典理论力学教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="pdfs/zhou-mechanics.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>周衍柏《理论力学教程》</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">中文经典教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="pdfs/landau-mechanics.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>Landau《力学》</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">理论物理学教程第一卷</small>
-                            </div>
-                            <div class="text-center mt-3">
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                                    <i class="fas fa-upload me-1"></i>上传资料
-                                </button>
-                            </div>
+                        <div class="card-body" id="resourceList">
+                            <!-- 由JS动态渲染 -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 右侧内容 -->
-            <div class="col-lg-9">
+            <div class="col-lg-9 content-col">
                 <!-- 第一章：牛顿力学 -->
                 <div class="mb-5 chapter-container" id="chapter1">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                         <h2 class="h3 mb-0 text-dark fw-bold">
-                            <i class="fas fa-apple-alt me-2 text-primary"></i>第一章：牛顿力学
+                            第一章：牛顿力学
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);">15题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);" id="count_1">0题</span>
                     </div>
                     <div class="question-list" data-chapter="1"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第一章添加新题目
+                        在第一章添加新题目
                     </button>
                 </div>
 
@@ -346,50 +368,53 @@
                 <div class="mb-5 chapter-container" id="chapter2">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                         <h2 class="h3 mb-0 text-dark fw-bold">
-                            <i class="fas fa-calculator me-2 text-primary"></i>第二章：拉格朗日力学
+                            第二章：拉格朗日力学
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);">18题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);" id="count_2">0题</span>
                     </div>
                     <div class="question-list" data-chapter="2"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第二章添加新题目
+                        在第二章添加新题目
                     </button>
                 </div>
 
                 <!-- 第三章：哈密顿力学 -->
                 <div class="mb-5 chapter-container" id="chapter3">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold"><i class="fas fa-chart-line me-2 text-primary"></i>第三章：哈密顿力学</h2>
-                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);">12题</span>
+                        <h2 class="h3 mb-0 text-dark fw-bold">第三章：哈密顿力学</h2>
+                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);" id="count_3">0题</span>
                     </div>
                     <div class="question-list" data-chapter="3"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;"><i class="fas fa-plus"></i> 在第三章添加新题目</button>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">在第三章添加新题目</button>
                 </div>
 
                 <!-- 第四章：刚体力学 -->
                 <div class="mb-5 chapter-container" id="chapter4">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold"><i class="fas fa-cube me-2 text-primary"></i>第四章：刚体力学</h2>
-                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);">10题</span>
+                        <h2 class="h3 mb-0 text-dark fw-bold">第四章：刚体力学</h2>
+                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);" id="count_4">0题</span>
                     </div>
                     <div class="question-list" data-chapter="4"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;"><i class="fas fa-plus"></i> 在第四章添加新题目</button>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">在第四章添加新题目</button>
                 </div>
 
                 <!-- 第五章：小振动 -->
                 <div class="mb-5 chapter-container" id="chapter5">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold"><i class="fas fa-wave-square me-2 text-primary"></i>第五章：小振动</h2>
-                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);">8题</span>
+                        <h2 class="h3 mb-0 text-dark fw-bold">第五章：小振动</h2>
+                        <span class="badge rounded-pill" style="background-color: var(--mechanics-green);" id="count_5">0题</span>
                     </div>
                     <div class="question-list" data-chapter="5"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter5')" style="display: none;"><i class="fas fa-plus"></i> 在第五章添加新题目</button>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter5')" style="display: none;">在第五章添加新题目</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 上传资料的模态框 (保留) -->
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" title="返回顶部"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- 上传资料的模态框 -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -426,10 +451,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 mb-4">
-                    <h5><i class="fas fa-atom me-2"></i>理论力学</h5>
+                    <h5>理论力学</h5>
                     <p class="mt-3">探索经典力学系统的运动规律</p>
                     <a href="index.html" class="btn btn-outline-light mt-2">
-                        <i class="fas fa-arrow-left me-1"></i> 返回首页
+                        返回首页
                     </a>
                 </div>
                 <div class="col-md-6 mb-4">
@@ -449,9 +474,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
-        // ======================== 数据层 (与cosmos一致) ============================
+        // ======================== 数据层 ============================
         const DEFAULT_DATA = {
             questions: [
                 // 第一章 牛顿力学
@@ -515,6 +539,26 @@
                     source: 'Goldstein《经典力学》',
                     ans: '步骤1：设两个质量 \\( m \\)，弹簧常数 \\( k \\)，耦合常数 \\( k_c \\)。\n\n步骤2：动能 \\( T = \\frac{1}{2}m(\\dot{x}_1^2 + \\dot{x}_2^2) \\)，势能 \\( V = \\frac{1}{2}k(x_1^2+x_2^2) + \\frac{1}{2}k_c(x_1-x_2)^2 \\)。\n\n步骤3：拉格朗日方程给出耦合方程。\n\n步骤4：简正频率：\n\\[ \\omega_1 = \\sqrt{\\frac{k}{m}}, \\quad \\omega_2 = \\sqrt{\\frac{k+2k_c}{m}} \\]'
                 }
+            ],
+            resources: [
+                {
+                    id: 'r1',
+                    name: 'Goldstein《经典力学》',
+                    desc: '经典理论力学教材',
+                    file: 'pdfs/goldstein-mechanics.pdf'
+                },
+                {
+                    id: 'r2',
+                    name: '周衍柏《理论力学教程》',
+                    desc: '中文经典教材',
+                    file: 'pdfs/zhou-mechanics.pdf'
+                },
+                {
+                    id: 'r3',
+                    name: 'Landau《力学》',
+                    desc: '理论物理学教程第一卷',
+                    file: 'pdfs/landau-mechanics.pdf'
+                }
             ]
         };
 
@@ -526,7 +570,7 @@
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
-                    if (parsed && Array.isArray(parsed.questions)) {
+                    if (parsed && Array.isArray(parsed.questions) && Array.isArray(parsed.resources)) {
                         return parsed;
                     }
                 } catch (e) {}
@@ -543,15 +587,16 @@
 
         // ======================== 渲染引擎 ============================
         function escapeHtml(str) {
+            if (!str) return '';
             return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
         function parseTextToHTML(text, type) {
-            const trimmed = text.trim();
+            const trimmed = (text || '').trim();
             if (type === 'title') return trimmed;
             if (type === 'source') {
                 if (!trimmed) return '';
-                return `<div class="alert alert-info mt-2 mb-0"><i class="fas fa-book me-2"></i>来源: ${trimmed}</div>`;
+                return `<div class="alert alert-info mt-2 mb-0">来源: ${trimmed}</div>`;
             }
             const blocks = trimmed.split(/\n\s*\n/);
             let finalHTML = '';
@@ -582,36 +627,36 @@
                 const ansHtml = parseTextToHTML(q.ans, 'ans');
 
                 html += `
-                <div class="card mb-4 editable-card" id="q_${uid}">
+                <div class="card mb-4 editable-card chapter-card" id="q_${uid}">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
                             <div>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')"><i class="fas fa-trash"></i> 删除</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')">编辑</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')">删除</button>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <h5 class="fw-bold mb-0 text-secondary">题目描述</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')">编辑</button>
                             </div>
                             <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
                         </div>
 
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-book me-2"></i>来源出处</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <h5 class="fw-bold mb-0 text-secondary">来源出处</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')">编辑</button>
                             </div>
                             <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
                         </div>
 
                         <div class="mb-2">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <h5 class="fw-bold mb-0 text-secondary">解答</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')">编辑</button>
                             </div>
                             <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
                         </div>
@@ -620,6 +665,12 @@
                 `;
             });
             container.innerHTML = html;
+
+            // 更新章节题数
+            const badge = document.getElementById(`count_${chapterNum}`);
+            if (badge) {
+                badge.textContent = chapterQuestions.length + '题';
+            }
 
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
@@ -630,12 +681,49 @@
             }
         }
 
+        function renderResources() {
+            const container = document.getElementById('resourceList');
+            if (!container) return;
+            let html = '';
+            questionsData.resources.forEach(r => {
+                html += `
+                <div class="resource-item" id="res_${r.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="${r.file}" target="_blank" class="d-flex align-items-center flex-grow-1">
+                            <span>${escapeHtml(r.name)}</span>
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger dev-tool" onclick="deleteResource('${r.id}')" style="display:none;">
+                            ×
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-1">${escapeHtml(r.desc)}</small>
+                </div>
+                `;
+            });
+            html += `
+                <div class="text-center mt-3">
+                    <button class="btn btn-sm btn-outline-primary dev-tool" onclick="showAddResourceModal()" style="display:none;">
+                        添加资料
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        上传资料
+                    </button>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+        }
+
         function renderAll() {
             renderChapter(1);
             renderChapter(2);
             renderChapter(3);
             renderChapter(4);
             renderChapter(5);
+            renderResources();
             document.getElementById('devModeSwitch').checked = devModeActive;
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
@@ -647,8 +735,6 @@
             if (!devModeActive) return;
             const contentDiv = document.getElementById(elementId);
             if (!contentDiv) return;
-            const btn = contentDiv.parentElement.querySelector('.dev-edit-btn') || 
-                        contentDiv.previousElementSibling?.querySelector('.dev-edit-btn');
             const type = contentDiv.getAttribute('data-type');
             const raw = contentDiv.getAttribute('data-raw') || '';
 
@@ -660,10 +746,14 @@
                 textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
                 textarea.value = raw;
                 contentDiv.replaceWith(textarea);
-                if (btn) {
-                    btn.innerHTML = '<i class="fas fa-save"></i> 保存';
-                    btn.classList.remove('btn-outline-danger');
-                    btn.classList.add('btn-success');
+                const card = textarea.closest('.editable-card');
+                if (card) {
+                    const btn = card.querySelector(`[onclick*="toggleEdit('${elementId}')"]`);
+                    if (btn) {
+                        btn.innerHTML = '保存';
+                        btn.classList.remove('btn-outline-danger');
+                        btn.classList.add('btn-success');
+                    }
                 }
             } else {
                 const currentText = contentDiv.value;
@@ -685,10 +775,14 @@
                 if (type === 'title') newDiv.classList.add('problem-title', 'mb-4', 'fw-bold');
                 newDiv.innerHTML = parseTextToHTML(currentText, type);
                 contentDiv.replaceWith(newDiv);
-                if (btn) {
-                    btn.innerHTML = '<i class="fas fa-edit"></i> 编辑';
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-outline-danger');
+                const card = newDiv.closest('.editable-card');
+                if (card) {
+                    const btn = card.querySelector(`[onclick*="toggleEdit('${elementId}')"]`);
+                    if (btn) {
+                        btn.innerHTML = '编辑';
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-outline-danger');
+                    }
                 }
                 if (window.MathJax) {
                     MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
@@ -707,12 +801,11 @@
         function addNewQuestion(chapterId) {
             if (!devModeActive) return;
             const chapterNum = parseInt(chapterId.replace('chapter', ''));
-            const maxId = questionsData.questions
-                .filter(q => q.chapter === chapterNum)
-                .reduce((max, q) => {
-                    const num = parseInt(q.id.split('_')[1]);
-                    return num > max ? num : max;
-                }, 0);
+            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
+            const maxId = chapterQuestions.reduce((max, q) => {
+                const num = parseInt(q.id.split('_')[1]);
+                return num > max ? num : max;
+            }, 0);
             const newId = `${chapterNum}_${maxId + 1}`;
             
             const newQ = {
@@ -726,6 +819,37 @@
             questionsData.questions.push(newQ);
             saveQuestionsData(questionsData);
             renderAll();
+        }
+
+        // ======================== 资源管理 ============================
+        function deleteResource(rid) {
+            if (!devModeActive) return;
+            if (!confirm(`确定要删除资料 "${questionsData.resources.find(r => r.id === rid)?.name}" 吗？`)) return;
+            questionsData.resources = questionsData.resources.filter(r => r.id !== rid);
+            saveQuestionsData(questionsData);
+            renderResources();
+        }
+
+        function showAddResourceModal() {
+            if (!devModeActive) return;
+            const name = prompt('请输入资料名称：');
+            if (!name) return;
+            const desc = prompt('请输入简要描述：');
+            const file = prompt('请输入文件路径（如：pdfs/example.pdf）：');
+            if (!file) return;
+            const newRes = {
+                id: 'r' + Date.now(),
+                name: name,
+                desc: desc || '无描述',
+                file: file
+            };
+            questionsData.resources.push(newRes);
+            saveQuestionsData(questionsData);
+            renderResources();
+        }
+
+        function addResource() {
+            showAddResourceModal();
         }
 
         // ======================== 开发者认证 ============================
@@ -850,12 +974,77 @@
             });
         });
 
+        // ======================== ScrollSpy 滚动监听 ============================
+        function setupScrollSpy() {
+            const options = { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 };
+            const scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const chapterId = entry.target.id;
+                        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(btn => btn.classList.remove('active'));
+                        const targetBtn = document.querySelector(`#chapterNavbar a[href="#${chapterId}"]`);
+                        if(targetBtn) targetBtn.classList.add('active');
+                    }
+                });
+            }, options);
+            document.querySelectorAll('.chapter-container').forEach(chapter => scrollObserver.observe(chapter));
+        }
+
+        // ======================== 阅读进度条、返回顶部 ============================
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("readingProgress").style.width = scrolled + "%";
+
+            const backToTopBtn = document.getElementById("backToTop");
+            if (winScroll > 300) { backToTopBtn.classList.add("show"); } 
+            else { backToTopBtn.classList.remove("show"); }
+        };
+        document.getElementById("backToTop").onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // ======================== 沉浸模式 ============================
+        const focusBtn = document.getElementById('focusToggle');
+        focusBtn.addEventListener('click', () => {
+            document.body.classList.toggle('focus-mode');
+            const icon = focusBtn.querySelector('i');
+            if(document.body.classList.contains('focus-mode')) {
+                icon.className = 'fas fa-compress'; focusBtn.title = '退出专注模式';
+            } else {
+                icon.className = 'fas fa-expand'; focusBtn.title = '沉浸/授课模式';
+            }
+        });
+
+        // ======================== 夜间模式 ============================
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            const htmlTag = document.documentElement;
+            const currentTheme = htmlTag.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlTag.setAttribute('data-bs-theme', newTheme);
+            themeBtn.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun text-warning"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // ======================== 上传功能 ============================
+        document.getElementById('submitUpload')?.addEventListener('click', function() {
+            const resourceName = document.getElementById('resourceName').value;
+            const fileInput = document.getElementById('resourceFile');
+            if(resourceName && fileInput.files.length > 0) {
+                alert(`文件 ${fileInput.files[0].name} 上传成功！`);
+                var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                bootstrapModal.hide();
+            } else {
+                alert('请填写完整信息并选择文件！');
+            }
+        });
+
         // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
             if (sessionStorage.getItem('dev_authenticated') === 'true') {
                 devModeActive = true;
             }
             renderAll();
+            setupScrollSpy();
             if (devModeActive) {
                 document.getElementById('devModeSwitch').checked = true;
                 document.querySelectorAll('.dev-tool').forEach(el => {
@@ -872,23 +1061,13 @@
         window.toggleEdit = toggleEdit;
         window.addNewQuestion = addNewQuestion;
         window.deleteQuestion = deleteQuestion;
+        window.deleteResource = deleteResource;
+        window.addResource = addResource;
+        window.showAddResourceModal = showAddResourceModal;
         window.openDevAuth = openDevAuth;
         window.closeDevAuth = closeDevAuth;
         window.verifyDevAuth = verifyDevAuth;
         window.togglePasswordVisibility = togglePasswordVisibility;
-
-        // 上传功能 (保留)
-        document.getElementById('submitUpload')?.addEventListener('click', function() {
-            const resourceName = document.getElementById('resourceName').value;
-            const fileInput = document.getElementById('resourceFile');
-            if(resourceName && fileInput.files.length > 0) {
-                alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
-                bootstrapModal.hide();
-            } else {
-                alert('请填写完整信息并选择文件！');
-            }
-        });
     </script>
 </body>
 </html>
