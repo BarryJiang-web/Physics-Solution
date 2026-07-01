@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电动力学解答 | PhysicsSolution Hub</title>
+    <title>原子物理 | PhysicsSolution Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         /* ================= 主题变量 ================= */
         :root {
-            --electro-blue: #1a73e8;
-            --electro-dark: #0d47a1;
+            --atomic-orange: #fd7e14;
+            --atomic-dark: #e66100;
             --physics-blue: #2b5fdc;
             --bg-body: #f8f9fa;
             --bg-card: #ffffff;
@@ -40,26 +40,26 @@
         .text-dark { color: var(--text-main) !important; }
         .text-secondary { color: #888 !important; }
 
-        .electro-header {
-            background: linear-gradient(135deg, var(--electro-blue) 0%, var(--electro-dark) 100%);
+        .atomic-header {
+            background: linear-gradient(135deg, var(--atomic-orange) 0%, var(--atomic-dark) 100%);
             color: white;
         }
         .chapter-card {
-            border-left: 4px solid var(--electro-blue);
+            border-left: 4px solid var(--atomic-orange);
             transition: all 0.3s;
         }
         .chapter-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(26, 115, 232, 0.1);
+            box-shadow: 0 10px 20px rgba(253, 126, 20, 0.1);
         }
         .problem-title {
-            color: var(--electro-blue);
-            border-bottom: 2px solid var(--electro-blue);
+            color: var(--atomic-orange);
+            border-bottom: 2px solid var(--atomic-orange);
         }
         .nav-pills .nav-link.active, .list-group-item.active {
-            background-color: var(--electro-blue) !important;
+            background-color: var(--atomic-orange) !important;
             color: white !important;
-            border-color: var(--electro-blue);
+            border-color: var(--atomic-orange);
         }
         .book-cover {
             max-height: 250px;
@@ -72,7 +72,7 @@
         .solution-step {
             margin-bottom: 15px;
             padding-left: 15px;
-            border-left: 3px solid var(--electro-blue);
+            border-left: 3px solid var(--atomic-orange);
         }
         .resource-item {
             border-left: 3px solid var(--physics-blue);
@@ -85,6 +85,9 @@
         }
         .resource-item a { color: var(--text-main); text-decoration: none; }
         .resource-item a:hover { color: var(--physics-blue); }
+        .atomic-icon {
+            color: var(--atomic-orange);
+        }
         @media (max-width: 768px) {
             .book-cover { max-width: 100%; height: auto; }
         }
@@ -115,12 +118,12 @@
         .dev-delete-btn { padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-left: 4px; }
         .dev-tool { display: none; }
 
-        /* ================= 新增功能样式 ================= */
+        /* 进度条 */
         .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 1060; }
-        .progress-bar { height: 4px; background: var(--electro-blue); width: 0%; transition: width 0.1s ease-out; }
+        .progress-bar { height: 4px; background: var(--atomic-orange); width: 0%; transition: width 0.1s ease-out; }
         
         .action-btn { background: transparent; border: none; color: var(--text-main); opacity: 0.7; transition: all 0.2s; padding: 5px 10px; border-radius: 6px; }
-        .action-btn:hover { opacity: 1; background-color: rgba(26, 115, 232, 0.1); color: var(--electro-blue); }
+        .action-btn:hover { opacity: 1; background-color: rgba(253, 126, 20, 0.1); color: var(--atomic-orange); }
 
         .focus-mode .sidebar-col { display: none !important; }
         .focus-mode .content-col { width: 100% !important; max-width: 900px; margin: 0 auto; transition: all 0.3s ease; }
@@ -128,7 +131,7 @@
         #backToTop {
             position: fixed; bottom: 30px; right: 30px; z-index: 99;
             width: 50px; height: 50px; border-radius: 50%;
-            background-color: var(--electro-blue); color: white; border: none;
+            background-color: var(--atomic-orange); color: white; border: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
             transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
@@ -150,8 +153,8 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .auth-modal .form-label { font-weight: 600; }
-        .auth-modal .btn-primary { background: var(--electro-blue); border: none; }
-        .auth-modal .btn-primary:hover { background: #1558b0; }
+        .auth-modal .btn-primary { background: var(--atomic-orange); border: none; }
+        .auth-modal .btn-primary:hover { background: #e05a00; }
         .auth-error { color: #dc3545; font-size: 0.9rem; margin-top: 8px; display: none; }
         #authButtons { display: none !important; }
         .password-toggle { position: relative; }
@@ -160,7 +163,48 @@
             cursor: pointer; color: #6c757d; background: none; border: none; padding: 0; z-index: 5;
         }
         .password-toggle .toggle-eye:hover { color: var(--text-main); }
-        #userMenu { display: none !important; }
+
+        /* 图片相关样式 */
+        .img-upload-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border: 1px solid var(--border-color);
+        }
+        .image-gallery-img {
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .image-gallery-img:hover {
+            transform: scale(1.05);
+        }
+        .chapter-editor {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .draggable-chapter {
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .draggable-chapter:hover {
+            background: rgba(253, 126, 20, 0.05);
+        }
+        .chapter-order-handle {
+            color: var(--atomic-orange);
+            margin-right: 10px;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
@@ -208,7 +252,7 @@
                         <a class="nav-link" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="electrodynamics.html">电动力学</a>
+                        <a class="nav-link active" href="atomic.html">原子物理</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
@@ -228,53 +272,74 @@
         </div>
     </nav>
 
-    <!-- 电动力学页头 -->
-    <header class="electro-header py-5 mb-5">
+    <!-- 原子物理页头 -->
+    <header class="atomic-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
-                电动力学解答库
+                原子物理解答库
             </h1>
-            <p class="lead mb-0">涵盖静电学、静磁学、电磁波传播等核心内容</p>
+            <p class="lead mb-0">涵盖原子结构、光谱学、量子跃迁等核心内容</p>
         </div>
     </header>
 
     <!-- 主要内容区 -->
     <div class="container">
         <div class="row">
-            <!-- 左侧导航 -->
+            <!-- 左侧导航 - 固定侧边栏 -->
             <div class="col-lg-3 mb-4 sidebar-col">
                 <div class="sidebar-sticky">
-                    <!-- 搜索卡片 -->
+                    <!-- 搜索栏 -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
                             <h5 class="card-title mb-3">搜索题目</h5>
                             <div class="input-group">
-                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词 (如：电容)...">
+                                <input type="text" id="searchInput" class="form-control" placeholder="输入关键词...">
                             </div>
                         </div>
                     </div>
 
+                    <!-- 章节导航 - 可管理 -->
                     <div class="card shadow-sm">
-                        <div class="card-header bg-transparent">
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">章节导航</h5>
+                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addChapter()" style="display:none;">
+                                <i class="fas fa-plus"></i> 添加
+                            </button>
                         </div>
                         <div class="list-group list-group-flush" id="chapterNavbar">
-                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 静电学</a>
-                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 静磁学</a>
-                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 电磁波</a>
-                            <a href="#chapter4" class="list-group-item list-group-item-action">4. 辐射理论</a>
-                            <a href="#chapter5" class="list-group-item list-group-item-action">5. 相对论电动力学</a>
+                            <!-- 由JS动态渲染 -->
                         </div>
                     </div>
 
+                    <!-- 推荐教材 -->
                     <div class="card shadow-sm mt-4">
                         <div class="card-header bg-transparent">
                             <h5 class="mb-0">推荐教材</h5>
                         </div>
                         <div class="card-body text-center">
-                            <img src="electro.jpg" alt="电动力学" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
-                            <h6>电动力学导论</h6>
-                            <p class="text-muted small mb-0">David J. Griffiths</p>
+                            <img src="atom.webp" alt="原子物理学" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
+                            <h6>原子物理学</h6>
+                            <p class="text-muted small mb-0">杨福家</p>
+                        </div>
+                    </div>
+
+                    <!-- 图片工具栏（开发者模式） -->
+                    <div class="card shadow-sm mt-4 dev-tool" style="display:none;">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0"><i class="fas fa-images text-primary me-2"></i>图片管理</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="uploadImageToLibrary()">
+                                    <i class="fas fa-upload me-1"></i> 批量上传图片
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="showImageGallery()">
+                                    <i class="fas fa-photo-video me-1"></i> 图片库 (<span id="imageCount">0</span>)
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="clearAllImages()">
+                                    <i class="fas fa-trash-alt me-1"></i> 清空图片
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -282,7 +347,7 @@
                     <div class="card shadow-sm mt-4">
                         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">资料库</h5>
-                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addResource()" style="display:none;">
+                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="showAddResourceModal()" style="display:none;">
                                 添加
                             </button>
                         </div>
@@ -294,64 +359,8 @@
             </div>
 
             <!-- 右侧内容 -->
-            <div class="col-lg-9 content-col">
-                <!-- 章节1 -->
-                <div class="mb-5 chapter-container" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            第一章：静电学
-                        </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--electro-blue);" id="count_1">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="1"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
-                        在第一章添加新题目
-                    </button>
-                </div>
-
-                <!-- 章节2 -->
-                <div class="mb-5 chapter-container" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            第二章：静磁学
-                        </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--electro-blue);" id="count_2">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="2"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
-                        在第二章添加新题目
-                    </button>
-                </div>
-
-                <!-- 章节3 -->
-                <div class="mb-5 chapter-container" id="chapter3">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">第三章：电磁波</h2>
-                        <span class="badge rounded-pill" style="background-color: var(--electro-blue);" id="count_3">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="3"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">在第三章添加新题目</button>
-                </div>
-
-                <!-- 章节4 -->
-                <div class="mb-5 chapter-container" id="chapter4">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">第四章：辐射理论</h2>
-                        <span class="badge rounded-pill" style="background-color: var(--electro-blue);" id="count_4">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="4"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">在第四章添加新题目</button>
-                </div>
-
-                <!-- 章节5 -->
-                <div class="mb-5 chapter-container" id="chapter5">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">第五章：相对论电动力学</h2>
-                        <span class="badge rounded-pill" style="background-color: var(--electro-blue);" id="count_5">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="5"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter5')" style="display: none;">在第五章添加新题目</button>
-                </div>
+            <div class="col-lg-9 content-col" id="contentArea">
+                <!-- 章节容器由JS动态渲染 -->
             </div>
         </div>
     </div>
@@ -359,7 +368,10 @@
     <!-- 返回顶部按钮 -->
     <button id="backToTop" title="返回顶部"><i class="fas fa-arrow-up"></i></button>
 
-    <!-- 上传资料的模态框 -->
+    <!-- Toast 通知容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 上传资料模态框 -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -391,87 +403,104 @@
         </div>
     </div>
 
+    <!-- 章节编辑模态框 -->
+    <div class="modal fade" id="chapterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chapterModalTitle">编辑章节</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">章节编号</label>
+                        <input type="number" class="form-control" id="chapterNumber" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">章节名称</label>
+                        <input type="text" class="form-control" id="chapterName" placeholder="如：原子模型">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">章节描述（可选）</label>
+                        <input type="text" class="form-control" id="chapterDesc" placeholder="简短描述">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="deleteChapterBtn" style="display:none;" onclick="deleteCurrentChapter()">删除章节</button>
+                    <button type="button" class="btn btn-primary" onclick="saveChapter()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ======================== 数据层 ============================
-        const DEFAULT_DATA = {
-            questions: [
-                {
-                    id: '1_1',
-                    chapter: 1,
-                    title: '问题1.1 - 导体球的电容',
-                    desc: '半径为 \\( R \\) 的孤立导体球，求其电容 \\( C \\)。',
-                    source: 'Griffiths《电动力学导论》第二章',
-                    ans: '步骤1：设导体球带电量为 \\( Q \\)，则电势为：\n\\[ \\phi = \\frac{1}{4\\pi\\epsilon_0}\\frac{Q}{R} \\]\n\n步骤2：根据电容定义：\n\\[ C = \\frac{Q}{\\phi} = 4\\pi\\epsilon_0 R \\]'
-                },
-                {
-                    id: '1_2',
-                    chapter: 1,
-                    title: '问题1.2 - 平行板电容器',
-                    desc: '面积为 \\( A \\)，间距为 \\( d \\) 的平行板电容器，求电容 \\( C \\)。',
-                    source: 'Griffiths《电动力学导论》第二章',
-                    ans: '步骤1：设板间电场 \\( E = \\sigma/\\epsilon_0 = Q/(\\epsilon_0 A) \\)\n\n步骤2：电势差 \\( V = E d = Qd/(\\epsilon_0 A) \\)\n\n步骤3：电容 \\( C = Q/V = \\epsilon_0 A/d \\)'
-                },
-                {
-                    id: '2_1',
-                    chapter: 2,
-                    title: '问题2.1 - 无限长直导线的磁场',
-                    desc: '求通有电流 \\( I \\) 的无限长直导线周围的磁感应强度 \\( \\mathbf{B} \\)。',
-                    source: 'Griffiths《电动力学导论》第五章',
-                    ans: '步骤1：根据安培环路定理：\n\\[ \\oint \\mathbf{B} \\cdot d\\mathbf{l} = \\mu_0 I_{\\text{enc}} \\]\n\n步骤2：选择半径为 \\( r \\) 的圆形环路：\n\\[ B \\cdot 2\\pi r = \\mu_0 I \\Rightarrow B = \\frac{\\mu_0 I}{2\\pi r} \\]\n\n步骤3：方向沿切向，柱坐标表示为：\n\\[ \\mathbf{B} = \\frac{\\mu_0 I}{2\\pi r} \\hat{\\phi} \\]'
-                },
-                {
-                    id: '3_1',
-                    chapter: 3,
-                    title: '问题3.1 - 平面电磁波波动方程',
-                    desc: '证明在真空中传播的平面电磁波满足波动方程：\n\\[ \\nabla^2 \\mathbf{E} - \\mu_0 \\epsilon_0 \\frac{\\partial^2 \\mathbf{E}}{\\partial t^2} = 0 \\]',
-                    source: 'Griffiths《电动力学导论》第九章',
-                    ans: '步骤1：从麦克斯韦方程出发：\n\\[ \\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t}, \\quad \\nabla \\times \\mathbf{B} = \\mu_0 \\epsilon_0 \\frac{\\partial \\mathbf{E}}{\\partial t} \\]\n\n步骤2：对第一个方程取旋度：\n\\[ \\nabla \\times (\\nabla \\times \\mathbf{E}) = -\\frac{\\partial}{\\partial t}(\\nabla \\times \\mathbf{B}) \\]\n\n步骤3：使用矢量恒等式并代入第二个方程：\n\\[ \\nabla(\\nabla \\cdot \\mathbf{E}) - \\nabla^2 \\mathbf{E} = -\\mu_0 \\epsilon_0 \\frac{\\partial^2 \\mathbf{E}}{\\partial t^2} \\]\n\n步骤4：在真空中 \\(\\nabla \\cdot \\mathbf{E} = 0\\)，得到波动方程。'
-                }
-            ],
-            resources: [
-                {
-                    id: 'r1',
-                    name: 'Griffiths《电动力学》',
-                    desc: '经典电动力学教材',
-                    file: 'pdfs/griffiths-electro.pdf'
-                },
-                {
-                    id: 'r2',
-                    name: '蒋泊远笔记',
-                    desc: '精选习题与解答',
-                    file: '../物理系教材解答网站尝试/source/electro/电动力学复习.pdf'
-                },
-                {
-                    id: 'r3',
-                    name: '北京大学电动力学简明教程',
-                    desc: '俞允强教授',
-                    file: '../物理系教材解答网站尝试/source/electro/【北京大学物理学丛书】电动力学简明教程【俞允强】.pdf'
-                },
-                {
-                    id: 'r4',
-                    name: '经典电动力学',
-                    desc: '经典电动力学教材',
-                    file: '../物理系教材解答网站尝试/source/electro/经典电动力学_13451420.pdf'
-                }
-            ]
-        };
+        const STORAGE_KEY = 'atomic_full_data';
 
-        const STORAGE_KEY = 'electro_questions_data';
-        let devModeActive = false;
+        const DEFAULT_CHAPTERS = [
+            { id: 'ch1', number: 1, name: '原子模型', desc: '卢瑟福模型、玻尔模型' },
+            { id: 'ch2', number: 2, name: '氢原子光谱', desc: '巴尔末系、里德伯公式' },
+            { id: 'ch3', number: 3, name: '多电子原子', desc: '泡利原理、洪特规则' },
+            { id: 'ch4', number: 4, name: 'X射线', desc: '特征X射线、康普顿散射' },
+            { id: 'ch5', number: 5, name: '原子核物理基础', desc: '核衰变、核反应' }
+        ];
+
+        const DEFAULT_QUESTIONS = [
+            {
+                id: 'q1_1',
+                chapterId: 'ch1',
+                title: '问题1.1 - 卢瑟福散射公式推导',
+                desc: '推导卢瑟福散射公式，证明散射截面为：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left(\\frac{Ze^2}{16\\pi\\epsilon_0 E}\\right)^2 \\frac{1}{\\sin^4(\\theta/2)} \\]\n其中Z为靶核电荷数，E为入射粒子动能，θ为散射角。',
+                source: '杨福家《原子物理学》第一章',
+                ans: '步骤1：考虑库仑相互作用力：\n\\[ F = \\frac{Ze^2}{4\\pi\\epsilon_0 r^2} \\]\n\n步骤2：计算角动量守恒和能量守恒，得到碰撞参数b与散射角关系：\n\\[ b = \\frac{Ze^2}{8\\pi\\epsilon_0 E} \\cot(\\theta/2) \\]\n\n步骤3：散射截面定义：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left|\\frac{b}{\\sin\\theta}\\frac{db}{d\\theta}\\right| \\]\n\n步骤4：代入b的表达式得到卢瑟福公式。'
+            },
+            {
+                id: 'q1_2',
+                chapterId: 'ch1',
+                title: '问题1.2 - 玻尔氢原子能级',
+                desc: '根据玻尔模型推导氢原子能级公式，并计算基态能量。',
+                source: '杨福家《原子物理学》第一章',
+                ans: '步骤1：角动量量子化条件：\n\\[ mvr = n\\hbar \\]\n\n步骤2：库仑力提供向心力：\n\\[ \\frac{e^2}{4\\pi\\epsilon_0 r^2} = \\frac{mv^2}{r} \\]\n\n步骤3：联立解得轨道半径：\n\\[ r_n = n^2 a_0, \\quad a_0 = \\frac{4\\pi\\epsilon_0\\hbar^2}{me^2} \\]\n\n步骤4：能量：\n\\[ E_n = -\\frac{13.6}{n^2} \\text{eV} \\]，基态能量 -13.6 eV。'
+            },
+            {
+                id: 'q2_1',
+                chapterId: 'ch2',
+                title: '问题2.1 - 巴尔末系波长计算',
+                desc: '计算氢原子巴尔末系前三条谱线的波长（n=3,4,5→n=2）。',
+                source: '杨福家《原子物理学》第二章',
+                ans: '步骤1：里德伯公式：\n\\[ \\frac{1}{\\lambda} = R_H \\left(\\frac{1}{n_f^2} - \\frac{1}{n_i^2}\\right) \\]\n其中R_H=1.097×10⁷ m⁻¹\n\n步骤2：Hα线(n=3→2)：\n\\[ \\lambda = 656.3 \\text{nm} \\]\n\n步骤3：Hβ线(n=4→2)：\n\\[ \\lambda = 486.1 \\text{nm} \\]\n\n步骤4：Hγ线(n=5→2)：\n\\[ \\lambda = 434.0 \\text{nm} \\]'
+            }
+        ];
+
+        const DEFAULT_RESOURCES = [
+            { id: 'r1', name: 'QZQ笔记', desc: '原子物理学习笔记', file: '原子物理学笔记.pdf' },
+            { id: 'r2', name: '原子物理学', desc: '杨福家', file: '../source/atom/原子物理学 by 杨福家 (z-lib.org).pdf' },
+            { id: 'r3', name: '蒋泊远笔记', desc: '学习笔记', file: '../source/atom/原子物理学.pdf' }
+        ];
+
+        function getDefaultData() {
+            return {
+                chapters: JSON.parse(JSON.stringify(DEFAULT_CHAPTERS)),
+                questions: JSON.parse(JSON.stringify(DEFAULT_QUESTIONS)),
+                resources: JSON.parse(JSON.stringify(DEFAULT_RESOURCES))
+            };
+        }
 
         function loadData() {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
-                    if (parsed && Array.isArray(parsed.questions) && Array.isArray(parsed.resources)) {
+                    if (parsed && parsed.chapters && parsed.questions && parsed.resources) {
                         return parsed;
                     }
                 } catch (e) {}
             }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
-            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+            const defaultData = getDefaultData();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+            return defaultData;
         }
 
         function saveData(data) {
@@ -479,20 +508,100 @@
         }
 
         let appData = loadData();
+        let devModeActive = false;
+        let editingChapterId = null;
 
-        // ======================== 渲染引擎 ============================
+        // ======================== 图片管理系统 ============================
+        const IMAGE_STORAGE_KEY = 'atomic_images_data';
+
+        function loadImages() {
+            const stored = localStorage.getItem(IMAGE_STORAGE_KEY);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {}
+            }
+            return {};
+        }
+
+        function saveImages(images) {
+            localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(images));
+            updateImageCount();
+        }
+
+        let imageData = loadImages();
+
+        function updateImageCount() {
+            const countEl = document.getElementById('imageCount');
+            if (countEl) {
+                countEl.textContent = Object.keys(imageData).length;
+            }
+        }
+
+        // ======================== 工具函数 ============================
         function escapeHtml(str) {
+            if (!str) return '';
             return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
+        function unescapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        }
+
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-success text-white',
+                danger: 'bg-danger text-white',
+                warning: 'bg-warning text-dark',
+                info: 'bg-info text-white'
+            };
+            toast.className = `toast show ${colors[type] || colors.success}`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="toast-body d-flex align-items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ======================== 图片处理函数 ============================
+        function parseImageMarkdown(text) {
+            if (!text) return text;
+            return text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, imgId) {
+                if (imageData[imgId]) {
+                    return `<img src="${imageData[imgId].data}" alt="${alt || '图片'}" class="img-fluid my-2" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">`;
+                }
+                return match;
+            });
+        }
+
         function parseTextToHTML(text, type) {
+            if (!text) return '';
             const trimmed = text.trim();
-            if (type === 'title') return trimmed;
+            
+            // 先解析图片
+            let processed = parseImageMarkdown(trimmed);
+            
+            if (type === 'title') return processed;
             if (type === 'source') {
-                if (!trimmed) return '';
-                return `<div class="alert alert-info mt-2 mb-0">来源: ${trimmed}</div>`;
+                if (!processed) return '';
+                return `<div class="alert alert-info mt-2 mb-0">来源: ${processed}</div>`;
             }
-            const blocks = trimmed.split(/\n\s*\n/);
+            
+            const blocks = processed.split(/\n\s*\n/);
             let finalHTML = '';
             blocks.forEach(block => {
                 if (!block.trim()) return;
@@ -503,74 +612,163 @@
                     finalHTML += `<div class="solution-step"><p>${formattedBlock}</p></div>`;
                 }
             });
-            return finalHTML || trimmed;
+            return finalHTML || processed;
         }
 
-        function renderChapter(chapterNum) {
-            const container = document.querySelector(`.chapter-container#chapter${chapterNum} .question-list`);
-            if (!container) return;
-            const chapterQuestions = appData.questions.filter(q => q.chapter === chapterNum);
-            chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
+        // ======================== 渲染引擎 ============================
+        function renderChapters() {
+            const navbar = document.getElementById('chapterNavbar');
+            if (!navbar) return;
+            
+            // 按编号排序
+            const sortedChapters = [...appData.chapters].sort((a, b) => a.number - b.number);
             
             let html = '';
-            chapterQuestions.forEach(q => {
-                const uid = q.id;
-                const titleHtml = parseTextToHTML(q.title, 'title');
-                const descHtml = parseTextToHTML(q.desc, 'desc');
-                const sourceHtml = parseTextToHTML(q.source, 'source');
-                const ansHtml = parseTextToHTML(q.ans, 'ans');
-
+            sortedChapters.forEach((ch, index) => {
+                const isActive = index === 0 ? 'active' : '';
+                const questionCount = appData.questions.filter(q => q.chapterId === ch.id).length;
                 html += `
-                <div class="card mb-4 editable-card chapter-card" id="q_${uid}">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
-                            <div>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')">编辑</button>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')">删除</button>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary">题目描述</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')">编辑</button>
-                            </div>
-                            <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary">来源出处</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')">编辑</button>
-                            </div>
-                            <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
-                        </div>
-
-                        <div class="mb-2">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary">解答</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')">编辑</button>
-                            </div>
-                            <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
-                        </div>
+                <a href="#${ch.id}" class="list-group-item list-group-item-action ${isActive} draggable-chapter" 
+                   data-chapter-id="${ch.id}" data-index="${index}"
+                   onclick="scrollToChapter('${ch.id}')">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="chapter-order-handle dev-tool" style="display:none; cursor:grab;">
+                                <i class="fas fa-grip-vertical"></i>
+                            </span>
+                            ${ch.number}. ${ch.name}
+                        </span>
+                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${questionCount}</span>
                     </div>
-                </div>
+                    ${ch.desc ? `<small class="text-muted d-block ms-3">${ch.desc}</small>` : ''}
+                    <div class="dev-tool mt-1" style="display:none;">
+                        <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); editChapter('${ch.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteChapter('${ch.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </a>
                 `;
             });
-            container.innerHTML = html;
-
-            // 更新题目计数
-            const countBadge = document.getElementById(`count_${chapterNum}`);
-            if (countBadge) {
-                countBadge.textContent = `${chapterQuestions.length}题`;
-            }
-
+            navbar.innerHTML = html;
+            
+            // 更新开发者工具显示
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
+        }
 
-            if (window.MathJax && container.querySelectorAll('.editable-content').length) {
+        function renderContent() {
+            const container = document.getElementById('contentArea');
+            if (!container) return;
+            
+            const sortedChapters = [...appData.chapters].sort((a, b) => a.number - b.number);
+            
+            let html = '';
+            sortedChapters.forEach(ch => {
+                const chapterQuestions = appData.questions.filter(q => q.chapterId === ch.id);
+                chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
+                
+                html += `
+                <div class="mb-5 chapter-container" id="${ch.id}">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            ${ch.number}. ${ch.name}
+                            ${ch.desc ? `<small class="text-muted fs-6 ms-2">${ch.desc}</small>` : ''}
+                        </h2>
+                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${chapterQuestions.length}题</span>
+                    </div>
+                    <div class="question-list" data-chapter-id="${ch.id}">
+                `;
+                
+                if (chapterQuestions.length === 0) {
+                    html += `<p class="text-muted text-center py-3">暂无题目</p>`;
+                } else {
+                    chapterQuestions.forEach(q => {
+                        const uid = q.id;
+                        const titleHtml = parseTextToHTML(q.title, 'title');
+                        const descHtml = parseTextToHTML(q.desc, 'desc');
+                        const sourceHtml = parseTextToHTML(q.source, 'source');
+                        const ansHtml = parseTextToHTML(q.ans, 'ans');
+                        
+                        html += `
+                        <div class="card mb-4 editable-card chapter-card" id="q_${uid}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('title_${uid}')" style="display:none;" title="插入图片">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')" style="display:none;">编辑</button>
+                                        <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')" style="display:none;">删除</button>
+                                    </div>
+                                </div>
+        
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="fw-bold mb-0 text-secondary">题目描述</h5>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('desc_${uid}')" style="display:none;" title="插入图片">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')" style="display:none;">编辑</button>
+                                        </div>
+                                    </div>
+                                    <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
+                                </div>
+        
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="fw-bold mb-0 text-secondary">来源出处</h5>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('source_${uid}')" style="display:none;" title="插入图片">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')" style="display:none;">编辑</button>
+                                        </div>
+                                    </div>
+                                    <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
+                                </div>
+        
+                                <div class="mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="fw-bold mb-0 text-secondary">解答</h5>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('ans_${uid}')" style="display:none;" title="插入图片">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')" style="display:none;">编辑</button>
+                                        </div>
+                                    </div>
+                                    <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    });
+                }
+                
+                html += `
+                    </div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('${ch.id}')" style="display:none;">
+                        <i class="fas fa-plus"></i> 在此章节添加新题目
+                    </button>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // 更新开发者工具显示
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+            
+            // 渲染MathJax
+            if (window.MathJax) {
                 MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
             }
         }
@@ -578,16 +776,18 @@
         function renderResources() {
             const container = document.getElementById('resourceList');
             if (!container) return;
+            
             let html = '';
             appData.resources.forEach(r => {
                 html += `
                 <div class="resource-item" id="res_${r.id}">
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="${r.file}" target="_blank" class="d-flex align-items-center flex-grow-1">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>
                             <span>${escapeHtml(r.name)}</span>
                         </a>
                         <button class="btn btn-sm btn-outline-danger dev-tool" onclick="deleteResource('${r.id}')" style="display:none;">
-                            ×
+                            <i class="fas fa-times"></i>
                         </button>
                     </div>
                     <small class="text-muted d-block mt-1">${escapeHtml(r.desc)}</small>
@@ -596,32 +796,528 @@
             });
             html += `
                 <div class="text-center mt-3">
-                    <button class="btn btn-sm btn-outline-primary dev-tool" onclick="showAddResourceModal()" style="display:none;">
-                        上传资料
-                    </button>
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                        上传资料
+                        <i class="fas fa-upload me-1"></i> 上传资料
                     </button>
                 </div>
             `;
             container.innerHTML = html;
-
+            
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
         }
 
         function renderAll() {
-            renderChapter(1);
-            renderChapter(2);
-            renderChapter(3);
-            renderChapter(4);
-            renderChapter(5);
+            renderChapters();
+            renderContent();
             renderResources();
+            updateImageCount();
             document.getElementById('devModeSwitch').checked = devModeActive;
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
+        }
+
+        // ======================== 章节管理 ============================
+        function scrollToChapter(chapterId) {
+            const el = document.getElementById(chapterId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function addChapter() {
+            if (!devModeActive) return;
+            const maxNumber = appData.chapters.reduce((max, ch) => Math.max(max, ch.number), 0);
+            editingChapterId = null;
+            document.getElementById('chapterModalTitle').textContent = '添加新章节';
+            document.getElementById('chapterNumber').value = maxNumber + 1;
+            document.getElementById('chapterName').value = '';
+            document.getElementById('chapterDesc').value = '';
+            document.getElementById('deleteChapterBtn').style.display = 'none';
+            const modal = new bootstrap.Modal(document.getElementById('chapterModal'));
+            modal.show();
+        }
+
+        function editChapter(chapterId) {
+            if (!devModeActive) return;
+            const ch = appData.chapters.find(c => c.id === chapterId);
+            if (!ch) return;
+            editingChapterId = chapterId;
+            document.getElementById('chapterModalTitle').textContent = '编辑章节';
+            document.getElementById('chapterNumber').value = ch.number;
+            document.getElementById('chapterName').value = ch.name;
+            document.getElementById('chapterDesc').value = ch.desc || '';
+            document.getElementById('deleteChapterBtn').style.display = 'inline-block';
+            const modal = new bootstrap.Modal(document.getElementById('chapterModal'));
+            modal.show();
+        }
+
+        function saveChapter() {
+            const number = parseInt(document.getElementById('chapterNumber').value);
+            const name = document.getElementById('chapterName').value.trim();
+            const desc = document.getElementById('chapterDesc').value.trim();
+            
+            if (!number || number < 1) {
+                showToast('请输入有效的章节编号', 'danger');
+                return;
+            }
+            if (!name) {
+                showToast('请输入章节名称', 'danger');
+                return;
+            }
+            
+            if (editingChapterId) {
+                // 编辑已有章节
+                const ch = appData.chapters.find(c => c.id === editingChapterId);
+                if (ch) {
+                    ch.number = number;
+                    ch.name = name;
+                    ch.desc = desc;
+                    showToast('章节已更新', 'success');
+                }
+            } else {
+                // 添加新章节
+                const newChapter = {
+                    id: 'ch' + Date.now(),
+                    number: number,
+                    name: name,
+                    desc: desc
+                };
+                appData.chapters.push(newChapter);
+                showToast('新章节已添加', 'success');
+            }
+            
+            saveData(appData);
+            renderAll();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('chapterModal'));
+            modal.hide();
+        }
+
+        function deleteCurrentChapter() {
+            if (!editingChapterId) return;
+            deleteChapter(editingChapterId);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('chapterModal'));
+            modal.hide();
+        }
+
+        function deleteChapter(chapterId) {
+            if (!devModeActive) return;
+            const ch = appData.chapters.find(c => c.id === chapterId);
+            if (!ch) return;
+            const questionCount = appData.questions.filter(q => q.chapterId === chapterId).length;
+            if (questionCount > 0) {
+                if (!confirm(`章节 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除整个章节吗？题目也会被删除！`)) {
+                    return;
+                }
+            } else {
+                if (!confirm(`确定要删除章节 "${ch.number}. ${ch.name}" 吗？`)) {
+                    return;
+                }
+            }
+            
+            appData.chapters = appData.chapters.filter(c => c.id !== chapterId);
+            appData.questions = appData.questions.filter(q => q.chapterId !== chapterId);
+            saveData(appData);
+            renderAll();
+            showToast(`已删除章节 "${ch.name}"`, 'danger');
+        }
+
+        // ======================== 题目管理 ============================
+        function addNewQuestion(chapterId) {
+            if (!devModeActive) return;
+            const ch = appData.chapters.find(c => c.id === chapterId);
+            if (!ch) {
+                showToast('章节不存在', 'danger');
+                return;
+            }
+            
+            const chapterQuestions = appData.questions.filter(q => q.chapterId === chapterId);
+            const maxNum = chapterQuestions.reduce((max, q) => {
+                const parts = q.id.split('_');
+                const num = parseInt(parts[parts.length - 1]);
+                return num > max ? num : max;
+            }, 0);
+            
+            const newQ = {
+                id: `q${ch.number}_${maxNum + 1}`,
+                chapterId: chapterId,
+                title: '新题目名称',
+                desc: '请在此输入题目内容，支持 LaTeX 公式：\n\\[ E = mc^2 \\]\n\n双换行可以分段。',
+                source: '待补充参考书籍',
+                ans: '步骤1：输入解答内容。\n\n步骤2：空行后输入下一步。'
+            };
+            
+            appData.questions.push(newQ);
+            saveData(appData);
+            renderAll();
+            showToast('新题目已添加', 'success');
+            
+            // 滚动到新题目
+            setTimeout(() => {
+                const el = document.getElementById(`q_${newQ.id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
+        function deleteQuestion(uid) {
+            if (!devModeActive) return;
+            const q = appData.questions.find(q => q.id === uid);
+            if (!q) return;
+            if (!confirm(`确定要删除题目 "${q.title}" 吗？`)) return;
+            
+            appData.questions = appData.questions.filter(q => q.id !== uid);
+            saveData(appData);
+            renderAll();
+            showToast('题目已删除', 'danger');
+        }
+
+        // ======================== 编辑功能 ============================
+        function toggleEdit(elementId) {
+            if (!devModeActive) return;
+            const contentDiv = document.getElementById(elementId);
+            if (!contentDiv) return;
+            const type = contentDiv.getAttribute('data-type');
+            const raw = contentDiv.getAttribute('data-raw') || '';
+            const uid = elementId.split('_').slice(1).join('_');
+            
+            if (contentDiv.tagName.toLowerCase() !== 'textarea') {
+                const textarea = document.createElement('textarea');
+                textarea.id = elementId;
+                textarea.className = 'form-control editable-content mb-2';
+                textarea.setAttribute('data-type', type);
+                textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
+                textarea.value = unescapeHtml(raw);
+                contentDiv.replaceWith(textarea);
+                
+                // 更新按钮
+                const btn = document.querySelector(`#q_${uid} .dev-edit-btn`);
+                if (btn) {
+                    btn.innerHTML = '保存';
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-success');
+                }
+                textarea.focus();
+            } else {
+                const currentText = contentDiv.value;
+                const typeKey = elementId.split('_')[0];
+                const q = appData.questions.find(q => q.id === uid);
+                if (q) {
+                    if (typeKey === 'title') q.title = currentText;
+                    else if (typeKey === 'desc') q.desc = currentText;
+                    else if (typeKey === 'source') q.source = currentText;
+                    else if (typeKey === 'ans') q.ans = currentText;
+                    saveData(appData);
+                }
+                
+                const newDiv = document.createElement('div');
+                newDiv.id = elementId;
+                newDiv.className = 'editable-content';
+                newDiv.setAttribute('data-type', type);
+                newDiv.setAttribute('data-raw', escapeHtml(currentText));
+                if (type === 'title') newDiv.classList.add('problem-title', 'mb-4', 'fw-bold');
+                newDiv.innerHTML = parseTextToHTML(currentText, type);
+                contentDiv.replaceWith(newDiv);
+                
+                const btn = document.querySelector(`#q_${uid} .dev-edit-btn`);
+                if (btn) {
+                    btn.innerHTML = '编辑';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-danger');
+                }
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
+                }
+                showToast('内容已保存', 'success');
+            }
+        }
+
+        // ======================== 图片插入功能 ============================
+        function insertImageToContent(targetElementId) {
+            if (!devModeActive) return;
+            
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+            
+            fileInput.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    fileInput.remove();
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('图片大小不能超过 5MB', 'danger');
+                    fileInput.remove();
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const imgId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                    imageData[imgId] = {
+                        data: ev.target.result,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        uploadTime: new Date().toISOString()
+                    };
+                    saveImages(imageData);
+                    
+                    const targetElement = document.getElementById(targetElementId);
+                    if (targetElement) {
+                        if (targetElement.tagName.toLowerCase() === 'textarea') {
+                            const cursorPos = targetElement.selectionStart;
+                            const textBefore = targetElement.value.substring(0, cursorPos);
+                            const textAfter = targetElement.value.substring(cursorPos);
+                            const imgTag = `\n![${file.name}](${imgId})\n`;
+                            targetElement.value = textBefore + imgTag + textAfter;
+                            
+                            // 自动保存
+                            const uid = targetElementId.split('_').slice(1).join('_');
+                            const typeKey = targetElementId.split('_')[0];
+                            const q = appData.questions.find(q => q.id === uid);
+                            if (q) {
+                                if (typeKey === 'title') q.title = targetElement.value;
+                                else if (typeKey === 'desc') q.desc = targetElement.value;
+                                else if (typeKey === 'source') q.source = targetElement.value;
+                                else if (typeKey === 'ans') q.ans = targetElement.value;
+                                saveData(appData);
+                            }
+                            showToast('图片已插入，点击"保存"确认', 'success');
+                        } else {
+                            // 在内容后追加图片
+                            const imgHTML = `<img src="${imageData[imgId].data}" alt="${file.name}" class="img-fluid my-2" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">`;
+                            targetElement.innerHTML += '<br>' + imgHTML;
+                            
+                            // 更新 raw 数据
+                            const raw = targetElement.getAttribute('data-raw') || '';
+                            const uid = targetElementId.split('_').slice(1).join('_');
+                            const type = targetElement.getAttribute('data-type');
+                            const q = appData.questions.find(q => q.id === uid);
+                            if (q) {
+                                const newRaw = raw + '\n[图片: ' + file.name + ']';
+                                if (type === 'title') q.title = newRaw;
+                                else if (type === 'desc') q.desc = newRaw;
+                                else if (type === 'source') q.source = newRaw;
+                                else if (type === 'ans') q.ans = newRaw;
+                                targetElement.setAttribute('data-raw', escapeHtml(newRaw));
+                                saveData(appData);
+                            }
+                            showToast('图片已插入', 'success');
+                        }
+                    }
+                    
+                    if (window.MathJax) {
+                        MathJax.typesetPromise().catch(err => console.error('MathJax渲染错误', err));
+                    }
+                    fileInput.remove();
+                };
+                reader.readAsDataURL(file);
+            };
+            fileInput.click();
+        }
+
+        // ======================== 图片库管理 ============================
+        function uploadImageToLibrary() {
+            if (!devModeActive) return;
+            
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.multiple = true;
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+            
+            fileInput.onchange = function(e) {
+                const files = e.target.files;
+                let uploadCount = 0;
+                const validFiles = Array.from(files).filter(f => f.size <= 5 * 1024 * 1024);
+                
+                if (validFiles.length === 0) {
+                    showToast('没有有效的图片（单张不超过5MB）', 'warning');
+                    fileInput.remove();
+                    return;
+                }
+                
+                validFiles.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const imgId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                        imageData[imgId] = {
+                            data: ev.target.result,
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            uploadTime: new Date().toISOString()
+                        };
+                        uploadCount++;
+                        if (uploadCount === validFiles.length) {
+                            saveImages(imageData);
+                            showToast(`成功上传 ${uploadCount} 张图片！`, 'success');
+                            renderAll();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+                fileInput.remove();
+            };
+            fileInput.click();
+        }
+
+        function showImageGallery() {
+            const imageKeys = Object.keys(imageData);
+            if (imageKeys.length === 0) {
+                showToast('暂无已上传的图片', 'info');
+                return;
+            }
+            
+            let modalHTML = `
+            <div class="modal fade" id="imageGalleryModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-images me-2"></i>图片库 (${imageKeys.length}张)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                            <div class="row g-3">
+            `;
+            
+            imageKeys.forEach(key => {
+                const img = imageData[key];
+                modalHTML += `
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        <img src="${img.data}" class="card-img-top image-gallery-img" alt="${img.name}" 
+                             onclick="window.open('${img.data}', '_blank')">
+                        <div class="card-body p-2">
+                            <p class="card-text small text-truncate" title="${img.name}">${img.name}</p>
+                            <div class="d-grid gap-1">
+                                <button class="btn btn-sm btn-outline-primary" onclick="copyImageMarkdown('${key}')">
+                                    <i class="fas fa-copy"></i> 复制引用
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteImageFromGallery('${key}')">
+                                    <i class="fas fa-trash"></i> 删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            modalHTML += `
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+            
+            const oldModal = document.getElementById('imageGalleryModal');
+            if (oldModal) oldModal.remove();
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.innerHTML = modalHTML;
+            document.body.appendChild(modalContainer.firstElementChild);
+            
+            const modal = new bootstrap.Modal(document.getElementById('imageGalleryModal'));
+            modal.show();
+        }
+
+        function copyImageMarkdown(imgId) {
+            const img = imageData[imgId];
+            if (!img) {
+                showToast('图片不存在', 'danger');
+                return;
+            }
+            
+            const markdown = `![${img.name}](${imgId})`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(markdown).then(() => {
+                    showToast('已复制图片引用', 'success');
+                }).catch(() => {
+                    fallbackCopy(markdown);
+                });
+            } else {
+                fallbackCopy(markdown);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+            showToast('已复制图片引用', 'success');
+        }
+
+        function deleteImageFromGallery(imgId) {
+            if (!confirm('确定要删除这张图片吗？')) return;
+            delete imageData[imgId];
+            saveImages(imageData);
+            showImageGallery();
+            renderAll();
+            showToast('图片已删除', 'danger');
+        }
+
+        function clearAllImages() {
+            const count = Object.keys(imageData).length;
+            if (count === 0) {
+                showToast('没有图片需要清空', 'info');
+                return;
+            }
+            if (!confirm(`确定要删除所有 ${count} 张图片吗？此操作不可撤销！`)) return;
+            imageData = {};
+            saveImages(imageData);
+            renderAll();
+            showToast(`已清空 ${count} 张图片`, 'danger');
+        }
+
+        // ======================== 资源管理 ============================
+        function deleteResource(rid) {
+            if (!devModeActive) return;
+            const res = appData.resources.find(r => r.id === rid);
+            if (!res) return;
+            if (!confirm(`确定要删除资料 "${res.name}" 吗？`)) return;
+            
+            appData.resources = appData.resources.filter(r => r.id !== rid);
+            saveData(appData);
+            renderResources();
+            showToast('资料已删除', 'danger');
+        }
+
+        function showAddResourceModal() {
+            if (!devModeActive) return;
+            const name = prompt('请输入资料名称：');
+            if (!name) return;
+            const desc = prompt('请输入简要描述：') || '无描述';
+            const file = prompt('请输入文件路径（如：pdfs/example.pdf）：');
+            if (!file) return;
+            
+            const newRes = {
+                id: 'r' + Date.now(),
+                name: name,
+                desc: desc,
+                file: file
+            };
+            appData.resources.push(newRes);
+            saveData(appData);
+            renderResources();
+            showToast('资料已添加', 'success');
         }
 
         // ======================== 搜索功能 ============================
@@ -645,20 +1341,24 @@
             });
         });
 
-        // ======================== ScrollSpy 滚动监听 ============================
+        // ======================== ScrollSpy ============================
         function setupScrollSpy() {
             const options = { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 };
             const scrollObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const chapterId = entry.target.id;
-                        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(btn => btn.classList.remove('active'));
+                        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
                         const targetBtn = document.querySelector(`#chapterNavbar a[href="#${chapterId}"]`);
                         if(targetBtn) targetBtn.classList.add('active');
                     }
                 });
             }, options);
-            document.querySelectorAll('.chapter-container').forEach(chapter => scrollObserver.observe(chapter));
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                if (chapter) scrollObserver.observe(chapter);
+            });
         }
 
         // ======================== 阅读进度条、返回顶部 ============================
@@ -680,9 +1380,11 @@
             document.body.classList.toggle('focus-mode');
             const icon = focusBtn.querySelector('i');
             if(document.body.classList.contains('focus-mode')) {
-                icon.className = 'fas fa-compress'; focusBtn.title = '退出专注模式';
+                icon.className = 'fas fa-compress';
+                focusBtn.title = '退出专注模式';
             } else {
-                icon.className = 'fas fa-expand'; focusBtn.title = '沉浸/授课模式';
+                icon.className = 'fas fa-expand';
+                focusBtn.title = '沉浸/授课模式';
             }
         });
 
@@ -696,125 +1398,9 @@
             themeBtn.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun text-warning"></i>' : '<i class="fas fa-moon"></i>';
         });
 
-        // ======================== 编辑与删除 ============================
-        function toggleEdit(elementId) {
-            if (!devModeActive) return;
-            const contentDiv = document.getElementById(elementId);
-            if (!contentDiv) return;
-            const btn = contentDiv.parentElement.querySelector('.dev-edit-btn') || 
-                        contentDiv.previousElementSibling?.querySelector('.dev-edit-btn');
-            const type = contentDiv.getAttribute('data-type');
-            const raw = contentDiv.getAttribute('data-raw') || '';
-
-            if (contentDiv.tagName.toLowerCase() !== 'textarea') {
-                const textarea = document.createElement('textarea');
-                textarea.id = elementId;
-                textarea.className = 'form-control editable-content mb-2';
-                textarea.setAttribute('data-type', type);
-                textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
-                textarea.value = raw;
-                contentDiv.replaceWith(textarea);
-                if (btn) {
-                    btn.innerHTML = '保存';
-                    btn.classList.remove('btn-outline-danger');
-                    btn.classList.add('btn-success');
-                }
-            } else {
-                const currentText = contentDiv.value;
-                const id = elementId.split('_').slice(1).join('_');
-                const typeKey = elementId.split('_')[0];
-                const q = appData.questions.find(q => q.id === id);
-                if (q) {
-                    if (typeKey === 'title') q.title = currentText;
-                    else if (typeKey === 'desc') q.desc = currentText;
-                    else if (typeKey === 'source') q.source = currentText;
-                    else if (typeKey === 'ans') q.ans = currentText;
-                    saveData(appData);
-                }
-                const newDiv = document.createElement('div');
-                newDiv.id = elementId;
-                newDiv.className = 'editable-content';
-                newDiv.setAttribute('data-type', type);
-                newDiv.setAttribute('data-raw', currentText);
-                if (type === 'title') newDiv.classList.add('problem-title', 'mb-4', 'fw-bold');
-                newDiv.innerHTML = parseTextToHTML(currentText, type);
-                contentDiv.replaceWith(newDiv);
-                if (btn) {
-                    btn.innerHTML = '编辑';
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-outline-danger');
-                }
-                if (window.MathJax) {
-                    MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
-                }
-            }
-        }
-
-        function deleteQuestion(uid) {
-            if (!devModeActive) return;
-            if (!confirm(`确定要删除题目 "${uid}" 吗？此操作不可撤销。`)) return;
-            appData.questions = appData.questions.filter(q => q.id !== uid);
-            saveData(appData);
-            renderAll();
-        }
-
-        function addNewQuestion(chapterId) {
-            if (!devModeActive) return;
-            const chapterNum = parseInt(chapterId.replace('chapter', ''));
-            const maxId = appData.questions
-                .filter(q => q.chapter === chapterNum)
-                .reduce((max, q) => {
-                    const num = parseInt(q.id.split('_')[1]);
-                    return num > max ? num : max;
-                }, 0);
-            const newId = `${chapterNum}_${maxId + 1}`;
-            
-            const newQ = {
-                id: newId,
-                chapter: chapterNum,
-                title: '新题目名称',
-                desc: '请在此直接输入题目文本及 LaTeX 公式，双换行（留一个空行）可以分段。',
-                source: '未指定参考书籍',
-                ans: '步骤1：输入内容。\n\n步骤2：空行后输入第二步公式：\\[ \\nabla \\cdot \\mathbf{E} = \\rho/\\epsilon_0 \\]'
-            };
-            appData.questions.push(newQ);
-            saveData(appData);
-            renderAll();
-        }
-
-        // ======================== 资源管理 ============================
-        function deleteResource(rid) {
-            if (!devModeActive) return;
-            if (!confirm(`确定要删除资料 "${appData.resources.find(r => r.id === rid)?.name}" 吗？`)) return;
-            appData.resources = appData.resources.filter(r => r.id !== rid);
-            saveData(appData);
-            renderResources();
-        }
-
-        function showAddResourceModal() {
-            if (!devModeActive) return;
-            const name = prompt('请输入资料名称：');
-            if (!name) return;
-            const desc = prompt('请输入简要描述：');
-            const file = prompt('请输入文件路径（如：pdfs/example.pdf）：');
-            if (!file) return;
-            const newRes = {
-                id: 'r' + Date.now(),
-                name: name,
-                desc: desc || '无描述',
-                file: file
-            };
-            appData.resources.push(newRes);
-            saveData(appData);
-            renderResources();
-        }
-
-        function addResource() {
-            showAddResourceModal();
-        }
-
         // ======================== 开发者认证 ============================
         let passwordVisible = false;
+
         function togglePasswordVisibility() {
             const pwdInput = document.getElementById('devPassword');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -857,8 +1443,10 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'inline-block';
                 });
-                sessionStorage.setItem('dev_authenticated_electro', 'true');
+                sessionStorage.setItem('dev_authenticated_atomic', 'true');
                 document.getElementById('devPassword').value = '';
+                renderAll();
+                showToast('开发者模式已开启', 'success');
             } else {
                 document.getElementById('authError').style.display = 'block';
                 document.getElementById('devPassword').value = '';
@@ -892,6 +1480,7 @@
                     document.querySelectorAll('.dev-tool').forEach(el => {
                         el.style.display = 'inline-block';
                     });
+                    renderAll();
                     return;
                 }
                 openDevAuth();
@@ -903,35 +1492,52 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'none';
                 });
-                sessionStorage.removeItem('dev_authenticated_electro');
+                sessionStorage.removeItem('dev_authenticated_atomic');
+                renderAll();
             }
         });
 
-        // ======================== 导航 ============================
-        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // ======================== 上传功能 ============================
+        // ======================== 上传资料 ============================
         document.getElementById('submitUpload')?.addEventListener('click', function() {
             const resourceName = document.getElementById('resourceName').value;
             const fileInput = document.getElementById('resourceFile');
+            const description = document.getElementById('resourceDescription').value;
             
-            if(resourceName && fileInput.files.length > 0) {
-                alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
-                bootstrapModal.hide();
+            if (resourceName && fileInput.files.length > 0) {
+                const newRes = {
+                    id: 'r' + Date.now(),
+                    name: resourceName,
+                    desc: description || '无描述',
+                    file: fileInput.files[0].name
+                };
+                appData.resources.push(newRes);
+                saveData(appData);
+                renderResources();
+                showToast(`资料 "${resourceName}" 上传成功！`, 'success');
+                
+                document.getElementById('resourceName').value = '';
+                document.getElementById('resourceDescription').value = '';
+                fileInput.value = '';
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                modal.hide();
             } else {
-                alert('请填写完整信息并选择文件！');
+                showToast('请填写完整信息并选择文件！', 'warning');
+            }
+        });
+
+        // ======================== 导航点击 ============================
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('#chapterNavbar .list-group-item');
+            if (target && target.getAttribute('href')) {
+                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
+                target.classList.add('active');
             }
         });
 
         // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
-            if (sessionStorage.getItem('dev_authenticated_electro') === 'true') {
+            if (sessionStorage.getItem('dev_authenticated_atomic') === 'true') {
                 devModeActive = true;
             }
             renderAll();
@@ -947,6 +1553,11 @@
                     el.style.display = 'none';
                 });
             }
+            
+            // 更新主题图标
+            if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
+                themeBtn.innerHTML = '<i class="fas fa-sun text-warning"></i>';
+            }
         });
 
         // 暴露全局函数
@@ -954,12 +1565,23 @@
         window.addNewQuestion = addNewQuestion;
         window.deleteQuestion = deleteQuestion;
         window.deleteResource = deleteResource;
-        window.addResource = addResource;
         window.showAddResourceModal = showAddResourceModal;
         window.openDevAuth = openDevAuth;
         window.closeDevAuth = closeDevAuth;
         window.verifyDevAuth = verifyDevAuth;
         window.togglePasswordVisibility = togglePasswordVisibility;
+        window.scrollToChapter = scrollToChapter;
+        window.addChapter = addChapter;
+        window.editChapter = editChapter;
+        window.saveChapter = saveChapter;
+        window.deleteChapter = deleteChapter;
+        window.deleteCurrentChapter = deleteCurrentChapter;
+        window.insertImageToContent = insertImageToContent;
+        window.uploadImageToLibrary = uploadImageToLibrary;
+        window.showImageGallery = showImageGallery;
+        window.copyImageMarkdown = copyImageMarkdown;
+        window.deleteImageFromGallery = deleteImageFromGallery;
+        window.clearAllImages = clearAllImages;
     </script>
 </body>
 </html>

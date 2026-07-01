@@ -179,16 +179,40 @@
             cursor: pointer; color: #6c757d; background: none; border: none; padding: 0; z-index: 5;
         }
         .password-toggle .toggle-eye:hover { color: var(--text-main); }
-        #devModeSwitchContainer {
-            display: flex;
-            align-items: center;
+
+        /* 图片相关样式 */
+        .img-upload-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border: 1px solid var(--border-color);
         }
-        .editable-card .d-flex .btn {
-            font-size: 0.75rem;
-            padding: 0.15rem 0.5rem;
+        .image-gallery-img {
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-        .editable-card .d-flex .btn i {
-            margin-right: 2px;
+        .image-gallery-img:hover {
+            transform: scale(1.05);
+        }
+        .draggable-chapter {
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .draggable-chapter:hover {
+            background: rgba(229, 57, 53, 0.05);
+        }
+        .chapter-order-handle {
+            color: var(--grouptheory-red);
+            margin-right: 10px;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
         }
         .editable-content p:last-child {
             margin-bottom: 0;
@@ -200,19 +224,6 @@
             overflow-x: auto;
             overflow-y: hidden;
         }
-        .chapter-container .badge {
-            font-size: 0.85rem;
-            padding: 0.35rem 0.65rem;
-        }
-        .navbar .form-check {
-            margin-right: 1rem;
-        }
-        .navbar .form-check-label {
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        .upload-btn-wrapper .btn { margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -272,7 +283,7 @@
                     </button>
                     <div class="form-check form-switch d-flex align-items-center ms-2 mb-0" id="devModeSwitchContainer">
                         <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
-                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer; font-size: 0.85rem;">开发者模式</label>
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;">开发者模式</label>
                     </div>
                 </div>
             </div>
@@ -305,15 +316,16 @@
                         </div>
                     </div>
 
+                    <!-- 章节导航 - 可管理 -->
                     <div class="card shadow-sm">
-                        <div class="card-header bg-transparent">
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">章节导航</h5>
+                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addChapter()" style="display:none;">
+                                <i class="fas fa-plus"></i> 添加
+                            </button>
                         </div>
                         <div class="list-group list-group-flush" id="chapterNavbar">
-                            <a href="#chapter1" class="list-group-item list-group-item-action active">1. 群论基础</a>
-                            <a href="#chapter2" class="list-group-item list-group-item-action">2. 表示论</a>
-                            <a href="#chapter3" class="list-group-item list-group-item-action">3. 点群与空间群</a>
-                            <a href="#chapter4" class="list-group-item list-group-item-action">4. 李群与李代数</a>
+                            <!-- 由JS动态渲染 -->
                         </div>
                     </div>
 
@@ -328,11 +340,31 @@
                         </div>
                     </div>
 
-                    <!-- 资料库部分 -->
+                    <!-- 图片工具栏（开发者模式） -->
+                    <div class="card shadow-sm mt-4 dev-tool" style="display:none;">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0"><i class="fas fa-images text-primary me-2"></i>图片管理</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="uploadImageToLibrary()">
+                                    <i class="fas fa-upload me-1"></i> 批量上传图片
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="showImageGallery()">
+                                    <i class="fas fa-photo-video me-1"></i> 图片库 (<span id="imageCount">0</span>)
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="clearAllImages()">
+                                    <i class="fas fa-trash-alt me-1"></i> 清空图片
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 资料库 -->
                     <div class="card shadow-sm mt-4">
                         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">资料库</h5>
-                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addResource()" style="display:none;">
+                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="showAddResourceModal()" style="display:none;">
                                 添加
                             </button>
                         </div>
@@ -344,62 +376,8 @@
             </div>
 
             <!-- 右侧内容 -->
-            <div class="col-lg-9 content-col">
-                <!-- 第一章 -->
-                <div class="mb-5 chapter-container" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            第一章：群论基础
-                        </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);" id="count_1">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="1"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
-                        在第一章添加新题目
-                    </button>
-                </div>
-
-                <!-- 第二章 -->
-                <div class="mb-5 chapter-container" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            第二章：表示论
-                        </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);" id="count_2">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="2"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
-                        在第二章添加新题目
-                    </button>
-                </div>
-
-                <!-- 第三章 -->
-                <div class="mb-5 chapter-container" id="chapter3">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            第三章：点群与空间群
-                        </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);" id="count_3">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="3"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">
-                        在第三章添加新题目
-                    </button>
-                </div>
-
-                <!-- 第四章 -->
-                <div class="mb-5 chapter-container" id="chapter4">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h2 class="h3 mb-0 text-dark fw-bold">
-                            第四章：李群与李代数
-                        </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);" id="count_4">0题</span>
-                    </div>
-                    <div class="question-list" data-chapter="4"></div>
-                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">
-                        在第四章添加新题目
-                    </button>
-                </div>
+            <div class="col-lg-9 content-col" id="contentArea">
+                <!-- 章节容器由JS动态渲染 -->
             </div>
         </div>
     </div>
@@ -407,33 +385,65 @@
     <!-- 返回顶部按钮 -->
     <button id="backToTop" title="返回顶部"><i class="fas fa-arrow-up"></i></button>
 
-    <!-- 上传资料的模态框 -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <!-- Toast 通知容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 上传资料模态框 -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadModalLabel">上传PDF资料</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">上传PDF资料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="uploadForm">
-                        <div class="mb-3">
-                            <label for="resourceName" class="form-label">资料名称</label>
-                            <input type="text" class="form-control" id="resourceName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceFile" class="form-label">选择PDF文件</label>
-                            <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceDescription" class="form-label">简要描述</label>
-                            <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label class="form-label">资料名称</label>
+                        <input type="text" class="form-control" id="resourceName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">选择PDF文件</label>
+                        <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">简要描述</label>
+                        <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                     <button type="button" class="btn btn-primary" id="submitUpload">上传</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 章节编辑模态框 -->
+    <div class="modal fade" id="chapterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chapterModalTitle">编辑章节</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">章节编号</label>
+                        <input type="number" class="form-control" id="chapterNumber" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">章节名称</label>
+                        <input type="text" class="form-control" id="chapterName" placeholder="如：群论基础">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">章节描述（可选）</label>
+                        <input type="text" class="form-control" id="chapterDesc" placeholder="简短描述">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="deleteChapterBtn" style="display:none;" onclick="deleteCurrentChapter()">删除章节</button>
+                    <button type="button" class="btn btn-primary" onclick="saveChapter()">保存</button>
                 </div>
             </div>
         </div>
@@ -469,174 +479,177 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ======================== 数据层 ============================
-        const DEFAULT_DATA = {
-            questions: [
-                // 第一章：群论基础
-                {
-                    id: '1_1',
-                    chapter: 1,
-                    title: '问题1.1 - 群的基本概念',
-                    desc: 'a) 什么是群？并请举例。\n\nb) 请写出 D₃ 群={e, a, b, c, d, f}每个元素的阶和对应循环群，以及 D₃ 群的各个类？\n\nc) 请写出 D₃ 群的不变子群及其商群，这个商群与 Z₂ 群同构吗？为什么？\n\nd) D₃ 群是否与 Z₂ 群同态？如果是，请写出同态核。',
-                    source: '经典群论教材',
-                    ans: 'a) 群的定义：在规定了元素的"乘积"法则后，元素的集合G如果满足下面四个条件，则称为群：\n\n1. 集合对乘积的封闭性。集合中任意两元素的乘积仍属此集合：\\( RS \\in G, \\forall R \\text{和} S \\in G \\)\n\n2. 乘积满足结合律：\\( R(ST) = (RS)T, \\forall R, S, \\text{和} T \\in G \\)\n\n3. 集合中存在恒元E，用它左乘集合中的任意元素，保持该元素不变：\\( E \\in G, \\text{和} ER = R, \\forall R \\in G \\)\n\n4. 任何元素R的逆R⁻¹存在于集合中：\\( \\forall R \\in G, \\exists R^{-1} \\in G, \\text{使} R^{-1}R = E \\)\n\n举例：以"乘法"作为乘积的所有正实数构成群；以"加法"作为乘积的所有实数构成群。\n\nb) D₃群的元素阶、循环群和类：恒元的阶为1，三次轴转动元素d和f的阶为3，二次轴转动元素a、b、c的阶为2。\n\n对应循环群：\\( (e), (e,d,f), (e,a), (e,b), (e,c) \\)\n\nD₃群有三个类：1. 恒元e构成一类 2. 三次轴转动d和f构成一类 3. 二次轴转动a、b、c构成一类\n\nc) 不变子群：\\( H = \\{ e, d, f \\} \\)，商群：\\( D_3/H = \\{ H, aH \\} \\)，其中 \\( aH = \\{ a, b, c \\} \\)。可以验证 \\( (aH)^2 = H \\)，因此商群 \\( D_3/H \\) 与二阶循环群 Z₂ 同构。\n\nd) D₃群与二阶循环群 \\( Z_2 = \\{1, -1\\} \\) 同态，同态核为 \\( H = \\{ e, d, f \\} \\)，即D₃的不变子群。'
-                },
-                {
-                    id: '1_2',
-                    chapter: 1,
-                    title: '问题1.2 - 同态核与商群',
-                    desc: '设群 \\( G \\) 与 \\( F \\) 同态，\\(\\phi : G \\sim F\\)，则 \\( G \\) 中与 \\( F \\) 的单位元 \\( f_0 \\) 对应的元素 \\( h_\\alpha \\) 的集合 \\( H = \\{h_\\alpha | \\phi(h_\\alpha) = f_0, h_\\alpha \\in G\\} \\) 称为同态核。\n\n设 \\( G \\) 群与 \\( F \\) 群同态，同态核为 \\( H \\)，证明：① \\( H \\) 是 \\( G \\) 的不变子群。\\( H \\prec G \\) ② 商群 \\( G/H \\) 与 \\( F \\) 同构，\\( G/H \\cong F \\)。',
-                    source: '群论基础习题',
-                    ans: '（1）证明 \\( H \\prec G \\)：\\(\\forall g \\in G, h \\in H\\)，\\(\\phi\\) 为 \\(G\\) 到 \\(F\\) 的同态映射，有：\n\n\\[ \\phi(ghg^{-1}) = \\phi(g) \\circ f_0 \\circ \\phi(g^{-1}) = \\phi(g) \\circ [\\phi(g)]^{-1} = f_0 \\]\n\n即 \\(ghg^{-1} \\in H\\)，故 \\( H \\prec G \\)，为不变子群。\n\n（2）证明 \\( G/H \\cong F \\)：定义映射 \\( \\psi: G/H \\rightarrow F, \\psi(gH) = \\phi(g) \\)\n\na. 映射唯一性：设 \\( h \\in H, gh \\in gH \\)，则 \\( \\psi(gH) = \\psi(ghH) = \\phi(gh) = \\phi(g) \\circ \\phi(h) = \\phi(g) \\circ f_0 = \\phi(g) \\)，故映射 \\( \\psi \\) 与代表元选取无关。\n\nb. 单射性：若 \\( \\psi(g_1H) = \\psi(g_2H) \\)，则 \\( \\phi(g_1) = \\phi(g_2) \\)，故 \\( g_2^{-1}g_1 \\in H \\)，即 \\( g_1H = g_2H \\)。\n\nc. 满射性：\\(\\forall f_\\alpha \\in F, \\exists g_\\gamma \\in G\\) 使 \\( \\phi(g_\\gamma) = f_\\alpha \\)，即 \\( f_\\alpha = \\psi(g_\\gamma H) \\)。\n\nd. 同态性：\\[ \\psi(g_1Hg_2H) = \\psi(g_1g_2H) = \\phi(g_1g_2) = \\phi(g_1) \\circ \\phi(g_2) = \\psi(g_1H) \\circ \\psi(g_2H) \\]\n\n综上，\\( \\psi \\) 为同构映射，故 \\( G/H \\cong F \\)。'
-                },
-                {
-                    id: '1_3',
-                    chapter: 1,
-                    title: '问题1.3 - 阿贝尔群性质',
-                    desc: '证明：除恒元外，每个元素的阶都是 2 的群一定是阿贝尔群。',
-                    source: '群论基础习题',
-                    ans: '任取群 \\( G \\) 中两个不同元素 \\( R \\) 和 \\( S \\)，设 \\( RS = T \\)。\n\n由条件 \\( R^2 = S^2 = E \\)，则：\n\n\\[ TS = RS^2 = R, \\quad TR = T^2S = S \\]\n\n又因为 \\( SR = TR^2 = T = RS \\)，故任意元素乘积可交换，\\( G \\) 为阿贝尔群。'
-                },
-                // 第二章：表示论
-                {
-                    id: '2_1',
-                    chapter: 2,
-                    title: '问题2.1 - D₃群在函数空间中的表示',
-                    desc: '\\( D_3 \\) 在 \\( x, y, z \\) 的二次齐次函数空间中的表示，空间基为：\n\n\\[ \\phi_1 = x^2, \\phi_2 = y^2, \\phi_3 = z^2, \\phi_4 = xy, \\phi_5 = yz, \\phi_6 = xz \\]\n\n求 \\( D_3 \\) 群元 \\( d \\) 的表示矩阵 \\( A(d) \\)。',
-                    source: '群论表示论习题',
-                    ans: '计算各基函数在 \\( d \\) 作用下的变换：\n\n\\[ A(d)\\phi_1 = \\frac{1}{4}\\phi_1 + \\frac{3}{4}\\phi_2 - \\frac{\\sqrt{3}}{2}\\phi_4 \\]\n\\[ A(d)\\phi_2 = \\frac{3}{4}\\phi_1 + \\frac{1}{4}\\phi_2 + \\frac{\\sqrt{3}}{2}\\phi_4 \\]\n\\[ A(d)\\phi_3 = \\phi_3 \\]\n\\[ A(d)\\phi_4 = \\frac{\\sqrt{3}}{4}\\phi_1 - \\frac{\\sqrt{3}}{4}\\phi_2 - \\frac{1}{2}\\phi_4 \\]\n\\[ A(d)\\phi_5 = -\\frac{1}{2}\\phi_5 - \\frac{\\sqrt{3}}{2}\\phi_6 \\]\n\\[ A(d)\\phi_6 = -\\frac{\\sqrt{3}}{2}\\phi_5 - \\frac{1}{2}\\phi_6 \\]\n\n因此表示矩阵为：\n\n\\[ A(d) = \\begin{pmatrix}\n\\frac{1}{4} & \\frac{3}{4} & 0 & \\frac{\\sqrt{3}}{4} & 0 & 0 \\\\\n\\frac{3}{4} & \\frac{1}{4} & 0 & -\\frac{\\sqrt{3}}{4} & 0 & 0 \\\\\n0 & 0 & 1 & 0 & 0 & 0 \\\\\n-\\frac{\\sqrt{3}}{2} & \\frac{\\sqrt{3}}{2} & 0 & -\\frac{1}{2} & 0 & 0 \\\\\n0 & 0 & 0 & 0 & -\\frac{1}{2} & -\\frac{\\sqrt{3}}{2} \\\\\n0 & 0 & 0 & 0 & \\frac{\\sqrt{3}}{2} & -\\frac{1}{2}\n\\end{pmatrix} \\]'
-                },
-                {
-                    id: '2_2',
-                    chapter: 2,
-                    title: '问题2.2 - 立方体对称群O群的特征标表',
-                    desc: '立方体对称群O群具有24个元素，其特征标表如下，请回答：\n\na) O群有几个类？每个类中分别包括什么元素？\n\nb) 每个类所对应的对称操作是什么？\n\nc) O群有几个不等价不可约表示，分别维数是多少？\n\nd) 请填写完整O群的特征标表，并写出详细的计算过程。\n\n\\[ \\begin{array}{cccccc} & E & 3C_4^2 & 8C_3^2 & 6C_4 & 6C_2^2 \\\\ A_1 & 1 & 1 & 1 & 1 & 1 \\\\ A_2 & 1 & 1 & 1 & -1 & -1 \\\\ E & 2 & 2 & \\square & \\square & \\square \\\\ T_1 & 3 & -1 & \\square & \\square & \\square \\\\ T_2 & 3 & -1 & \\square & \\square & \\square \\end{array} \\]',
-                    source: '群论表示论习题',
-                    ans: 'a) 和 b) O群的类和对称操作：O群包含5个类：1. 恒元E构成一类 2. 绕三个四次轴转动π角的元素 \\( C_4^2 \\) 构成一类（3个元素）3. 绕四个三次轴转动±2π/3角的元素 \\( C_3^2 \\) 构成一类（8个元素）4. 绕三个四次轴转动±π/2角的元素 \\( C_4 \\) 构成一类（6个元素）5. 绕六个二次轴转动π角的元素 \\( C_2 \\) 构成一类（6个元素）\n\nc) 不等价不可约表示：O群有24个元素，5个自逆类，因此有5个不等价不可约表示：2个一维表示（A₁和A₂），1个二维表示（E），2个三维表示（T₁和T₂）。维数平方和验证：\\( 1^2 + 1^2 + 2^2 + 3^2 + 3^2 = 24 \\)\n\nd) 完整的特征标表：\n\n\\[ \\begin{array}{c|cccccc} O & E & 3C_4^2 & 8C_3^2 & 6C_4 & 6C_2 \\\\ \\hline A_1 & 1 & 1 & 1 & 1 & 1 \\\\ A_2 & 1 & 1 & 1 & -1 & -1 \\\\ E & 2 & 2 & -1 & 0 & 0 \\\\ T_1 & 3 & -1 & 0 & 1 & -1 \\\\ T_2 & 3 & -1 & 0 & -1 & 1 \\end{array} \\]'
-                },
-                {
-                    id: '2_3',
-                    chapter: 2,
-                    title: '问题2.3 - 第一类点群基本定理',
-                    desc: '根据第一类点群基本定理：\n\n\\[ \\sum_{i=1}^{l} \\left(n - \\frac{n}{n_i}\\right) = 2(n-1) \\]\n\n请回答：a) 证明极点的轨道数目只能是多少？b) 与轨道数相对应的第一类点群的分类？c) 并写出每一类中极点轨道对应的对称操作是什么？',
-                    source: '群论点群习题',
-                    ans: 'a) 极点轨道数目：对于非平凡情况，G群的阶n≥2\n\n\\[ \\sum_{i=1}^{l} \\left(n - \\frac{n}{n_i}\\right) = 2(n-1) \\rightarrow \\sum_{i=1}^{l} \\left(1 - \\frac{1}{n_i}\\right) = 2\\left(1 - \\frac{1}{n}\\right) \\]\n\n因为 \\( 1 \\leq 2\\left(1 - \\frac{1}{n}\\right) < 2 \\) 且 \\( \\frac{1}{2} \\leq \\sum_{i=1}^{l} \\left(1 - \\frac{1}{n_i}\\right) < l \\)，所以 \\( 1 < l < 4 \\)，即极点轨道数目只能是 l=2 或 l=3\n\nb) 第一类点群分类：1. l=2，\\( n_1 = n_2 = n \\)，对应 Cₙ 群（n=2,3,4,...）2. l=3，\\( n_1 = 2 \\)，\\( n_2 = 2 \\)，\\( n_3 = n/2 \\)，对应 Dₙ 群（n=4,6,8,...）3. l=3，\\( n_1 = 2 \\)，\\( n_2 = n_3 = 3 \\)，n=12，对应四面体群 T 4. l=3，\\( n_1 = 2 \\)，\\( n_2 = 3 \\)，\\( n_3 = 4 \\)，n=24，对应八面体 O 群 5. l=3，\\( n_1 = 2 \\)，\\( n_2 = 3 \\)，\\( n_3 = 5 \\)，n=60，对应十二面体 I 群'
-                },
-                {
-                    id: '2_4',
-                    chapter: 2,
-                    title: '问题2.4 - 12阶群的性质分析',
-                    desc: '群 \\( G \\) 由12个元素组成，给定乘法表：(1) 找出各元素的逆元；(2) 指出可与所有元素对易的元素；(3) 列出各元素的周期和阶；(4) 找出群的类；(5) 找出不变子群及其商群；(6) 判断是否与 \\( T \\) 或 \\( D_6 \\) 同构。',
-                    source: '群论习题',
-                    ans: '(1) 逆元：\\( E^{-1}=E, A^{-1}=A, B^{-1}=F, C^{-1}=I, D^{-1}=J, K^{-1}=L, M^{-1}=N \\)\n\n(2) 可对易元素：\\( E \\) 和 \\( A \\)\n\n(3) 周期和阶：阶数1：\\( E \\)，阶数2：\\( A \\)，阶数3：\\( M, N \\)，阶数4：\\( B, C, D, F, I, J \\)，阶数6：\\( K, L \\)\n\n(4) 共轭类：\\( \\{E\\}, \\{A\\}, \\{M,N\\}, \\{K,L\\}, \\{B,C,D\\}, \\{F,I,J\\} \\)\n\n(5) 不变子群：\\( \\{E,A\\} \\)，商群同构于 \\( D_3 \\)；\\( \\{E,M,N\\} \\)，商群同构于 \\( C_4 \\)；\\( \\{E,K,N,A,M,L\\} \\)，商群同构于 \\( V_2 \\)\n\n(6) 与 \\( T \\) 和 \\( D_6 \\) 都不同构，因 \\( T \\) 无6阶元，\\( D_6 \\) 无4阶元。'
-                },
-                {
-                    id: '2_5',
-                    chapter: 2,
-                    title: '问题2.5 - 表示的构造',
-                    desc: '设 \\( G \\) 是非阿贝尔群，\\( D(G) \\) 是其不可约表示。判断以下矩阵集合是否构成 \\( G \\) 的表示：\n\n(1) \\( D(R)^T \\) (2) \\( D(R)^\\dagger \\) (3) \\( D(R^{-1}) \\) (4) \\( D(R)^* \\) (5) \\( D(R^{-1})^T \\) (6) det \\( D(R) \\) (7) tr \\( D(R) \\)',
-                    source: '群论表示论习题',
-                    ans: '判断依据：是否满足 \\( D(RS) = D(R)D(S) \\)\n\n(1) 不是表示：\\( D(R)^T D(S)^T \\neq D(RS)^T \\)\n(2) 不是表示：\\( D(R)^\\dagger D(S)^\\dagger \\neq D(RS)^\\dagger \\)\n(3) 不是表示：\\( D(R^{-1})D(S^{-1}) \\neq D((RS)^{-1}) \\)\n(4) 是表示：\\( D(R)^* D(S)^* = D(RS)^* \\)\n(5) 是表示：\\( D(R^{-1})^T D(S^{-1})^T = D((RS)^{-1})^T \\)\n(6) 是表示：det \\( D(R) \\) det \\( D(S) \\) = det \\( D(RS) \\)\n(7) 不是表示：tr \\( D(R) \\) tr \\( D(S) \\) ≠ tr \\( D(RS) \\)'
-                },
-                {
-                    id: '2_6',
-                    chapter: 2,
-                    title: '问题2.6 - 函数空间的表示矩阵',
-                    desc: '由基 \\( \\psi_1(x,y)=x^2 \\), \\( \\psi_2(x,y)=xy \\), \\( \\psi_3(x,y)=y^2 \\) 构成的三维函数空间，对变换 \\( R \\)：\n\n\\[ \\begin{pmatrix}x\'\\\\y\'\\end{pmatrix} = R\\begin{pmatrix}x\\\\y\\end{pmatrix} \\]\n\n计算 \\( P_R \\) 的矩阵表示 \\( D(R) \\)：\n\n(1) \\( R = \\begin{pmatrix}1&0\\\\0&-1\\end{pmatrix} \\) (2) \\( R = \\frac{1}{2}\\begin{pmatrix}-1&-\\sqrt{3}\\\\\\sqrt{3}&-1\\end{pmatrix} \\) (3) \\( R = \\begin{pmatrix}\\cos\\alpha&-\\sin\\alpha\\\\\\sin\\alpha&\\cos\\alpha\\end{pmatrix} \\)\n\n再将基 \\( \\psi_2 \\) 换成 \\( \\sqrt{2}xy \\)，重新计算。',
-                    source: '群论表示论习题',
-                    ans: '(1) 原基：\\( D(R) = \\begin{pmatrix}1&0&0\\\\0&-1&0\\\\0&0&1\\end{pmatrix} \\)，新基：矩阵不变\n\n(2) 原基：\\( D(R) = \\frac{1}{4}\\begin{pmatrix}1 & \\sqrt{3} & 3 \\\\ -2\\sqrt{3} & -2 & 2\\sqrt{3} \\\\ 3 & -\\sqrt{3} & 1\\end{pmatrix} \\)\n\n新基：\\( \\overline{D}(R) = \\frac{1}{4}\\begin{pmatrix}1 & \\sqrt{6} & 3 \\\\ -\\sqrt{6} & -2 & \\sqrt{6} \\\\ 3 & -\\sqrt{6} & 1\\end{pmatrix} \\)\n\n(3) 原基：\\( D(R) = \\frac{1}{2}\\begin{pmatrix}2\\cos^2\\alpha & -\\sin(2\\alpha) & 2\\sin^2\\alpha \\\\ 2\\sin(2\\alpha) & 2\\cos(2\\alpha) & -2\\sin(2\\alpha) \\\\ 2\\sin^2\\alpha & \\sin(2\\alpha) & 2\\cos^2\\alpha\\end{pmatrix} \\)\n\n新基：\\( \\overline{D}(R) = \\frac{1}{\\sqrt{2}}\\begin{pmatrix}\\sqrt{2}\\cos^2\\alpha & -\\sin(2\\alpha) & \\sqrt{2}\\sin^2\\alpha \\\\ \\sin(2\\alpha) & \\sqrt{2}\\cos(2\\alpha) & -\\sin(2\\alpha) \\\\ \\sqrt{2}\\sin^2\\alpha & \\sin(2\\alpha) & \\sqrt{2}\\cos^2\\alpha\\end{pmatrix} \\)'
-                },
-                // 第三章：点群与空间群
-                {
-                    id: '3_1',
-                    chapter: 3,
-                    title: '问题3.1 - 杨图与置换群',
-                    desc: '对于下图所对应的杨图，请问：a) 其对应的置换群 Sₙ 群的阶数是多少？b) 该杨图对应几个轮换，这些轮换分别是几维？c) 请问此杨图对应的所有标准盘的个数是多少？d) 请分别写出标准盘中的 T₄ 和 T₆ 的形式。e) 并写出 T₄ → T₆ 的置换变换。\n\n\\[ \\begin{array}{|c|c|c|c|c|} \\hline & & & & \\\\ \\hline & & & & \\\\ \\hline & & & & \\\\ \\hline \\end{array} \\]',
-                    source: '群论点群习题',
-                    ans: 'a) 杨图对应 S₉ 置换群，阶数为 9! = 362880\n\nb) 杨图对应的轮换类型为 (1¹, 2¹, 3²)，即有1个一维轮换，1个二维轮换，2个三维轮换\n\nc) 正则杨表的钩型数计算：\\( d_{[4,3,2]} = \\frac{9!}{6 \\times 5 \\times 3 \\times 1 \\times 4 \\times 3 \\times 1 \\times 2 \\times 1} = 168 \\)，因此标准盘个数为168个\n\nd) 标准盘形式：\\( T_4 = \\begin{array}{|c|c|c|c|} \\hline 1 & 2 & 3 & 4 \\\\ \\hline 5 & 7 & 8 & \\\\ \\hline 6 & 9 & & \\\\ \\hline \\end{array} \\)，\\( T_6 = \\begin{array}{|c|c|c|c|} \\hline 1 & 2 & 3 & 4 \\\\ \\hline 5 & 8 & 9 & \\\\ \\hline 6 & 7 & & \\\\ \\hline \\end{array} \\)\n\ne) 置换变换：\\( T_6 = (789)T_4 \\)，即通过置换(789)将T₄变换为T₆'
-                },
-                {
-                    id: '3_2',
-                    chapter: 3,
-                    title: '问题3.2 - 直积群的表示',
-                    desc: '若群 \\( G = H_1 \\otimes H_2 \\)，证明 \\( G \\) 的不等价不可约表示都可表为两子群不等价不可约表示的直积。',
-                    source: '群论习题',
-                    ans: '证明：1. 设 \\( D^{(1)}(H_1) \\) 和 \\( D^{(2)}(H_2) \\) 分别为子群的不可约表示，构造：\n\n\\[ D(RS) = D^{(1)}(R) \\otimes D^{(2)}(S), \\quad R \\in H_1, S \\in H_2 \\]\n\n2. 验证表示性质：\n\n\\[ D(RS)D(R\'S\') = [D^{(1)}(R) \\otimes D^{(2)}(S)][D^{(1)}(R\') \\otimes D^{(2)}(S\')] = D^{(1)}(RR\') \\otimes D^{(2)}(SS\') = D(RR\'SS\') \\]\n\n3. 不可约性：若表示空间存在不变子空间，则必须同时是 \\( D^{(1)} \\) 和 \\( D^{(2)} \\) 的不变子空间，矛盾。\n\n4. 完备性：不等价表示的直积产生不等价表示，且数量匹配类数。'
-                },
-                // 第四章：李群与李代数
-                {
-                    id: '4_1',
-                    chapter: 4,
-                    title: '问题4.1 - 函数空间的变换矩阵',
-                    desc: '由函数基 \\( \\Psi_1(x,y)=x^2 \\)，\\( \\Psi_2(x,y)=xy \\)，\\( \\Psi_3(x,y)=y^2 \\) 架设的三维函数空间（二次齐次函数空间）对下列二维空间转动变换 R 保持不变，试计算变换 R 对应的标量函数换号算符 \\( P_R \\) 在此函数基中的矩阵形式为 \\( D(R) \\)：\n\na) \\( R = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix} \\)\n\nb) \\( R = \\frac{1}{2} \\begin{pmatrix} -1 & -\\sqrt{3} \\\\ \\sqrt{3} & -1 \\end{pmatrix} \\)\n\nc) \\( R = \\begin{pmatrix} \\cos \\alpha & -\\sin \\alpha \\\\ \\sin \\alpha & \\cos \\alpha \\end{pmatrix} \\)\n\n如果再把基 \\( \\Psi_2(x,y) \\) 换成 \\( \\sqrt{2}xy \\)，请重新计算 \\( P_R \\) 算符的矩阵形式。',
-                    source: '李群与李代数习题',
-                    ans: 'a) 变换矩阵：\\( P_R \\psi_1(x,y) = x^2 = \\psi_1(x,y) \\)，\\( P_R \\psi_2(x,y) = -xy = -\\psi_2(x,y) \\)，\\( P_R \\psi_3(x,y) = y^2 = \\psi_3(x,y) \\)\n\n\\( D(R) = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & -1 & 0 \\\\ 0 & 0 & 1 \\end{pmatrix} \\)，基变换后矩阵不变\n\nb) 变换矩阵：\n\n\\( P_R \\psi_1(x,y) = \\frac{1}{4} [\\psi_1(x,y) - 2\\sqrt{3}\\psi_2(x,y) + 3\\psi_3(x,y)] \\)\n\\( P_R \\psi_2(x,y) = \\frac{1}{4} [\\sqrt{3}\\psi_1(x,y) - 2\\psi_2(x,y) - \\sqrt{3}\\psi_3(x,y)] \\)\n\\( P_R \\psi_3(x,y) = \\frac{1}{4} [3\\psi_1(x,y) + 2\\sqrt{3}\\psi_2(x,y) + \\psi_3(x,y)] \\)\n\n\\( D(R) = \\frac{1}{4} \\begin{pmatrix} 1 & \\sqrt{3} & 3 \\\\ -2\\sqrt{3} & -2 & 2\\sqrt{3} \\\\ 3 & -\\sqrt{3} & 1 \\end{pmatrix} \\)\n\n基变换后矩阵：\\( \\overline{D}(R) = \\frac{1}{4} \\begin{pmatrix} 1 & \\sqrt{6} & 3 \\\\ -\\sqrt{6} & -2 & \\sqrt{6} \\\\ 3 & -\\sqrt{6} & 1 \\end{pmatrix} \\)\n\nc) 变换矩阵：\n\n\\( P_R \\psi_1(x,y) = \\cos^2 \\alpha \\psi_1(x,y) + \\sin(2\\alpha)\\psi_2(x,y) + \\sin^2 \\alpha \\psi_3(x,y) \\)\n\\( P_R \\psi_2(x,y) = -\\sin \\alpha \\cos \\alpha \\psi_1(x,y) + \\cos(2\\alpha)\\psi_2(x,y) + \\sin \\alpha \\cos \\alpha \\psi_3(x,y) \\)\n\\( P_R \\psi_3(x,y) = \\sin^2 \\alpha \\psi_1(x,y) - \\sin(2\\alpha)\\psi_2(x,y) + \\cos^2 \\alpha \\psi_3(x,y) \\)\n\n\\( D(R) = \\frac{1}{2} \\begin{pmatrix} 2\\cos^2 \\alpha & -\\sin(2\\alpha) & 2\\sin^2 \\alpha \\\\ 2\\sin(2\\alpha) & 2\\cos(2\\alpha) & -2\\sin(2\\alpha) \\\\ 2\\sin^2 \\alpha & \\sin(2\\alpha) & 2\\cos^2 \\alpha \\end{pmatrix} \\)\n\n基变换后矩阵：\\( \\overline{D}(R) = \\frac{1}{\\sqrt{2}} \\begin{pmatrix} \\sqrt{2}\\cos^2 \\alpha & -\\sin(2\\alpha) & \\sqrt{2}\\sin^2 \\alpha \\\\ \\sin(2\\alpha) & \\sqrt{2}\\cos(2\\alpha) & -\\sin(2\\alpha) \\\\ \\sqrt{2}\\sin^2 \\alpha & \\sin(2\\alpha) & \\sqrt{2}\\cos^2 \\alpha \\end{pmatrix} \\)'
-                }
-            ],
-            resources: [
-                {
-                    id: 'r1',
-                    name: '蒋泊远笔记',
-                    desc: '经典群论教材',
-                    file: '../物理系教材解答网站尝试/source/group/物理学中群论.pdf'
-                },
-                {
-                    id: 'r2',
-                    name: '群论',
-                    desc: '冯克勤',
-                    file: '../物理系教材解答网站尝试/source/group/群论(冯克勤).pdf'
-                },
-                {
-                    id: 'r3',
-                    name: '物理学中的群论',
-                    desc: '马中骐',
-                    file: '../物理系教材解答网站尝试/source/group/[现代物理基础丛书]8 物理学中的群论(马中骐).pdf'
-                },
-                {
-                    id: 'r4',
-                    name: '群论与量子力学中对称性',
-                    desc: '北京大学经典群论教材',
-                    file: '../物理系教材解答网站尝试/source/group/【北京大学物理学丛书】群论和量子力学中的对称性 - 朱洪元.pdf'
-                }
-            ]
-        };
+        const STORAGE_KEY = 'grouptheory_full_data';
 
-        const STORAGE_KEY = 'grouptheory_questions_data';
-        let devModeActive = false;
+        const DEFAULT_CHAPTERS = [
+            { id: 'ch1', number: 1, name: '群论基础', desc: '群的定义、同态与同构' },
+            { id: 'ch2', number: 2, name: '表示论', desc: '不可约表示、特征标' },
+            { id: 'ch3', number: 3, name: '点群与空间群', desc: '晶体对称性' },
+            { id: 'ch4', number: 4, name: '李群与李代数', desc: '连续对称性' }
+        ];
 
-        function loadQuestionsData() {
+        const DEFAULT_QUESTIONS = [
+            {
+                id: 'q1_1',
+                chapterId: 'ch1',
+                title: '群的基本概念',
+                desc: 'a) 什么是群？并请举例。\n\nb) 请写出 D₃ 群={e, a, b, c, d, f}每个元素的阶和对应循环群，以及 D₃ 群的各个类？\n\nc) 请写出 D₃ 群的不变子群及其商群，这个商群与 Z₂ 群同构吗？为什么？\n\nd) D₃ 群是否与 Z₂ 群同态？如果是，请写出同态核。',
+                source: '经典群论教材',
+                ans: 'a) 群的定义：在规定了元素的"乘积"法则后，元素的集合G如果满足下面四个条件，则称为群：\n\n1. 集合对乘积的封闭性。集合中任意两元素的乘积仍属此集合：\\( RS \\in G, \\forall R \\text{和} S \\in G \\)\n\n2. 乘积满足结合律：\\( R(ST) = (RS)T, \\forall R, S, \\text{和} T \\in G \\)\n\n3. 集合中存在恒元E，用它左乘集合中的任意元素，保持该元素不变：\\( E \\in G, \\text{和} ER = R, \\forall R \\in G \\)\n\n4. 任何元素R的逆R⁻¹存在于集合中：\\( \\forall R \\in G, \\exists R^{-1} \\in G, \\text{使} R^{-1}R = E \\)\n\n举例：以"乘法"作为乘积的所有正实数构成群；以"加法"作为乘积的所有实数构成群。\n\nb) D₃群的元素阶、循环群和类：恒元的阶为1，三次轴转动元素d和f的阶为3，二次轴转动元素a、b、c的阶为2。\n\n对应循环群：\\( (e), (e,d,f), (e,a), (e,b), (e,c) \\)\n\nD₃群有三个类：1. 恒元e构成一类 2. 三次轴转动d和f构成一类 3. 二次轴转动a、b、c构成一类\n\nc) 不变子群：\\( H = \\{ e, d, f \\} \\)，商群：\\( D_3/H = \\{ H, aH \\} \\)，其中 \\( aH = \\{ a, b, c \\} \\)。可以验证 \\( (aH)^2 = H \\)，因此商群 \\( D_3/H \\) 与二阶循环群 Z₂ 同构。\n\nd) D₃群与二阶循环群 \\( Z_2 = \\{1, -1\\} \\) 同态，同态核为 \\( H = \\{ e, d, f \\} \\)，即D₃的不变子群。'
+            },
+            {
+                id: 'q2_1',
+                chapterId: 'ch2',
+                title: 'D₃群在函数空间中的表示',
+                desc: '\\( D_3 \\) 在 \\( x, y, z \\) 的二次齐次函数空间中的表示，空间基为：\n\n\\[ \\phi_1 = x^2, \\phi_2 = y^2, \\phi_3 = z^2, \\phi_4 = xy, \\phi_5 = yz, \\phi_6 = xz \\]\n\n求 \\( D_3 \\) 群元 \\( d \\) 的表示矩阵 \\( A(d) \\)。',
+                source: '群论表示论习题',
+                ans: '计算各基函数在 \\( d \\) 作用下的变换：\n\n\\[ A(d)\\phi_1 = \\frac{1}{4}\\phi_1 + \\frac{3}{4}\\phi_2 - \\frac{\\sqrt{3}}{2}\\phi_4 \\]\n\\[ A(d)\\phi_2 = \\frac{3}{4}\\phi_1 + \\frac{1}{4}\\phi_2 + \\frac{\\sqrt{3}}{2}\\phi_4 \\]\n\\[ A(d)\\phi_3 = \\phi_3 \\]\n\\[ A(d)\\phi_4 = \\frac{\\sqrt{3}}{4}\\phi_1 - \\frac{\\sqrt{3}}{4}\\phi_2 - \\frac{1}{2}\\phi_4 \\]\n\\[ A(d)\\phi_5 = -\\frac{1}{2}\\phi_5 - \\frac{\\sqrt{3}}{2}\\phi_6 \\]\n\\[ A(d)\\phi_6 = -\\frac{\\sqrt{3}}{2}\\phi_5 - \\frac{1}{2}\\phi_6 \\]\n\n因此表示矩阵为：\n\n\\[ A(d) = \\begin{pmatrix}\n\\frac{1}{4} & \\frac{3}{4} & 0 & \\frac{\\sqrt{3}}{4} & 0 & 0 \\\\\n\\frac{3}{4} & \\frac{1}{4} & 0 & -\\frac{\\sqrt{3}}{4} & 0 & 0 \\\\\n0 & 0 & 1 & 0 & 0 & 0 \\\\\n-\\frac{\\sqrt{3}}{2} & \\frac{\\sqrt{3}}{2} & 0 & -\\frac{1}{2} & 0 & 0 \\\\\n0 & 0 & 0 & 0 & -\\frac{1}{2} & -\\frac{\\sqrt{3}}{2} \\\\\n0 & 0 & 0 & 0 & \\frac{\\sqrt{3}}{2} & -\\frac{1}{2}\n\\end{pmatrix} \\]'
+            },
+            {
+                id: 'q3_1',
+                chapterId: 'ch3',
+                title: '杨图与置换群',
+                desc: '对于下图所对应的杨图，请问：a) 其对应的置换群 Sₙ 群的阶数是多少？b) 该杨图对应几个轮换，这些轮换分别是几维？c) 请问此杨图对应的所有标准盘的个数是多少？d) 请分别写出标准盘中的 T₄ 和 T₆ 的形式。e) 并写出 T₄ → T₆ 的置换变换。\n\n\\[ \\begin{array}{|c|c|c|c|c|} \\hline & & & & \\\\ \\hline & & & & \\\\ \\hline & & & & \\\\ \\hline \\end{array} \\]',
+                source: '群论点群习题',
+                ans: 'a) 杨图对应 S₉ 置换群，阶数为 9! = 362880\n\nb) 杨图对应的轮换类型为 (1¹, 2¹, 3²)，即有1个一维轮换，1个二维轮换，2个三维轮换\n\nc) 正则杨表的钩型数计算：\\( d_{[4,3,2]} = \\frac{9!}{6 \\times 5 \\times 3 \\times 1 \\times 4 \\times 3 \\times 1 \\times 2 \\times 1} = 168 \\)，因此标准盘个数为168个\n\nd) 标准盘形式：\\( T_4 = \\begin{array}{|c|c|c|c|} \\hline 1 & 2 & 3 & 4 \\\\ \\hline 5 & 7 & 8 & \\\\ \\hline 6 & 9 & & \\\\ \\hline \\end{array} \\)，\\( T_6 = \\begin{array}{|c|c|c|c|} \\hline 1 & 2 & 3 & 4 \\\\ \\hline 5 & 8 & 9 & \\\\ \\hline 6 & 7 & & \\\\ \\hline \\end{array} \\)\n\ne) 置换变换：\\( T_6 = (789)T_4 \\)，即通过置换(789)将T₄变换为T₆'
+            },
+            {
+                id: 'q4_1',
+                chapterId: 'ch4',
+                title: '函数空间的变换矩阵',
+                desc: '由函数基 \\( \\Psi_1(x,y)=x^2 \\)，\\( \\Psi_2(x,y)=xy \\)，\\( \\Psi_3(x,y)=y^2 \\) 架设的三维函数空间（二次齐次函数空间）对下列二维空间转动变换 R 保持不变，试计算变换 R 对应的标量函数换号算符 \\( P_R \\) 在此函数基中的矩阵形式为 \\( D(R) \\)：\n\na) \\( R = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix} \\)\n\nb) \\( R = \\frac{1}{2} \\begin{pmatrix} -1 & -\\sqrt{3} \\\\ \\sqrt{3} & -1 \\end{pmatrix} \\)\n\nc) \\( R = \\begin{pmatrix} \\cos \\alpha & -\\sin \\alpha \\\\ \\sin \\alpha & \\cos \\alpha \\end{pmatrix} \\)\n\n如果再把基 \\( \\Psi_2(x,y) \\) 换成 \\( \\sqrt{2}xy \\)，请重新计算 \\( P_R \\) 算符的矩阵形式。',
+                source: '李群与李代数习题',
+                ans: 'a) 变换矩阵：\\( P_R \\psi_1(x,y) = x^2 = \\psi_1(x,y) \\)，\\( P_R \\psi_2(x,y) = -xy = -\\psi_2(x,y) \\)，\\( P_R \\psi_3(x,y) = y^2 = \\psi_3(x,y) \\)\n\n\\( D(R) = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & -1 & 0 \\\\ 0 & 0 & 1 \\end{pmatrix} \\)，基变换后矩阵不变\n\nb) 变换矩阵：\n\n\\( P_R \\psi_1(x,y) = \\frac{1}{4} [\\psi_1(x,y) - 2\\sqrt{3}\\psi_2(x,y) + 3\\psi_3(x,y)] \\)\n\\( P_R \\psi_2(x,y) = \\frac{1}{4} [\\sqrt{3}\\psi_1(x,y) - 2\\psi_2(x,y) - \\sqrt{3}\\psi_3(x,y)] \\)\n\\( P_R \\psi_3(x,y) = \\frac{1}{4} [3\\psi_1(x,y) + 2\\sqrt{3}\\psi_2(x,y) + \\psi_3(x,y)] \\)\n\n\\( D(R) = \\frac{1}{4} \\begin{pmatrix} 1 & \\sqrt{3} & 3 \\\\ -2\\sqrt{3} & -2 & 2\\sqrt{3} \\\\ 3 & -\\sqrt{3} & 1 \\end{pmatrix} \\)\n\n基变换后矩阵：\\( \\overline{D}(R) = \\frac{1}{4} \\begin{pmatrix} 1 & \\sqrt{6} & 3 \\\\ -\\sqrt{6} & -2 & \\sqrt{6} \\\\ 3 & -\\sqrt{6} & 1 \\end{pmatrix} \\)\n\nc) 变换矩阵：\n\n\\( P_R \\psi_1(x,y) = \\cos^2 \\alpha \\psi_1(x,y) + \\sin(2\\alpha)\\psi_2(x,y) + \\sin^2 \\alpha \\psi_3(x,y) \\)\n\\( P_R \\psi_2(x,y) = -\\sin \\alpha \\cos \\alpha \\psi_1(x,y) + \\cos(2\\alpha)\\psi_2(x,y) + \\sin \\alpha \\cos \\alpha \\psi_3(x,y) \\)\n\\( P_R \\psi_3(x,y) = \\sin^2 \\alpha \\psi_1(x,y) - \\sin(2\\alpha)\\psi_2(x,y) + \\cos^2 \\alpha \\psi_3(x,y) \\)\n\n\\( D(R) = \\frac{1}{2} \\begin{pmatrix} 2\\cos^2 \\alpha & -\\sin(2\\alpha) & 2\\sin^2 \\alpha \\\\ 2\\sin(2\\alpha) & 2\\cos(2\\alpha) & -2\\sin(2\\alpha) \\\\ 2\\sin^2 \\alpha & \\sin(2\\alpha) & 2\\cos^2 \\alpha \\end{pmatrix} \\)\n\n基变换后矩阵：\\( \\overline{D}(R) = \\frac{1}{\\sqrt{2}} \\begin{pmatrix} \\sqrt{2}\\cos^2 \\alpha & -\\sin(2\\alpha) & \\sqrt{2}\\sin^2 \\alpha \\\\ \\sin(2\\alpha) & \\sqrt{2}\\cos(2\\alpha) & -\\sin(2\\alpha) \\\\ \\sqrt{2}\\sin^2 \\alpha & \\sin(2\\alpha) & \\sqrt{2}\\cos^2 \\alpha \\end{pmatrix} \\)'
+            }
+        ];
+
+        const DEFAULT_RESOURCES = [
+            { id: 'r1', name: '蒋泊远笔记', desc: '经典群论教材', file: '../source/group/物理学中群论.pdf' },
+            { id: 'r2', name: '群论', desc: '冯克勤', file: '../source/group/群论(冯克勤).pdf' },
+            { id: 'r3', name: '物理学中的群论', desc: '马中骐', file: '../source/group/物理学中的群论.pdf' }
+        ];
+
+        function getDefaultData() {
+            return {
+                chapters: JSON.parse(JSON.stringify(DEFAULT_CHAPTERS)),
+                questions: JSON.parse(JSON.stringify(DEFAULT_QUESTIONS)),
+                resources: JSON.parse(JSON.stringify(DEFAULT_RESOURCES))
+            };
+        }
+
+        function loadData() {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
-                    if (parsed && Array.isArray(parsed.questions) && Array.isArray(parsed.resources)) {
+                    if (parsed && parsed.chapters && parsed.questions && parsed.resources) {
                         return parsed;
                     }
                 } catch (e) {}
             }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
-            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+            const defaultData = getDefaultData();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+            return defaultData;
         }
 
-        function saveQuestionsData(data) {
+        function saveData(data) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
-        let questionsData = loadQuestionsData();
+        let appData = loadData();
+        let devModeActive = false;
+        let editingChapterId = null;
 
-        // ======================== 渲染引擎 ============================
+        // ======================== 图片管理系统 ============================
+        const IMAGE_STORAGE_KEY = 'grouptheory_images_data';
+
+        function loadImages() {
+            const stored = localStorage.getItem(IMAGE_STORAGE_KEY);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {}
+            }
+            return {};
+        }
+
+        function saveImages(images) {
+            localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(images));
+            updateImageCount();
+        }
+
+        let imageData = loadImages();
+
+        function updateImageCount() {
+            const countEl = document.getElementById('imageCount');
+            if (countEl) {
+                countEl.textContent = Object.keys(imageData).length;
+            }
+        }
+
+        // ======================== 工具函数 ============================
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
+        function unescapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        }
+
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-success text-white',
+                danger: 'bg-danger text-white',
+                warning: 'bg-warning text-dark',
+                info: 'bg-info text-white'
+            };
+            toast.className = `toast show ${colors[type] || colors.success}`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="toast-body d-flex align-items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ======================== 图片处理函数 ============================
+        function parseImageMarkdown(text) {
+            if (!text) return text;
+            return text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, imgId) {
+                if (imageData[imgId]) {
+                    return `<img src="${imageData[imgId].data}" alt="${alt || '图片'}" class="img-fluid my-2" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">`;
+                }
+                return match;
+            });
+        }
+
         function parseTextToHTML(text, type) {
-            const trimmed = (text || '').trim();
-            if (type === 'title') return trimmed;
+            if (!text) return '';
+            const trimmed = text.trim();
+            
+            let processed = parseImageMarkdown(trimmed);
+            
+            if (type === 'title') return processed;
             if (type === 'source') {
-                if (!trimmed) return '';
-                return `<div class="alert alert-info mt-2 mb-0">来源: ${trimmed}</div>`;
+                if (!processed) return '';
+                return `<div class="alert alert-info mt-2 mb-0">来源: ${processed}</div>`;
             }
-            const blocks = trimmed.split(/\n\s*\n/);
+            
+            const blocks = processed.split(/\n\s*\n/);
             let finalHTML = '';
             blocks.forEach(block => {
                 if (!block.trim()) return;
@@ -647,75 +660,159 @@
                     finalHTML += `<div class="solution-step"><p>${formattedBlock}</p></div>`;
                 }
             });
-            return finalHTML || trimmed;
+            return finalHTML || processed;
         }
 
-        function renderChapter(chapterNum) {
-            const container = document.querySelector(`.chapter-container#chapter${chapterNum} .question-list`);
-            if (!container) return;
-            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
-            chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
+        // ======================== 渲染引擎 ============================
+        function renderChapters() {
+            const navbar = document.getElementById('chapterNavbar');
+            if (!navbar) return;
+            
+            const sortedChapters = [...appData.chapters].sort((a, b) => a.number - b.number);
             
             let html = '';
-            chapterQuestions.forEach(q => {
-                const uid = q.id;
-                const titleHtml = parseTextToHTML(q.title, 'title');
-                const descHtml = parseTextToHTML(q.desc, 'desc');
-                const sourceHtml = parseTextToHTML(q.source, 'source');
-                const ansHtml = parseTextToHTML(q.ans, 'ans');
-
+            sortedChapters.forEach((ch, index) => {
+                const isActive = index === 0 ? 'active' : '';
+                const questionCount = appData.questions.filter(q => q.chapterId === ch.id).length;
                 html += `
-                <div class="card mb-4 editable-card chapter-card" id="q_${uid}">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
-                            <div class="flex-shrink-0">
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')">编辑</button>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')">删除</button>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary">题目描述</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')">编辑</button>
-                            </div>
-                            <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary">来源出处</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')">编辑</button>
-                            </div>
-                            <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
-                        </div>
-
-                        <div class="mb-2">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary">解答</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')">编辑</button>
-                            </div>
-                            <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
-                        </div>
+                <a href="#${ch.id}" class="list-group-item list-group-item-action ${isActive} draggable-chapter" 
+                   data-chapter-id="${ch.id}" data-index="${index}"
+                   onclick="scrollToChapter('${ch.id}')">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="chapter-order-handle dev-tool" style="display:none; cursor:grab;">
+                                <i class="fas fa-grip-vertical"></i>
+                            </span>
+                            ${ch.number}. ${ch.name}
+                        </span>
+                        <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);">${questionCount}</span>
                     </div>
-                </div>
+                    ${ch.desc ? `<small class="text-muted d-block ms-3">${ch.desc}</small>` : ''}
+                    <div class="dev-tool mt-1" style="display:none;">
+                        <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); editChapter('${ch.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteChapter('${ch.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </a>
                 `;
             });
-            container.innerHTML = html;
-
-            // 更新章节题数
-            const badge = document.getElementById(`count_${chapterNum}`);
-            if (badge) {
-                badge.textContent = chapterQuestions.length + '题';
-            }
-
+            navbar.innerHTML = html;
+            
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
+        }
 
-            // 重新渲染MathJax
-            if (window.MathJax && container.querySelectorAll('.editable-content').length) {
+        function renderContent() {
+            const container = document.getElementById('contentArea');
+            if (!container) return;
+            
+            const sortedChapters = [...appData.chapters].sort((a, b) => a.number - b.number);
+            
+            let html = '';
+            sortedChapters.forEach(ch => {
+                const chapterQuestions = appData.questions.filter(q => q.chapterId === ch.id);
+                chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
+                
+                html += `
+                <div class="mb-5 chapter-container" id="${ch.id}">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            ${ch.number}. ${ch.name}
+                            ${ch.desc ? `<small class="text-muted fs-6 ms-2">${ch.desc}</small>` : ''}
+                        </h2>
+                        <span class="badge rounded-pill" style="background-color: var(--grouptheory-red);">${chapterQuestions.length}题</span>
+                    </div>
+                    <div class="question-list" data-chapter-id="${ch.id}">
+                `;
+                
+                if (chapterQuestions.length === 0) {
+                    html += `<p class="text-muted text-center py-3">暂无题目</p>`;
+                } else {
+                    chapterQuestions.forEach(q => {
+                        const uid = q.id;
+                        const titleHtml = parseTextToHTML(q.title, 'title');
+                        const descHtml = parseTextToHTML(q.desc, 'desc');
+                        const sourceHtml = parseTextToHTML(q.source, 'source');
+                        const ansHtml = parseTextToHTML(q.ans, 'ans');
+                        
+                        html += `
+                        <div class="card mb-4 editable-card chapter-card" id="q_${uid}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('title_${uid}')" style="display:none;" title="插入图片">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')" style="display:none;">编辑</button>
+                                        <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')" style="display:none;">删除</button>
+                                    </div>
+                                </div>
+        
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="fw-bold mb-0 text-secondary">题目描述</h5>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('desc_${uid}')" style="display:none;" title="插入图片">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')" style="display:none;">编辑</button>
+                                        </div>
+                                    </div>
+                                    <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
+                                </div>
+        
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="fw-bold mb-0 text-secondary">来源出处</h5>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('source_${uid}')" style="display:none;" title="插入图片">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')" style="display:none;">编辑</button>
+                                        </div>
+                                    </div>
+                                    <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
+                                </div>
+        
+                                <div class="mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="fw-bold mb-0 text-secondary">解答</h5>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary dev-tool" onclick="insertImageToContent('ans_${uid}')" style="display:none;" title="插入图片">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')" style="display:none;">编辑</button>
+                                        </div>
+                                    </div>
+                                    <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    });
+                }
+                
+                html += `
+                    </div>
+                    <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('${ch.id}')" style="display:none;">
+                        <i class="fas fa-plus"></i> 在此章节添加新题目
+                    </button>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+            
+            if (window.MathJax) {
                 MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
             }
         }
@@ -723,16 +820,18 @@
         function renderResources() {
             const container = document.getElementById('resourceList');
             if (!container) return;
+            
             let html = '';
-            questionsData.resources.forEach(r => {
+            appData.resources.forEach(r => {
                 html += `
                 <div class="resource-item" id="res_${r.id}">
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="${r.file}" target="_blank" class="d-flex align-items-center flex-grow-1">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>
                             <span>${escapeHtml(r.name)}</span>
                         </a>
                         <button class="btn btn-sm btn-outline-danger dev-tool" onclick="deleteResource('${r.id}')" style="display:none;">
-                            ×
+                            <i class="fas fa-times"></i>
                         </button>
                     </div>
                     <small class="text-muted d-block mt-1">${escapeHtml(r.desc)}</small>
@@ -741,197 +840,604 @@
             });
             html += `
                 <div class="text-center mt-3">
-                    <button class="btn btn-sm btn-outline-primary dev-tool" onclick="showAddResourceModal()" style="display:none;">
-                        添加资料
-                    </button>
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                        上传资料
+                        <i class="fas fa-upload me-1"></i> 上传资料
                     </button>
                 </div>
             `;
             container.innerHTML = html;
-
+            
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
         }
 
         function renderAll() {
-            renderChapter(1);
-            renderChapter(2);
-            renderChapter(3);
-            renderChapter(4);
+            renderChapters();
+            renderContent();
             renderResources();
+            updateImageCount();
             document.getElementById('devModeSwitch').checked = devModeActive;
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
         }
 
-        // ======================== 编辑与删除 ============================
+        // ======================== 章节管理 ============================
+        function scrollToChapter(chapterId) {
+            const el = document.getElementById(chapterId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function addChapter() {
+            if (!devModeActive) return;
+            const maxNumber = appData.chapters.reduce((max, ch) => Math.max(max, ch.number), 0);
+            editingChapterId = null;
+            document.getElementById('chapterModalTitle').textContent = '添加新章节';
+            document.getElementById('chapterNumber').value = maxNumber + 1;
+            document.getElementById('chapterName').value = '';
+            document.getElementById('chapterDesc').value = '';
+            document.getElementById('deleteChapterBtn').style.display = 'none';
+            const modal = new bootstrap.Modal(document.getElementById('chapterModal'));
+            modal.show();
+        }
+
+        function editChapter(chapterId) {
+            if (!devModeActive) return;
+            const ch = appData.chapters.find(c => c.id === chapterId);
+            if (!ch) return;
+            editingChapterId = chapterId;
+            document.getElementById('chapterModalTitle').textContent = '编辑章节';
+            document.getElementById('chapterNumber').value = ch.number;
+            document.getElementById('chapterName').value = ch.name;
+            document.getElementById('chapterDesc').value = ch.desc || '';
+            document.getElementById('deleteChapterBtn').style.display = 'inline-block';
+            const modal = new bootstrap.Modal(document.getElementById('chapterModal'));
+            modal.show();
+        }
+
+        function saveChapter() {
+            const number = parseInt(document.getElementById('chapterNumber').value);
+            const name = document.getElementById('chapterName').value.trim();
+            const desc = document.getElementById('chapterDesc').value.trim();
+            
+            if (!number || number < 1) {
+                showToast('请输入有效的章节编号', 'danger');
+                return;
+            }
+            if (!name) {
+                showToast('请输入章节名称', 'danger');
+                return;
+            }
+            
+            if (editingChapterId) {
+                const ch = appData.chapters.find(c => c.id === editingChapterId);
+                if (ch) {
+                    ch.number = number;
+                    ch.name = name;
+                    ch.desc = desc;
+                    showToast('章节已更新', 'success');
+                }
+            } else {
+                const newChapter = {
+                    id: 'ch' + Date.now(),
+                    number: number,
+                    name: name,
+                    desc: desc
+                };
+                appData.chapters.push(newChapter);
+                showToast('新章节已添加', 'success');
+            }
+            
+            saveData(appData);
+            renderAll();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('chapterModal'));
+            modal.hide();
+        }
+
+        function deleteCurrentChapter() {
+            if (!editingChapterId) return;
+            deleteChapter(editingChapterId);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('chapterModal'));
+            modal.hide();
+        }
+
+        function deleteChapter(chapterId) {
+            if (!devModeActive) return;
+            const ch = appData.chapters.find(c => c.id === chapterId);
+            if (!ch) return;
+            const questionCount = appData.questions.filter(q => q.chapterId === chapterId).length;
+            if (questionCount > 0) {
+                if (!confirm(`章节 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除吗？题目也会被删除！`)) {
+                    return;
+                }
+            } else {
+                if (!confirm(`确定要删除章节 "${ch.number}. ${ch.name}" 吗？`)) {
+                    return;
+                }
+            }
+            
+            appData.chapters = appData.chapters.filter(c => c.id !== chapterId);
+            appData.questions = appData.questions.filter(q => q.chapterId !== chapterId);
+            saveData(appData);
+            renderAll();
+            showToast(`已删除章节 "${ch.name}"`, 'danger');
+        }
+
+        // ======================== 题目管理 ============================
+        function addNewQuestion(chapterId) {
+            if (!devModeActive) return;
+            const ch = appData.chapters.find(c => c.id === chapterId);
+            if (!ch) {
+                showToast('章节不存在', 'danger');
+                return;
+            }
+            
+            const chapterQuestions = appData.questions.filter(q => q.chapterId === chapterId);
+            const maxNum = chapterQuestions.reduce((max, q) => {
+                const parts = q.id.split('_');
+                const num = parseInt(parts[parts.length - 1]);
+                return num > max ? num : max;
+            }, 0);
+            
+            const newQ = {
+                id: `q${ch.number}_${maxNum + 1}`,
+                chapterId: chapterId,
+                title: '新题目名称',
+                desc: '请在此输入题目内容，支持 LaTeX 公式：\n\\[ G = \\{ e, a, b \\} \\]\n\n双换行可以分段。',
+                source: '待补充参考来源',
+                ans: '步骤1：输入解答内容。\n\n步骤2：空行后输入下一步。'
+            };
+            
+            appData.questions.push(newQ);
+            saveData(appData);
+            renderAll();
+            showToast('新题目已添加', 'success');
+            
+            setTimeout(() => {
+                const el = document.getElementById(`q_${newQ.id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
+        function deleteQuestion(uid) {
+            if (!devModeActive) return;
+            const q = appData.questions.find(q => q.id === uid);
+            if (!q) return;
+            if (!confirm(`确定要删除题目 "${q.title}" 吗？`)) return;
+            
+            appData.questions = appData.questions.filter(q => q.id !== uid);
+            saveData(appData);
+            renderAll();
+            showToast('题目已删除', 'danger');
+        }
+
+        // ======================== 编辑功能 ============================
         function toggleEdit(elementId) {
             if (!devModeActive) return;
             const contentDiv = document.getElementById(elementId);
             if (!contentDiv) return;
             const type = contentDiv.getAttribute('data-type');
             const raw = contentDiv.getAttribute('data-raw') || '';
-
+            const uid = elementId.split('_').slice(1).join('_');
+            
             if (contentDiv.tagName.toLowerCase() !== 'textarea') {
                 const textarea = document.createElement('textarea');
                 textarea.id = elementId;
                 textarea.className = 'form-control editable-content mb-2';
                 textarea.setAttribute('data-type', type);
                 textarea.rows = (type === 'title' || type === 'source') ? 2 : 8;
-                textarea.value = raw;
+                textarea.value = unescapeHtml(raw);
+                contentDiv.replaceWith(textarea);
                 
-                if (type === 'title') {
-                    const card = contentDiv.closest('.editable-card');
-                    const titleContainer = card.querySelector('.d-flex.justify-content-between');
-                    if (titleContainer) {
-                        const titleWrap = document.createElement('div');
-                        titleWrap.className = 'flex-grow-1 me-2';
-                        titleWrap.appendChild(textarea);
-                        const btnDiv = titleContainer.querySelector('.flex-shrink-0');
-                        titleContainer.innerHTML = '';
-                        titleContainer.appendChild(titleWrap);
-                        titleContainer.appendChild(btnDiv);
-                        const btn = btnDiv.querySelector('.dev-edit-btn');
-                        if (btn) {
-                            btn.innerHTML = '保存';
-                            btn.classList.remove('btn-outline-danger');
-                            btn.classList.add('btn-success');
-                        }
-                    }
-                } else {
-                    contentDiv.replaceWith(textarea);
-                    const card = textarea.closest('.editable-card');
-                    if (card) {
-                        const btn = card.querySelector(`[onclick*="toggleEdit('${elementId}')"]`);
-                        if (btn) {
-                            btn.innerHTML = '保存';
-                            btn.classList.remove('btn-outline-danger');
-                            btn.classList.add('btn-success');
-                        }
-                    }
+                const btn = document.querySelector(`#q_${uid} .dev-edit-btn`);
+                if (btn) {
+                    btn.innerHTML = '保存';
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-success');
                 }
+                textarea.focus();
             } else {
                 const currentText = contentDiv.value;
-                const id = elementId.split('_').slice(1).join('_');
                 const typeKey = elementId.split('_')[0];
-                const q = questionsData.questions.find(q => q.id === id);
+                const q = appData.questions.find(q => q.id === uid);
                 if (q) {
                     if (typeKey === 'title') q.title = currentText;
                     else if (typeKey === 'desc') q.desc = currentText;
                     else if (typeKey === 'source') q.source = currentText;
                     else if (typeKey === 'ans') q.ans = currentText;
-                    saveQuestionsData(questionsData);
+                    saveData(appData);
                 }
                 
                 const newDiv = document.createElement('div');
                 newDiv.id = elementId;
                 newDiv.className = 'editable-content';
                 newDiv.setAttribute('data-type', type);
-                newDiv.setAttribute('data-raw', currentText);
-                if (type === 'title') {
-                    newDiv.classList.add('problem-title', 'mb-0', 'fw-bold');
-                    const card = contentDiv.closest('.editable-card');
-                    const titleContainer = card.querySelector('.d-flex.justify-content-between');
-                    if (titleContainer) {
-                        const titleWrap = titleContainer.querySelector('.flex-grow-1');
-                        if (titleWrap) {
-                            titleWrap.innerHTML = '';
-                            titleWrap.appendChild(newDiv);
-                        }
-                        const btn = titleContainer.querySelector('.dev-edit-btn');
-                        if (btn) {
-                            btn.innerHTML = '编辑';
-                            btn.classList.remove('btn-success');
-                            btn.classList.add('btn-outline-danger');
-                        }
-                    }
-                } else {
-                    contentDiv.replaceWith(newDiv);
-                    const card = newDiv.closest('.editable-card');
-                    if (card) {
-                        const btn = card.querySelector(`[onclick*="toggleEdit('${elementId}')"]`);
-                        if (btn) {
-                            btn.innerHTML = '编辑';
-                            btn.classList.remove('btn-success');
-                            btn.classList.add('btn-outline-danger');
-                        }
-                    }
+                newDiv.setAttribute('data-raw', escapeHtml(currentText));
+                if (type === 'title') newDiv.classList.add('problem-title', 'mb-4', 'fw-bold');
+                newDiv.innerHTML = parseTextToHTML(currentText, type);
+                contentDiv.replaceWith(newDiv);
+                
+                const btn = document.querySelector(`#q_${uid} .dev-edit-btn`);
+                if (btn) {
+                    btn.innerHTML = '编辑';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-danger');
                 }
                 
                 if (window.MathJax) {
                     MathJax.typesetPromise([newDiv]).catch(err => console.error('MathJax渲染错误', err));
                 }
+                showToast('内容已保存', 'success');
             }
         }
 
-        function deleteQuestion(uid) {
+        // ======================== 图片插入功能 ============================
+        function insertImageToContent(targetElementId) {
             if (!devModeActive) return;
-            if (!confirm(`确定要删除题目 "${uid}" 吗？此操作不可撤销。`)) return;
-            questionsData.questions = questionsData.questions.filter(q => q.id !== uid);
-            saveQuestionsData(questionsData);
-            renderAll();
+            
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+            
+            fileInput.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    fileInput.remove();
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('图片大小不能超过 5MB', 'danger');
+                    fileInput.remove();
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const imgId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                    imageData[imgId] = {
+                        data: ev.target.result,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        uploadTime: new Date().toISOString()
+                    };
+                    saveImages(imageData);
+                    
+                    const targetElement = document.getElementById(targetElementId);
+                    if (targetElement) {
+                        if (targetElement.tagName.toLowerCase() === 'textarea') {
+                            const cursorPos = targetElement.selectionStart;
+                            const textBefore = targetElement.value.substring(0, cursorPos);
+                            const textAfter = targetElement.value.substring(cursorPos);
+                            const imgTag = `\n![${file.name}](${imgId})\n`;
+                            targetElement.value = textBefore + imgTag + textAfter;
+                            
+                            const uid = targetElementId.split('_').slice(1).join('_');
+                            const typeKey = targetElementId.split('_')[0];
+                            const q = appData.questions.find(q => q.id === uid);
+                            if (q) {
+                                if (typeKey === 'title') q.title = targetElement.value;
+                                else if (typeKey === 'desc') q.desc = targetElement.value;
+                                else if (typeKey === 'source') q.source = targetElement.value;
+                                else if (typeKey === 'ans') q.ans = targetElement.value;
+                                saveData(appData);
+                            }
+                            showToast('图片已插入，点击"保存"确认', 'success');
+                        } else {
+                            const imgHTML = `<img src="${imageData[imgId].data}" alt="${file.name}" class="img-fluid my-2" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">`;
+                            targetElement.innerHTML += '<br>' + imgHTML;
+                            
+                            const raw = targetElement.getAttribute('data-raw') || '';
+                            const uid = targetElementId.split('_').slice(1).join('_');
+                            const type = targetElement.getAttribute('data-type');
+                            const q = appData.questions.find(q => q.id === uid);
+                            if (q) {
+                                const newRaw = raw + '\n[图片: ' + file.name + ']';
+                                if (type === 'title') q.title = newRaw;
+                                else if (type === 'desc') q.desc = newRaw;
+                                else if (type === 'source') q.source = newRaw;
+                                else if (type === 'ans') q.ans = newRaw;
+                                targetElement.setAttribute('data-raw', escapeHtml(newRaw));
+                                saveData(appData);
+                            }
+                            showToast('图片已插入', 'success');
+                        }
+                    }
+                    
+                    if (window.MathJax) {
+                        MathJax.typesetPromise().catch(err => console.error('MathJax渲染错误', err));
+                    }
+                    fileInput.remove();
+                };
+                reader.readAsDataURL(file);
+            };
+            fileInput.click();
         }
 
-        function addNewQuestion(chapterId) {
+        // ======================== 图片库管理 ============================
+        function uploadImageToLibrary() {
             if (!devModeActive) return;
-            const chapterNum = parseInt(chapterId.replace('chapter', ''));
-            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
-            const maxId = chapterQuestions.reduce((max, q) => {
-                const num = parseInt(q.id.split('_')[1]);
-                return num > max ? num : max;
-            }, 0);
-            const newId = `${chapterNum}_${maxId + 1}`;
             
-            const newQ = {
-                id: newId,
-                chapter: chapterNum,
-                title: '新题目名称',
-                desc: '请在此直接输入题目文本及 LaTeX 公式，双换行（留一个空行）可以分段。',
-                source: '未指定参考书籍',
-                ans: '步骤1：输入内容。\n\n步骤2：空行后输入第二步公式：\\[ \\nabla \\cdot \\mathbf{E} = 0 \\]'
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.multiple = true;
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+            
+            fileInput.onchange = function(e) {
+                const files = e.target.files;
+                let uploadCount = 0;
+                const validFiles = Array.from(files).filter(f => f.size <= 5 * 1024 * 1024);
+                
+                if (validFiles.length === 0) {
+                    showToast('没有有效的图片（单张不超过5MB）', 'warning');
+                    fileInput.remove();
+                    return;
+                }
+                
+                validFiles.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const imgId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                        imageData[imgId] = {
+                            data: ev.target.result,
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            uploadTime: new Date().toISOString()
+                        };
+                        uploadCount++;
+                        if (uploadCount === validFiles.length) {
+                            saveImages(imageData);
+                            showToast(`成功上传 ${uploadCount} 张图片！`, 'success');
+                            renderAll();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+                fileInput.remove();
             };
-            questionsData.questions.push(newQ);
-            saveQuestionsData(questionsData);
+            fileInput.click();
+        }
+
+        function showImageGallery() {
+            const imageKeys = Object.keys(imageData);
+            if (imageKeys.length === 0) {
+                showToast('暂无已上传的图片', 'info');
+                return;
+            }
+            
+            let modalHTML = `
+            <div class="modal fade" id="imageGalleryModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-images me-2"></i>图片库 (${imageKeys.length}张)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                            <div class="row g-3">
+            `;
+            
+            imageKeys.forEach(key => {
+                const img = imageData[key];
+                modalHTML += `
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        <img src="${img.data}" class="card-img-top image-gallery-img" alt="${img.name}" 
+                             onclick="window.open('${img.data}', '_blank')">
+                        <div class="card-body p-2">
+                            <p class="card-text small text-truncate" title="${img.name}">${img.name}</p>
+                            <div class="d-grid gap-1">
+                                <button class="btn btn-sm btn-outline-primary" onclick="copyImageMarkdown('${key}')">
+                                    <i class="fas fa-copy"></i> 复制引用
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteImageFromGallery('${key}')">
+                                    <i class="fas fa-trash"></i> 删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            modalHTML += `
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+            
+            const oldModal = document.getElementById('imageGalleryModal');
+            if (oldModal) oldModal.remove();
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.innerHTML = modalHTML;
+            document.body.appendChild(modalContainer.firstElementChild);
+            
+            const modal = new bootstrap.Modal(document.getElementById('imageGalleryModal'));
+            modal.show();
+        }
+
+        function copyImageMarkdown(imgId) {
+            const img = imageData[imgId];
+            if (!img) {
+                showToast('图片不存在', 'danger');
+                return;
+            }
+            
+            const markdown = `![${img.name}](${imgId})`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(markdown).then(() => {
+                    showToast('已复制图片引用', 'success');
+                }).catch(() => {
+                    fallbackCopy(markdown);
+                });
+            } else {
+                fallbackCopy(markdown);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+            showToast('已复制图片引用', 'success');
+        }
+
+        function deleteImageFromGallery(imgId) {
+            if (!confirm('确定要删除这张图片吗？')) return;
+            delete imageData[imgId];
+            saveImages(imageData);
+            showImageGallery();
             renderAll();
+            showToast('图片已删除', 'danger');
+        }
+
+        function clearAllImages() {
+            const count = Object.keys(imageData).length;
+            if (count === 0) {
+                showToast('没有图片需要清空', 'info');
+                return;
+            }
+            if (!confirm(`确定要删除所有 ${count} 张图片吗？此操作不可撤销！`)) return;
+            imageData = {};
+            saveImages(imageData);
+            renderAll();
+            showToast(`已清空 ${count} 张图片`, 'danger');
         }
 
         // ======================== 资源管理 ============================
         function deleteResource(rid) {
             if (!devModeActive) return;
-            if (!confirm(`确定要删除资料 "${questionsData.resources.find(r => r.id === rid)?.name}" 吗？`)) return;
-            questionsData.resources = questionsData.resources.filter(r => r.id !== rid);
-            saveQuestionsData(questionsData);
+            const res = appData.resources.find(r => r.id === rid);
+            if (!res) return;
+            if (!confirm(`确定要删除资料 "${res.name}" 吗？`)) return;
+            
+            appData.resources = appData.resources.filter(r => r.id !== rid);
+            saveData(appData);
             renderResources();
+            showToast('资料已删除', 'danger');
         }
 
         function showAddResourceModal() {
             if (!devModeActive) return;
             const name = prompt('请输入资料名称：');
             if (!name) return;
-            const desc = prompt('请输入简要描述：');
+            const desc = prompt('请输入简要描述：') || '无描述';
             const file = prompt('请输入文件路径（如：pdfs/example.pdf）：');
             if (!file) return;
+            
             const newRes = {
                 id: 'r' + Date.now(),
                 name: name,
-                desc: desc || '无描述',
+                desc: desc,
                 file: file
             };
-            questionsData.resources.push(newRes);
-            saveQuestionsData(questionsData);
+            appData.resources.push(newRes);
+            saveData(appData);
             renderResources();
+            showToast('资料已添加', 'success');
         }
 
-        function addResource() {
-            showAddResourceModal();
+        // ======================== 搜索功能 ============================
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase().trim();
+            const allCards = document.querySelectorAll('.editable-card');
+            allCards.forEach(card => {
+                const contentElements = card.querySelectorAll('.editable-content');
+                let isMatch = false;
+                contentElements.forEach(el => {
+                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
+                    if (text.includes(keyword)) isMatch = true;
+                });
+                card.style.display = isMatch ? '' : 'none';
+            });
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                const cards = chapter.querySelectorAll('.editable-card');
+                let hasVisible = false;
+                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
+            });
+        });
+
+        // ======================== ScrollSpy ============================
+        function setupScrollSpy() {
+            const options = { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 };
+            const scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const chapterId = entry.target.id;
+                        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        const targetBtn = document.querySelector(`#chapterNavbar a[href="#${chapterId}"]`);
+                        if(targetBtn) targetBtn.classList.add('active');
+                    }
+                });
+            }, options);
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                if (chapter) scrollObserver.observe(chapter);
+            });
         }
+
+        // ======================== 阅读进度条、返回顶部 ============================
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("readingProgress").style.width = scrolled + "%";
+
+            const backToTopBtn = document.getElementById("backToTop");
+            if (winScroll > 300) { backToTopBtn.classList.add("show"); } 
+            else { backToTopBtn.classList.remove("show"); }
+        };
+        document.getElementById("backToTop").onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // ======================== 沉浸模式 ============================
+        const focusBtn = document.getElementById('focusToggle');
+        focusBtn.addEventListener('click', () => {
+            document.body.classList.toggle('focus-mode');
+            const icon = focusBtn.querySelector('i');
+            if(document.body.classList.contains('focus-mode')) {
+                icon.className = 'fas fa-compress';
+                focusBtn.title = '退出专注模式';
+            } else {
+                icon.className = 'fas fa-expand';
+                focusBtn.title = '沉浸/授课模式';
+            }
+        });
+
+        // ======================== 夜间模式 ============================
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            const htmlTag = document.documentElement;
+            const currentTheme = htmlTag.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlTag.setAttribute('data-bs-theme', newTheme);
+            themeBtn.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun text-warning"></i>' : '<i class="fas fa-moon"></i>';
+        });
 
         // ======================== 开发者认证 ============================
         let passwordVisible = false;
+
         function togglePasswordVisibility() {
             const pwdInput = document.getElementById('devPassword');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -974,8 +1480,10 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'inline-block';
                 });
-                sessionStorage.setItem('dev_authenticated', 'true');
+                sessionStorage.setItem('dev_authenticated_grouptheory', 'true');
                 document.getElementById('devPassword').value = '';
+                renderAll();
+                showToast('开发者模式已开启', 'success');
             } else {
                 document.getElementById('authError').style.display = 'block';
                 document.getElementById('devPassword').value = '';
@@ -1009,6 +1517,7 @@
                     document.querySelectorAll('.dev-tool').forEach(el => {
                         el.style.display = 'inline-block';
                     });
+                    renderAll();
                     return;
                 }
                 openDevAuth();
@@ -1020,142 +1529,56 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'none';
                 });
-                sessionStorage.removeItem('dev_authenticated');
+                sessionStorage.removeItem('dev_authenticated_grouptheory');
+                renderAll();
             }
         });
 
-        // ======================== 搜索与导航 ============================
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const keyword = e.target.value.toLowerCase().trim();
-            const allCards = document.querySelectorAll('.editable-card');
-            allCards.forEach(card => {
-                const contentElements = card.querySelectorAll('.editable-content');
-                let isMatch = false;
-                contentElements.forEach(el => {
-                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
-                    if (text.includes(keyword)) isMatch = true;
-                });
-                card.style.display = isMatch ? '' : 'none';
-            });
-            document.querySelectorAll('.chapter-container').forEach(chapter => {
-                const cards = chapter.querySelectorAll('.editable-card');
-                let hasVisible = false;
-                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
-                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
-            });
-        });
-
-        // ======================== ScrollSpy 滚动监听 ============================
-        function setupScrollSpy() {
-            const options = { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 };
-            const scrollObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const chapterId = entry.target.id;
-                        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(btn => btn.classList.remove('active'));
-                        const targetBtn = document.querySelector(`#chapterNavbar a[href="#${chapterId}"]`);
-                        if(targetBtn) targetBtn.classList.add('active');
-                    }
-                });
-            }, options);
-            document.querySelectorAll('.chapter-container').forEach(chapter => scrollObserver.observe(chapter));
-        }
-
-        // ======================== 阅读进度条、返回顶部 ============================
-        window.onscroll = function() {
-            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            let scrolled = (winScroll / height) * 100;
-            document.getElementById("readingProgress").style.width = scrolled + "%";
-
-            const backToTopBtn = document.getElementById("backToTop");
-            if (winScroll > 300) { backToTopBtn.classList.add("show"); } 
-            else { backToTopBtn.classList.remove("show"); }
-        };
-        document.getElementById("backToTop").onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // ======================== 沉浸模式 ============================
-        const focusBtn = document.getElementById('focusToggle');
-        focusBtn.addEventListener('click', () => {
-            document.body.classList.toggle('focus-mode');
-            const icon = focusBtn.querySelector('i');
-            if(document.body.classList.contains('focus-mode')) {
-                icon.className = 'fas fa-compress'; focusBtn.title = '退出专注模式';
-            } else {
-                icon.className = 'fas fa-expand'; focusBtn.title = '沉浸/授课模式';
-            }
-        });
-
-        // ======================== 夜间模式 ============================
-        const themeBtn = document.getElementById('themeToggle');
-        themeBtn.addEventListener('click', () => {
-            const htmlTag = document.documentElement;
-            const currentTheme = htmlTag.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            htmlTag.setAttribute('data-bs-theme', newTheme);
-            themeBtn.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun text-warning"></i>' : '<i class="fas fa-moon"></i>';
-        });
-
-        // ======================== 导航栏点击 ============================
-        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // ======================== 登录状态管理 ============================
-        function updateAuthUI() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const username = localStorage.getItem('username');
-            const authButtons = document.getElementById('authButtons');
-            const userMenu = document.getElementById('userMenu');
-            
-            if(isLoggedIn && username) {
-                authButtons.style.display = 'none';
-                userMenu.style.display = 'block';
-                document.getElementById('usernameDisplay').textContent = username;
-            } else {
-                authButtons.style.display = 'block';
-                userMenu.style.display = 'none';
-            }
-        }
-
-        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('username');
-            window.location.href = 'index.html';
-        });
-
-        // ======================== 上传功能 ============================
+        // ======================== 上传资料 ============================
         document.getElementById('submitUpload')?.addEventListener('click', function() {
             const resourceName = document.getElementById('resourceName').value;
             const fileInput = document.getElementById('resourceFile');
+            const description = document.getElementById('resourceDescription').value;
             
-            if(resourceName && fileInput.files.length > 0) {
-                alert(`文件 ${fileInput.files[0].name} 上传成功！`);
-                var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
-                bootstrapModal.hide();
+            if (resourceName && fileInput.files.length > 0) {
+                const newRes = {
+                    id: 'r' + Date.now(),
+                    name: resourceName,
+                    desc: description || '无描述',
+                    file: fileInput.files[0].name
+                };
+                appData.resources.push(newRes);
+                saveData(appData);
+                renderResources();
+                showToast(`资料 "${resourceName}" 上传成功！`, 'success');
+                
+                document.getElementById('resourceName').value = '';
+                document.getElementById('resourceDescription').value = '';
+                fileInput.value = '';
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                modal.hide();
             } else {
-                alert('请填写完整信息并选择文件！');
+                showToast('请填写完整信息并选择文件！', 'warning');
+            }
+        });
+
+        // ======================== 导航点击 ============================
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('#chapterNavbar .list-group-item');
+            if (target && target.getAttribute('href')) {
+                document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
+                target.classList.add('active');
             }
         });
 
         // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
-            // 强制自动登录
-            if (!localStorage.getItem('isLoggedIn')) {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', '访客用户');
-            }
-            
-            if (sessionStorage.getItem('dev_authenticated') === 'true') {
+            if (sessionStorage.getItem('dev_authenticated_grouptheory') === 'true') {
                 devModeActive = true;
             }
             renderAll();
             setupScrollSpy();
-            updateAuthUI();
             if (devModeActive) {
                 document.getElementById('devModeSwitch').checked = true;
                 document.querySelectorAll('.dev-tool').forEach(el => {
@@ -1167,6 +1590,10 @@
                     el.style.display = 'none';
                 });
             }
+            
+            if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
+                themeBtn.innerHTML = '<i class="fas fa-sun text-warning"></i>';
+            }
         });
 
         // 暴露全局函数
@@ -1174,12 +1601,23 @@
         window.addNewQuestion = addNewQuestion;
         window.deleteQuestion = deleteQuestion;
         window.deleteResource = deleteResource;
-        window.addResource = addResource;
         window.showAddResourceModal = showAddResourceModal;
         window.openDevAuth = openDevAuth;
         window.closeDevAuth = closeDevAuth;
         window.verifyDevAuth = verifyDevAuth;
         window.togglePasswordVisibility = togglePasswordVisibility;
+        window.scrollToChapter = scrollToChapter;
+        window.addChapter = addChapter;
+        window.editChapter = editChapter;
+        window.saveChapter = saveChapter;
+        window.deleteChapter = deleteChapter;
+        window.deleteCurrentChapter = deleteCurrentChapter;
+        window.insertImageToContent = insertImageToContent;
+        window.uploadImageToLibrary = uploadImageToLibrary;
+        window.showImageGallery = showImageGallery;
+        window.copyImageMarkdown = copyImageMarkdown;
+        window.deleteImageFromGallery = deleteImageFromGallery;
+        window.clearAllImages = clearAllImages;
     </script>
 </body>
 </html>
