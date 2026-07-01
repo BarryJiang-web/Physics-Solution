@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>原子物理 | PhysicsSolution Hub</title>
+    <title>AI与物理学 | PhysicsSolution Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         /* ================= 主题变量 ================= */
         :root {
-            --atomic-orange: #fd7e14;
-            --atomic-dark: #e66100;
+            --ai-purple: #9c27b0;
+            --ai-deep-purple: #673ab7;
             --physics-blue: #2b5fdc;
             --bg-body: #f8f9fa;
             --bg-card: #ffffff;
@@ -40,26 +40,26 @@
         .text-dark { color: var(--text-main) !important; }
         .text-secondary { color: #888 !important; }
 
-        .atomic-header {
-            background: linear-gradient(135deg, var(--atomic-orange) 0%, var(--atomic-dark) 100%);
+        .ai-header {
+            background: linear-gradient(135deg, var(--ai-purple) 0%, var(--ai-deep-purple) 100%);
             color: white;
         }
         .chapter-card {
-            border-left: 4px solid var(--atomic-orange);
+            border-left: 4px solid var(--ai-purple);
             transition: all 0.3s;
         }
         .chapter-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(253, 126, 20, 0.1);
+            box-shadow: 0 10px 20px rgba(156, 39, 176, 0.1);
         }
         .problem-title {
-            color: var(--atomic-orange);
-            border-bottom: 2px solid var(--atomic-orange);
+            color: var(--ai-purple);
+            border-bottom: 2px solid var(--ai-purple);
         }
         .nav-pills .nav-link.active, .list-group-item.active {
-            background-color: var(--atomic-orange) !important;
+            background-color: var(--ai-purple) !important;
             color: white !important;
-            border-color: var(--atomic-orange);
+            border-color: var(--ai-purple);
         }
         .book-cover {
             max-height: 250px;
@@ -72,7 +72,7 @@
         .solution-step {
             margin-bottom: 15px;
             padding-left: 15px;
-            border-left: 3px solid var(--atomic-orange);
+            border-left: 3px solid var(--ai-purple);
         }
         .resource-item {
             border-left: 3px solid var(--physics-blue);
@@ -85,8 +85,8 @@
         }
         .resource-item a { color: var(--text-main); text-decoration: none; }
         .resource-item a:hover { color: var(--physics-blue); }
-        .atomic-icon {
-            color: var(--atomic-orange);
+        .neural-network-icon {
+            color: var(--ai-purple);
         }
         @media (max-width: 768px) {
             .book-cover { max-width: 100%; height: auto; }
@@ -120,10 +120,10 @@
 
         /* 进度条 */
         .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 1060; }
-        .progress-bar { height: 4px; background: var(--atomic-orange); width: 0%; transition: width 0.1s ease-out; }
+        .progress-bar { height: 4px; background: var(--ai-purple); width: 0%; transition: width 0.1s ease-out; }
         
         .action-btn { background: transparent; border: none; color: var(--text-main); opacity: 0.7; transition: all 0.2s; padding: 5px 10px; border-radius: 6px; }
-        .action-btn:hover { opacity: 1; background-color: rgba(253, 126, 20, 0.1); color: var(--atomic-orange); }
+        .action-btn:hover { opacity: 1; background-color: rgba(156, 39, 176, 0.1); color: var(--ai-purple); }
 
         .focus-mode .sidebar-col { display: none !important; }
         .focus-mode .content-col { width: 100% !important; max-width: 900px; margin: 0 auto; transition: all 0.3s ease; }
@@ -131,7 +131,7 @@
         #backToTop {
             position: fixed; bottom: 30px; right: 30px; z-index: 99;
             width: 50px; height: 50px; border-radius: 50%;
-            background-color: var(--atomic-orange); color: white; border: none;
+            background-color: var(--ai-purple); color: white; border: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
             transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
@@ -153,8 +153,8 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .auth-modal .form-label { font-weight: 600; }
-        .auth-modal .btn-primary { background: var(--atomic-orange); border: none; }
-        .auth-modal .btn-primary:hover { background: #e05a00; }
+        .auth-modal .btn-primary { background: var(--ai-purple); border: none; }
+        .auth-modal .btn-primary:hover { background: #7b1fa2; }
         .auth-error { color: #dc3545; font-size: 0.9rem; margin-top: 8px; display: none; }
         #authButtons { display: none !important; }
         .password-toggle { position: relative; }
@@ -193,10 +193,10 @@
             transition: all 0.2s;
         }
         .draggable-chapter:hover {
-            background: rgba(253, 126, 20, 0.05);
+            background: rgba(156, 39, 176, 0.05);
         }
         .chapter-order-handle {
-            color: var(--atomic-orange);
+            color: var(--ai-purple);
             margin-right: 10px;
         }
         .toast-container {
@@ -252,7 +252,7 @@
                         <a class="nav-link" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="atomic.html">原子物理</a>
+                        <a class="nav-link active" href="ai-physics.html">AI与物理</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
@@ -266,19 +266,18 @@
                         <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
                         <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;">开发者模式</label>
                     </div>
-                    <div id="authButtons"></div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- 原子物理页头 -->
-    <header class="atomic-header py-5 mb-5">
+    <!-- AI与物理学页头 -->
+    <header class="ai-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
-                原子物理解答库
+                AI与物理学交叉研究
             </h1>
-            <p class="lead mb-0">涵盖原子结构、光谱学、量子跃迁等核心内容</p>
+            <p class="lead mb-0">探索机器学习在物理研究中的应用与前沿进展</p>
         </div>
     </header>
 
@@ -301,7 +300,7 @@
                     <!-- 章节导航 - 可管理 -->
                     <div class="card shadow-sm">
                         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">章节导航</h5>
+                            <h5 class="mb-0">研究方向</h5>
                             <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addChapter()" style="display:none;">
                                 <i class="fas fa-plus"></i> 添加
                             </button>
@@ -311,15 +310,15 @@
                         </div>
                     </div>
 
-                    <!-- 推荐教材 -->
+                    <!-- 推荐资源 -->
                     <div class="card shadow-sm mt-4">
                         <div class="card-header bg-transparent">
-                            <h5 class="mb-0">推荐教材</h5>
+                            <h5 class="mb-0">推荐资源</h5>
                         </div>
                         <div class="card-body text-center">
-                            <img src="atom.webp" alt="原子物理学" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
-                            <h6>原子物理学</h6>
-                            <p class="text-muted small mb-0">杨福家</p>
+                            <img src="ai-physics.jpg" alt="AI与物理学" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
+                            <h6>AI for Physics</h6>
+                            <p class="text-muted small">Volker Knecht</p>
                         </div>
                     </div>
 
@@ -372,28 +371,26 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- 上传资料模态框 -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadModalLabel">上传PDF资料</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">上传PDF资料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="uploadForm">
-                        <div class="mb-3">
-                            <label for="resourceName" class="form-label">资料名称</label>
-                            <input type="text" class="form-control" id="resourceName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceFile" class="form-label">选择PDF文件</label>
-                            <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceDescription" class="form-label">简要描述</label>
-                            <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label class="form-label">资料名称</label>
+                        <input type="text" class="form-control" id="resourceName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">选择PDF文件</label>
+                        <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">简要描述</label>
+                        <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -408,20 +405,20 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="chapterModalTitle">编辑章节</h5>
+                    <h5 class="modal-title" id="chapterModalTitle">编辑研究方向</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">章节编号</label>
+                        <label class="form-label">编号</label>
                         <input type="number" class="form-control" id="chapterNumber" min="1">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">章节名称</label>
-                        <input type="text" class="form-control" id="chapterName" placeholder="如：原子模型">
+                        <label class="form-label">名称</label>
+                        <input type="text" class="form-control" id="chapterName" placeholder="如：神经网络求解微分方程">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">章节描述（可选）</label>
+                        <label class="form-label">描述（可选）</label>
                         <input type="text" class="form-control" id="chapterDesc" placeholder="简短描述">
                     </div>
                 </div>
@@ -437,47 +434,47 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ======================== 数据层 ============================
-        const STORAGE_KEY = 'atomic_full_data';
+        const STORAGE_KEY = 'ai_physics_full_data';
 
         const DEFAULT_CHAPTERS = [
-            { id: 'ch1', number: 1, name: '原子模型', desc: '卢瑟福模型、玻尔模型' },
-            { id: 'ch2', number: 2, name: '氢原子光谱', desc: '巴尔末系、里德伯公式' },
-            { id: 'ch3', number: 3, name: '多电子原子', desc: '泡利原理、洪特规则' },
-            { id: 'ch4', number: 4, name: 'X射线', desc: '特征X射线、康普顿散射' },
-            { id: 'ch5', number: 5, name: '原子核物理基础', desc: '核衰变、核反应' }
+            { id: 'ch1', number: 1, name: '神经网络求解微分方程', desc: 'PINN、Neural ODE等' },
+            { id: 'ch2', number: 2, name: '材料发现与设计', desc: '晶体结构预测、分子设计' },
+            { id: 'ch3', number: 3, name: '量子机器学习', desc: '量子神经网络、变分量子算法' },
+            { id: 'ch4', number: 4, name: '物理信息神经网络', desc: 'PINN理论与应用' },
+            { id: 'ch5', number: 5, name: '高能物理数据分析', desc: '粒子物理、天体物理数据' }
         ];
 
         const DEFAULT_QUESTIONS = [
             {
                 id: 'q1_1',
                 chapterId: 'ch1',
-                title: '问题1.1 - 卢瑟福散射公式推导',
-                desc: '推导卢瑟福散射公式，证明散射截面为：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left(\\frac{Ze^2}{16\\pi\\epsilon_0 E}\\right)^2 \\frac{1}{\\sin^4(\\theta/2)} \\]\n其中Z为靶核电荷数，E为入射粒子动能，θ为散射角。',
-                source: '杨福家《原子物理学》第一章',
-                ans: '步骤1：考虑库仑相互作用力：\n\\[ F = \\frac{Ze^2}{4\\pi\\epsilon_0 r^2} \\]\n\n步骤2：计算角动量守恒和能量守恒，得到碰撞参数b与散射角关系：\n\\[ b = \\frac{Ze^2}{8\\pi\\epsilon_0 E} \\cot(\\theta/2) \\]\n\n步骤3：散射截面定义：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left|\\frac{b}{\\sin\\theta}\\frac{db}{d\\theta}\\right| \\]\n\n步骤4：代入b的表达式得到卢瑟福公式。'
-            },
-            {
-                id: 'q1_2',
-                chapterId: 'ch1',
-                title: '问题1.2 - 玻尔氢原子能级',
-                desc: '根据玻尔模型推导氢原子能级公式，并计算基态能量。',
-                source: '杨福家《原子物理学》第一章',
-                ans: '步骤1：角动量量子化条件：\n\\[ mvr = n\\hbar \\]\n\n步骤2：库仑力提供向心力：\n\\[ \\frac{e^2}{4\\pi\\epsilon_0 r^2} = \\frac{mv^2}{r} \\]\n\n步骤3：联立解得轨道半径：\n\\[ r_n = n^2 a_0, \\quad a_0 = \\frac{4\\pi\\epsilon_0\\hbar^2}{me^2} \\]\n\n步骤4：能量：\n\\[ E_n = -\\frac{13.6}{n^2} \\text{eV} \\]，基态能量 -13.6 eV。'
+                title: 'PINN求解薛定谔方程',
+                desc: '使用物理信息神经网络(PINN)求解一维定态薛定谔方程：\n\n\\[ -\\frac{\\hbar^2}{2m}\\frac{d^2\\psi}{dx^2} + V(x)\\psi(x) = E\\psi(x) \\]\n\n其中势能函数 \\( V(x) = \\frac{1}{2}kx^2 \\) (谐振子势)。',
+                source: 'Nature Machine Intelligence, 2021',
+                ans: '步骤1：构建神经网络模型：\n设计一个前馈神经网络 \\( \\psi_\\theta(x) \\)，输入为位置x，输出为波函数值\n\n步骤2：定义损失函数：\n\\[ \\mathcal{L} = \\mathcal{L}_{方程} + \\mathcal{L}_{边界} \\]\n其中方程损失：\n\\[ \\mathcal{L}_{方程} = \\frac{1}{N}\\sum_{i=1}^N \\left| -\\frac{\\hbar^2}{2m}\\frac{d^2\\psi_\\theta}{dx^2}(x_i) + V(x_i)\\psi_\\theta(x_i) - E\\psi_\\theta(x_i) \\right|^2 \\]\n\n步骤3：训练网络：\n使用自动微分计算二阶导数，优化网络参数θ使损失最小化\n\n步骤4：结果分析：\n比较神经网络解与解析解，评估模型精度'
             },
             {
                 id: 'q2_1',
                 chapterId: 'ch2',
-                title: '问题2.1 - 巴尔末系波长计算',
-                desc: '计算氢原子巴尔末系前三条谱线的波长（n=3,4,5→n=2）。',
-                source: '杨福家《原子物理学》第二章',
-                ans: '步骤1：里德伯公式：\n\\[ \\frac{1}{\\lambda} = R_H \\left(\\frac{1}{n_f^2} - \\frac{1}{n_i^2}\\right) \\]\n其中R_H=1.097×10⁷ m⁻¹\n\n步骤2：Hα线(n=3→2)：\n\\[ \\lambda = 656.3 \\text{nm} \\]\n\n步骤3：Hβ线(n=4→2)：\n\\[ \\lambda = 486.1 \\text{nm} \\]\n\n步骤4：Hγ线(n=5→2)：\n\\[ \\lambda = 434.0 \\text{nm} \\]'
+                title: '晶体结构预测',
+                desc: '使用生成对抗网络(GAN)预测新型二维材料的稳定晶体结构。',
+                source: 'Materials Today, 2022',
+                ans: '步骤1：数据准备：\n收集已知二维材料的晶体结构数据库，如Materials Project\n\n步骤2：模型构建：\n设计条件GAN，输入为元素组成和晶格约束条件，输出为晶体结构\n\n步骤3：训练策略：\n使用Wasserstein GAN提升训练稳定性，加入能量预测器作为辅助损失\n\n步骤4：结果验证：\n通过DFT计算验证生成结构的稳定性，筛选有潜力的新材料'
+            },
+            {
+                id: 'q3_1',
+                chapterId: 'ch3',
+                title: '变分量子本征求解器',
+                desc: '使用变分量子本征求解器(VQE)计算H2分子的基态能量。',
+                source: 'Quantum Science and Technology, 2023',
+                ans: '步骤1：定义哈密顿量：\n将分子哈密顿量映射到泡利算符：\n\\[ H = \\sum_i h_i P_i \\]\n\n步骤2：设计量子电路：\n使用硬件高效的拟设(Ansatz)，如Ry电路\n\n步骤3：优化过程：\n通过经典优化器最小化期望值：\n\\[ E(\\theta) = \\langle \\psi(\\theta) | H | \\psi(\\theta) \\rangle \\]\n\n步骤4：结果分析：\n比较VQE结果与精确对角化结果'
             }
         ];
 
         const DEFAULT_RESOURCES = [
-            { id: 'r1', name: 'QZQ笔记', desc: '原子物理学习笔记', file: '原子物理学笔记.pdf' },
-            { id: 'r2', name: '原子物理学', desc: '杨福家', file: '../source/atom/原子物理学 by 杨福家 (z-lib.org).pdf' },
-            { id: 'r3', name: '蒋泊远笔记', desc: '学习笔记', file: '../source/atom/原子物理学.pdf' }
+            { id: 'r1', name: 'AI在物理学中的应用综述', desc: 'Nature Reviews Physics', file: 'pdfs/ai-physics-review.pdf' },
+            { id: 'r2', name: '物理信息神经网络教程', desc: 'MIT教程资料', file: 'pdfs/pinn-tutorial.pdf' },
+            { id: 'r3', name: '量子机器学习进展', desc: '2023年综述文章', file: 'pdfs/quantum-ml.pdf' }
         ];
 
         function getDefaultData() {
@@ -512,7 +509,7 @@
         let editingChapterId = null;
 
         // ======================== 图片管理系统 ============================
-        const IMAGE_STORAGE_KEY = 'atomic_images_data';
+        const IMAGE_STORAGE_KEY = 'ai_physics_images_data';
 
         function loadImages() {
             const stored = localStorage.getItem(IMAGE_STORAGE_KEY);
@@ -592,7 +589,6 @@
             if (!text) return '';
             const trimmed = text.trim();
             
-            // 先解析图片
             let processed = parseImageMarkdown(trimmed);
             
             if (type === 'title') return processed;
@@ -620,7 +616,6 @@
             const navbar = document.getElementById('chapterNavbar');
             if (!navbar) return;
             
-            // 按编号排序
             const sortedChapters = [...appData.chapters].sort((a, b) => a.number - b.number);
             
             let html = '';
@@ -638,7 +633,7 @@
                             </span>
                             ${ch.number}. ${ch.name}
                         </span>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${questionCount}</span>
+                        <span class="badge rounded-pill" style="background-color: var(--ai-purple);">${questionCount}</span>
                     </div>
                     ${ch.desc ? `<small class="text-muted d-block ms-3">${ch.desc}</small>` : ''}
                     <div class="dev-tool mt-1" style="display:none;">
@@ -654,7 +649,6 @@
             });
             navbar.innerHTML = html;
             
-            // 更新开发者工具显示
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
@@ -678,7 +672,7 @@
                             ${ch.number}. ${ch.name}
                             ${ch.desc ? `<small class="text-muted fs-6 ms-2">${ch.desc}</small>` : ''}
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${chapterQuestions.length}题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--ai-purple);">${chapterQuestions.length}题</span>
                     </div>
                     <div class="question-list" data-chapter-id="${ch.id}">
                 `;
@@ -754,7 +748,7 @@
                 html += `
                     </div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('${ch.id}')" style="display:none;">
-                        <i class="fas fa-plus"></i> 在此章节添加新题目
+                        <i class="fas fa-plus"></i> 在此研究方向添加新题目
                     </button>
                 </div>
                 `;
@@ -762,12 +756,10 @@
             
             container.innerHTML = html;
             
-            // 更新开发者工具显示
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
             
-            // 渲染MathJax
             if (window.MathJax) {
                 MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
             }
@@ -831,7 +823,7 @@
             if (!devModeActive) return;
             const maxNumber = appData.chapters.reduce((max, ch) => Math.max(max, ch.number), 0);
             editingChapterId = null;
-            document.getElementById('chapterModalTitle').textContent = '添加新章节';
+            document.getElementById('chapterModalTitle').textContent = '添加新研究方向';
             document.getElementById('chapterNumber').value = maxNumber + 1;
             document.getElementById('chapterName').value = '';
             document.getElementById('chapterDesc').value = '';
@@ -845,7 +837,7 @@
             const ch = appData.chapters.find(c => c.id === chapterId);
             if (!ch) return;
             editingChapterId = chapterId;
-            document.getElementById('chapterModalTitle').textContent = '编辑章节';
+            document.getElementById('chapterModalTitle').textContent = '编辑研究方向';
             document.getElementById('chapterNumber').value = ch.number;
             document.getElementById('chapterName').value = ch.name;
             document.getElementById('chapterDesc').value = ch.desc || '';
@@ -860,25 +852,23 @@
             const desc = document.getElementById('chapterDesc').value.trim();
             
             if (!number || number < 1) {
-                showToast('请输入有效的章节编号', 'danger');
+                showToast('请输入有效的编号', 'danger');
                 return;
             }
             if (!name) {
-                showToast('请输入章节名称', 'danger');
+                showToast('请输入名称', 'danger');
                 return;
             }
             
             if (editingChapterId) {
-                // 编辑已有章节
                 const ch = appData.chapters.find(c => c.id === editingChapterId);
                 if (ch) {
                     ch.number = number;
                     ch.name = name;
                     ch.desc = desc;
-                    showToast('章节已更新', 'success');
+                    showToast('研究方向已更新', 'success');
                 }
             } else {
-                // 添加新章节
                 const newChapter = {
                     id: 'ch' + Date.now(),
                     number: number,
@@ -886,7 +876,7 @@
                     desc: desc
                 };
                 appData.chapters.push(newChapter);
-                showToast('新章节已添加', 'success');
+                showToast('新研究方向已添加', 'success');
             }
             
             saveData(appData);
@@ -908,11 +898,11 @@
             if (!ch) return;
             const questionCount = appData.questions.filter(q => q.chapterId === chapterId).length;
             if (questionCount > 0) {
-                if (!confirm(`章节 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除整个章节吗？题目也会被删除！`)) {
+                if (!confirm(`研究方向 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除吗？题目也会被删除！`)) {
                     return;
                 }
             } else {
-                if (!confirm(`确定要删除章节 "${ch.number}. ${ch.name}" 吗？`)) {
+                if (!confirm(`确定要删除研究方向 "${ch.number}. ${ch.name}" 吗？`)) {
                     return;
                 }
             }
@@ -921,7 +911,7 @@
             appData.questions = appData.questions.filter(q => q.chapterId !== chapterId);
             saveData(appData);
             renderAll();
-            showToast(`已删除章节 "${ch.name}"`, 'danger');
+            showToast(`已删除 "${ch.name}"`, 'danger');
         }
 
         // ======================== 题目管理 ============================
@@ -929,7 +919,7 @@
             if (!devModeActive) return;
             const ch = appData.chapters.find(c => c.id === chapterId);
             if (!ch) {
-                showToast('章节不存在', 'danger');
+                showToast('研究方向不存在', 'danger');
                 return;
             }
             
@@ -945,7 +935,7 @@
                 chapterId: chapterId,
                 title: '新题目名称',
                 desc: '请在此输入题目内容，支持 LaTeX 公式：\n\\[ E = mc^2 \\]\n\n双换行可以分段。',
-                source: '待补充参考书籍',
+                source: '待补充参考来源',
                 ans: '步骤1：输入解答内容。\n\n步骤2：空行后输入下一步。'
             };
             
@@ -954,7 +944,6 @@
             renderAll();
             showToast('新题目已添加', 'success');
             
-            // 滚动到新题目
             setTimeout(() => {
                 const el = document.getElementById(`q_${newQ.id}`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -991,7 +980,6 @@
                 textarea.value = unescapeHtml(raw);
                 contentDiv.replaceWith(textarea);
                 
-                // 更新按钮
                 const btn = document.querySelector(`#q_${uid} .dev-edit-btn`);
                 if (btn) {
                     btn.innerHTML = '保存';
@@ -1078,7 +1066,6 @@
                             const imgTag = `\n![${file.name}](${imgId})\n`;
                             targetElement.value = textBefore + imgTag + textAfter;
                             
-                            // 自动保存
                             const uid = targetElementId.split('_').slice(1).join('_');
                             const typeKey = targetElementId.split('_')[0];
                             const q = appData.questions.find(q => q.id === uid);
@@ -1091,11 +1078,9 @@
                             }
                             showToast('图片已插入，点击"保存"确认', 'success');
                         } else {
-                            // 在内容后追加图片
                             const imgHTML = `<img src="${imageData[imgId].data}" alt="${file.name}" class="img-fluid my-2" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">`;
                             targetElement.innerHTML += '<br>' + imgHTML;
                             
-                            // 更新 raw 数据
                             const raw = targetElement.getAttribute('data-raw') || '';
                             const uid = targetElementId.split('_').slice(1).join('_');
                             const type = targetElement.getAttribute('data-type');
@@ -1443,7 +1428,7 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'inline-block';
                 });
-                sessionStorage.setItem('dev_authenticated_atomic', 'true');
+                sessionStorage.setItem('dev_authenticated_ai_physics', 'true');
                 document.getElementById('devPassword').value = '';
                 renderAll();
                 showToast('开发者模式已开启', 'success');
@@ -1492,7 +1477,7 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'none';
                 });
-                sessionStorage.removeItem('dev_authenticated_atomic');
+                sessionStorage.removeItem('dev_authenticated_ai_physics');
                 renderAll();
             }
         });
@@ -1537,7 +1522,7 @@
 
         // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
-            if (sessionStorage.getItem('dev_authenticated_atomic') === 'true') {
+            if (sessionStorage.getItem('dev_authenticated_ai_physics') === 'true') {
                 devModeActive = true;
             }
             renderAll();
@@ -1554,7 +1539,6 @@
                 });
             }
             
-            // 更新主题图标
             if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
                 themeBtn.innerHTML = '<i class="fas fa-sun text-warning"></i>';
             }
