@@ -1,17 +1,45 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>声学 | PhysicsSolution Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
+        /* ================= 主题变量 ================= */
         :root {
             --acoustics-teal: #20c997;
             --acoustics-dark: #0d6efd;
             --physics-blue: #2b5fdc;
+            --bg-body: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-main: #212529;
+            --border-color: rgba(0,0,0,0.125);
         }
+
+        [data-bs-theme="dark"] {
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --text-main: #e0e0e0;
+            --border-color: #333333;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .card { background-color: var(--bg-card); border-color: var(--border-color); }
+        .card-header, .border-bottom { border-color: var(--border-color) !important; }
+        .form-control { background-color: var(--bg-card); color: var(--text-main); border-color: var(--border-color); }
+        .form-control:focus { background-color: var(--bg-card); color: var(--text-main); }
+        .list-group-item { background-color: transparent; color: var(--text-main); border-color: var(--border-color); transition: all 0.2s;}
+        .navbar.bg-white { background-color: var(--bg-card) !important; }
+        .text-dark { color: var(--text-main) !important; }
+        .text-secondary { color: #888 !important; }
+
         .acoustics-header {
             background: linear-gradient(135deg, var(--acoustics-teal) 0%, var(--acoustics-dark) 100%);
             color: white;
@@ -28,8 +56,10 @@
             color: var(--acoustics-teal);
             border-bottom: 2px solid var(--acoustics-teal);
         }
-        .nav-pills .nav-link.active {
-            background-color: var(--acoustics-teal);
+        .nav-pills .nav-link.active, .list-group-item.active {
+            background-color: var(--acoustics-teal) !important;
+            color: white !important;
+            border-color: var(--acoustics-teal);
         }
         .book-cover {
             max-height: 250px;
@@ -37,6 +67,7 @@
             object-fit: contain;
             padding: 15px;
             background: #fff;
+            border-radius: 8px;
         }
         .solution-step {
             margin-bottom: 15px;
@@ -50,125 +81,99 @@
             transition: all 0.2s;
         }
         .resource-item:hover {
-            background-color: #f8f9fa;
+            background-color: rgba(0,0,0,0.05);
         }
-        .resource-item a {
-            color: #333;
-            text-decoration: none;
-        }
-        .resource-item a:hover {
-            color: var(--physics-blue);
-        }
+        .resource-item a { color: var(--text-main); text-decoration: none; }
+        .resource-item a:hover { color: var(--physics-blue); }
         .acoustics-icon {
             color: var(--acoustics-teal);
         }
         @media (max-width: 768px) {
-            .book-cover {
-                max-width: 100%;
-                height: auto;
-            }
+            .book-cover { max-width: 100%; height: auto; }
         }
+
+        /* 侧边栏固定样式 */
+        .sidebar-sticky {
+            position: sticky;
+            top: 85px;
+            z-index: 100;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .sidebar-sticky::-webkit-scrollbar { width: 4px; }
+        .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 4px; }
+        [data-bs-theme="dark"] .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); }
+        .sidebar-sticky::-webkit-scrollbar-track { background: transparent; }
+
+        /* 开发者模式样式 */
         textarea.editable-content {
             font-family: 'Courier New', Courier, monospace;
-            background-color: #fdfdfd;
+            background-color: rgba(0,0,0,0.02);
+            color: var(--text-main);
             font-size: 0.95rem;
             line-height: 1.6;
         }
-        .dev-edit-btn {
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
+        [data-bs-theme="dark"] textarea.editable-content { background-color: rgba(255,255,255,0.05); }
+        .dev-edit-btn { padding: 0.2rem 0.5rem; font-size: 0.8rem; }
+        .dev-delete-btn { padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-left: 4px; }
+        .dev-tool { display: none; }
+
+        /* ================= 新增功能样式 ================= */
+        .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 1060; }
+        .progress-bar { height: 4px; background: var(--acoustics-teal); width: 0%; transition: width 0.1s ease-out; }
+        
+        .action-btn { background: transparent; border: none; color: var(--text-main); opacity: 0.7; transition: all 0.2s; padding: 5px 10px; border-radius: 6px; }
+        .action-btn:hover { opacity: 1; background-color: rgba(32, 201, 151, 0.1); color: var(--acoustics-teal); }
+
+        .focus-mode .sidebar-col { display: none !important; }
+        .focus-mode .content-col { width: 100% !important; max-width: 900px; margin: 0 auto; transition: all 0.3s ease; }
+
+        #backToTop {
+            position: fixed; bottom: 30px; right: 30px; z-index: 99;
+            width: 50px; height: 50px; border-radius: 50%;
+            background-color: var(--acoustics-teal); color: white; border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
+            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
-        .dev-delete-btn {
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
-            margin-left: 4px;
-        }
-        .sidebar-sticky {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-        }
-        .sidebar-sticky::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar-sticky::-webkit-scrollbar-thumb {
-            background-color: rgba(0,0,0,0.1);
-            border-radius: 4px;
-        }
-        .sidebar-sticky::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .dev-tool {
-            display: none;
-        }
+        #backToTop.show { opacity: 1; pointer-events: auto; }
+        #backToTop:hover { transform: translateY(-5px); }
+
+        .chapter-container { scroll-margin-top: 80px; }
+
         /* 认证弹窗 */
         .auth-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
         }
-        .auth-overlay.active {
-            display: flex;
-        }
+        .auth-overlay.active { display: flex; }
         .auth-modal {
-            background: #fff;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 420px;
-            width: 90%;
+            background: var(--bg-card); color: var(--text-main);
+            border-radius: 16px; padding: 2rem; max-width: 420px; width: 90%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
-        .auth-modal .form-label {
-            font-weight: 600;
-        }
-        .auth-modal .btn-primary {
-            background: var(--acoustics-teal);
-            border: none;
-        }
-        .auth-modal .btn-primary:hover {
-            background: #1ba87e;
-        }
-        .auth-error {
-            color: #dc3545;
-            font-size: 0.9rem;
-            margin-top: 8px;
-            display: none;
-        }
-        #authButtons {
-            display: none !important;
-        }
-        /* 密码输入框切换显示 */
-        .password-toggle {
-            position: relative;
-        }
+        .auth-modal .form-label { font-weight: 600; }
+        .auth-modal .btn-primary { background: var(--acoustics-teal); border: none; }
+        .auth-modal .btn-primary:hover { background: #1ba87e; }
+        .auth-error { color: #dc3545; font-size: 0.9rem; margin-top: 8px; display: none; }
+        #authButtons { display: none !important; }
+        .password-toggle { position: relative; }
         .password-toggle .toggle-eye {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #6c757d;
-            background: none;
-            border: none;
-            padding: 0;
-            z-index: 5;
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: #6c757d; background: none; border: none; padding: 0; z-index: 5;
         }
-        .password-toggle .toggle-eye:hover {
-            color: #333;
-        }
+        .password-toggle .toggle-eye:hover { color: var(--text-main); }
+        #userMenu { display: none !important; }
     </style>
 </head>
 <body>
+    <!-- 阅读进度条 -->
+    <div class="progress-container"><div class="progress-bar" id="readingProgress"></div></div>
+
     <!-- 开发者认证弹窗 -->
     <div class="auth-overlay" id="devAuthOverlay">
         <div class="auth-modal">
-            <h4 class="mb-3"><i class="fas fa-shield-alt me-2" style="color: var(--acoustics-teal);"></i>开发者验证</h4>
+            <h4 class="mb-3">开发者验证</h4>
             <p class="text-muted small">请输入账号与密码以启用开发者模式</p>
             <div class="mb-3">
                 <label class="form-label">账号</label>
@@ -186,16 +191,16 @@
             <div class="auth-error" id="authError">账号或密码错误，请重试。</div>
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-secondary" onclick="closeDevAuth()">取消</button>
-                <button class="btn btn-primary" onclick="verifyDevAuth()"><i class="fas fa-unlock me-1"></i> 验证并开启</button>
+                <button class="btn btn-primary" onclick="verifyDevAuth()">验证并开启</button>
             </div>
         </div>
     </div>
 
     <!-- 导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <i class="fas fa-volume-up me-2"></i>PhysicsSolution Hub
+            <a class="navbar-brand text-dark" href="index.html">
+                PhysicsSolution Hub
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -203,30 +208,24 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i> 首页</a>
+                        <a class="nav-link" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="acoustics.html"><i class="fas fa-volume-up me-1"></i> 声学</a>
+                        <a class="nav-link active" href="acoustics.html">声学</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    <div class="form-check form-switch me-4 d-flex align-items-center" id="devModeSwitchContainer">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn action-btn" id="focusToggle" title="沉浸/授课模式 (隐藏侧边栏)">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="btn action-btn" id="themeToggle" title="切换夜间模式">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="form-check form-switch d-flex align-items-center ms-2 mb-0" id="devModeSwitchContainer">
                         <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
-                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;"><i class="fas fa-code"></i> 开发者模式</label>
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;">开发者模式</label>
                     </div>
                     <div id="authButtons"></div>
-                    <div id="userMenu" style="display: none;">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i> <span id="usernameDisplay"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-code me-1"></i> 开发者模式</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a></li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -236,7 +235,7 @@
     <header class="acoustics-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
-                <i class="fas fa-volume-up me-2"></i>声学习题解答库
+                声学习题解答库
             </h1>
             <p class="lead mb-0">涵盖声波传播、声学波动方程、声学测量等核心内容</p>
         </div>
@@ -245,13 +244,13 @@
     <!-- 主要内容区 -->
     <div class="container">
         <div class="row">
-            <!-- 左侧导航 (sticky) -->
-            <div class="col-lg-3 mb-4">
+            <!-- 左侧导航 -->
+            <div class="col-lg-3 mb-4 sidebar-col">
                 <div class="sidebar-sticky">
                     <!-- 搜索框 -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
-                            <h5 class="card-title mb-3"><i class="fas fa-search me-2"></i>搜索题目</h5>
+                            <h5 class="card-title mb-3">搜索题目</h5>
                             <div class="input-group">
                                 <input type="text" id="searchInput" class="form-control" placeholder="输入关键词 (如：声速)...">
                             </div>
@@ -259,8 +258,8 @@
                     </div>
 
                     <div class="card shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>章节导航</h5>
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">章节导航</h5>
                         </div>
                         <div class="list-group list-group-flush" id="chapterNavbar">
                             <a href="#chapter1" class="list-group-item list-group-item-action active">1. 声学基础</a>
@@ -272,141 +271,108 @@
                     </div>
 
                     <div class="card shadow-sm mt-4">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="fas fa-book me-2"></i>推荐教材</h5>
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">推荐教材</h5>
                         </div>
                         <div class="card-body text-center">
-                            <img src="sound.webp" alt="声学基础" class="img-fluid book-cover mb-3">
+                            <img src="sound.webp" alt="声学基础" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
                             <h6>声学基础</h6>
-                            <p class="text-muted small">杜功焕等</p>
+                            <p class="text-muted small mb-0">杜功焕等</p>
                         </div>
                     </div>
 
                     <!-- 资料库部分 -->
                     <div class="card shadow-sm mt-4">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>资料库</h5>
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">资料库</h5>
+                            <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addResource()" style="display:none;">
+                                添加
+                            </button>
                         </div>
-                        <div class="card-body">
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/sound/声学基础笔记.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>蒋泊远笔记</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">经典声学教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/sound/现代声学理论基础_.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>现代声学理论基础</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">现代声学教材</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/sound/声学理论与工程应用.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>声学理论与工程应用</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">TBD</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/sound/[现代物理基础丛书]13 大气声学（杨训仁, 陈宇）.pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>大气声学</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">杨训仁</small>
-                            </div>
-                            <div class="resource-item">
-                                <a href="../物理系教材解答网站尝试/source/sound/[现代物理基础丛书]1 现代声学理论基础[马大猷].pdf" target="_blank" class="d-flex align-items-center">
-                                    <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                    <span>现代声学理论基础</span>
-                                </a>
-                                <small class="text-muted d-block mt-1">马大有</small>
-                            </div>
-                            <div class="text-center mt-3">
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                                    <i class="fas fa-upload me-1"></i>上传资料
-                                </button>
-                            </div>
+                        <div class="card-body" id="resourceList">
+                            <!-- 由JS动态渲染 -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 右侧内容 -->
-            <div class="col-lg-9">
+            <div class="col-lg-9 content-col">
                 <!-- 第一章：声学基础 -->
                 <div class="mb-5 chapter-container" id="chapter1">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-wave-square acoustics-icon me-2"></i>第一章：声学基础
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            第一章：声学基础
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);">18题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);" id="count_1">0题</span>
                     </div>
                     <div class="question-list" data-chapter="1"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter1')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第一章添加新题目
+                        在第一章添加新题目
                     </button>
                 </div>
 
                 <!-- 第二章：声波传播 -->
                 <div class="mb-5 chapter-container" id="chapter2">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-project-diagram acoustics-icon me-2"></i>第二章：声波传播
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            第二章：声波传播
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);">15题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);" id="count_2">0题</span>
                     </div>
                     <div class="question-list" data-chapter="2"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter2')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第二章添加新题目
+                        在第二章添加新题目
                     </button>
                 </div>
 
                 <!-- 第三章：声学波动方程 -->
                 <div class="mb-5 chapter-container" id="chapter3">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-wave-square acoustics-icon me-2"></i>第三章：声学波动方程
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            第三章：声学波动方程
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);">12题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);" id="count_3">0题</span>
                     </div>
                     <div class="question-list" data-chapter="3"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter3')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第三章添加新题目
+                        在第三章添加新题目
                     </button>
                 </div>
 
                 <!-- 第四章：声学测量 -->
                 <div class="mb-5 chapter-container" id="chapter4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-microphone acoustics-icon me-2"></i>第四章：声学测量
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            第四章：声学测量
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);">10题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);" id="count_4">0题</span>
                     </div>
                     <div class="question-list" data-chapter="4"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter4')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第四章添加新题目
+                        在第四章添加新题目
                     </button>
                 </div>
 
                 <!-- 第五章：超声学 -->
                 <div class="mb-5 chapter-container" id="chapter5">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h3 mb-0">
-                            <i class="fas fa-soundcloud acoustics-icon me-2"></i>第五章：超声学
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h2 class="h3 mb-0 text-dark fw-bold">
+                            第五章：超声学
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);">8题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--acoustics-teal);" id="count_5">0题</span>
                     </div>
                     <div class="question-list" data-chapter="5"></div>
                     <button class="btn btn-outline-primary w-100 mt-2 dev-tool add-q-btn" onclick="addNewQuestion('chapter5')" style="display: none;">
-                        <i class="fas fa-plus mr-1"></i> 在第五章添加新题目
+                        在第五章添加新题目
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" title="返回顶部"><i class="fas fa-arrow-up"></i></button>
 
     <!-- 上传资料的模态框 -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
@@ -440,40 +406,11 @@
         </div>
     </div>
 
-    <!-- 页脚 -->
-    <footer class="py-5 text-white" style="background: linear-gradient(135deg, var(--acoustics-teal) 0%, var(--acoustics-dark) 100%);">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <h5><i class="fas fa-volume-up me-2"></i>声学</h5>
-                    <p class="mt-3">探索声波的产生、传播、接收及其与物质的相互作用</p>
-                    <a href="index.html" class="btn btn-outline-light mt-2">
-                        <i class="fas fa-arrow-left me-1"></i> 返回首页
-                    </a>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <h5>相关学科</h5>
-                    <div class="d-flex flex-wrap">
-                        <a href="mechanics.html" class="btn btn-sm btn-outline-light m-1">力学</a>
-                        <a href="electrodynamics.html" class="btn btn-sm btn-outline-light m-1">电动力学</a>
-                        <a href="solid-state.html" class="btn btn-sm btn-outline-light m-1">固体物理</a>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-4 bg-light">
-            <div class="text-center">
-                <p class="mb-0">© 2023 PhysicsSolution Hub 声学分部</p>
-            </div>
-        </div>
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
         // ======================== 数据层 ============================
         const DEFAULT_DATA = {
             questions: [
-                // 第一章
                 {
                     id: '1_1',
                     chapter: 1,
@@ -482,7 +419,6 @@
                     source: '声学基础 第一章',
                     ans: '步骤1：考虑小振幅声波传播，气体状态变化为绝热过程：\n\n\\[ pV^\\gamma = \\text{常数} \\]\n\n步骤2：线性化连续性方程和运动方程：\n\n\\[ \\frac{\\partial \\rho\'}{\\partial t} + \\rho_0 \\nabla \\cdot \\mathbf{v} = 0 \\]\n\n\\[ \\rho_0 \\frac{\\partial \\mathbf{v}}{\\partial t} = -\\nabla p\' \\]\n\n步骤3：绝热关系给出压强扰动与密度扰动关系：\n\n\\[ p\' = \\left(\\frac{\\partial p}{\\partial \\rho}\\right)_s \\rho\' = c^2 \\rho\' \\]\n\n步骤4：结合理想气体状态方程，得到声速公式：\n\n\\[ c = \\sqrt{\\frac{\\gamma p_0}{\\rho_0}} = \\sqrt{\\gamma R T / M} \\]'
                 },
-                // 第二章
                 {
                     id: '2_1',
                     chapter: 2,
@@ -491,7 +427,6 @@
                     source: '声学基础 第二章',
                     ans: '步骤1：声强定义：\n\n\\[ I = \\frac{1}{T} \\int_0^T p(t)v(t) dt \\]\n\n步骤2：对于平面波，声压与质点速度同相：\n\n\\[ v(t) = \\frac{p(t)}{\\rho_0 c} \\]\n\n步骤3：代入简谐声波表达式：\n\n\\[ p(t) = p_0 \\cos(\\omega t), \\quad v(t) = \\frac{p_0}{\\rho_0 c} \\cos(\\omega t) \\]\n\n步骤4：计算得到平均声强：\n\n\\[ I = \\frac{p_0^2}{2\\rho_0 c} = \\frac{1^2}{2 \\times 415} \\approx 1.2 \\times 10^{-3} \\text{W/m}^2 \\]'
                 },
-                // 第三章 示例
                 {
                     id: '3_1',
                     chapter: 3,
@@ -500,7 +435,6 @@
                     source: '声学基础 第三章',
                     ans: '步骤1：连续性方程：\n\n\\[ \\frac{\\partial \\rho}{\\partial t} + \\nabla \\cdot (\\rho \\mathbf{v}) = 0 \\]\n\n步骤2：欧拉方程（忽略黏性）：\n\n\\[ \\rho \\frac{\\partial \\mathbf{v}}{\\partial t} = -\\nabla p \\]\n\n步骤3：绝热状态方程：\n\n\\[ p = p(\\rho) \\]\n\n步骤4：线性化后得到波动方程：\n\n\\[ \\frac{\\partial^2 p\'}{\\partial t^2} = c^2 \\nabla^2 p\' \\]'
                 },
-                // 第四章 示例
                 {
                     id: '4_1',
                     chapter: 4,
@@ -509,7 +443,6 @@
                     source: '声学测量',
                     ans: '步骤1：声压级定义：\n\n\\[ L_p = 20 \\log_{10} \\frac{p_{\\text{rms}}}{p_{\\text{ref}}} \\]\n\n步骤2：代入数值：\n\n\\[ L_p = 20 \\log_{10} \\frac{2 \\times 10^{-3}}{2 \\times 10^{-5}} = 20 \\log_{10}(100) = 40 \\text{ dB} \\]'
                 },
-                // 第五章 示例
                 {
                     id: '5_1',
                     chapter: 5,
@@ -518,18 +451,50 @@
                     source: '超声学基础',
                     ans: '步骤1：声压衰减规律：\n\n\\[ p(x) = p_0 e^{-\\alpha x} \\]\n\n步骤2：代入数值：\n\n\\[ p(2) = 1 \\times 10^6 \\times e^{-0.5 \\times 2} = 1 \\times 10^6 \\times e^{-1} \\approx 3.68 \\times 10^5 \\text{ Pa} \\]'
                 }
+            ],
+            resources: [
+                {
+                    id: 'r1',
+                    name: '蒋泊远笔记',
+                    desc: '经典声学笔记',
+                    file: '../物理系教材解答网站尝试/source/sound/声学基础笔记.pdf'
+                },
+                {
+                    id: 'r2',
+                    name: '现代声学理论基础',
+                    desc: '现代声学教材',
+                    file: '../物理系教材解答网站尝试/source/sound/现代声学理论基础_.pdf'
+                },
+                {
+                    id: 'r3',
+                    name: '声学理论与工程应用',
+                    desc: 'TBD',
+                    file: '../物理系教材解答网站尝试/source/sound/声学理论与工程应用.pdf'
+                },
+                {
+                    id: 'r4',
+                    name: '大气声学',
+                    desc: '杨训仁',
+                    file: '../物理系教材解答网站尝试/source/sound/[现代物理基础丛书]13 大气声学（杨训仁, 陈宇）.pdf'
+                },
+                {
+                    id: 'r5',
+                    name: '现代声学理论基础',
+                    desc: '马大猷',
+                    file: '../物理系教材解答网站尝试/source/sound/[现代物理基础丛书]1 现代声学理论基础[马大猷].pdf'
+                }
             ]
         };
 
         const STORAGE_KEY = 'acoustics_questions_data';
         let devModeActive = false;
 
-        function loadQuestionsData() {
+        function loadData() {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
-                    if (parsed && Array.isArray(parsed.questions)) {
+                    if (parsed && Array.isArray(parsed.questions) && Array.isArray(parsed.resources)) {
                         return parsed;
                     }
                 } catch (e) {}
@@ -538,11 +503,11 @@
             return JSON.parse(JSON.stringify(DEFAULT_DATA));
         }
 
-        function saveQuestionsData(data) {
+        function saveData(data) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
-        let questionsData = loadQuestionsData();
+        let appData = loadData();
 
         // ======================== 渲染引擎 ============================
         function escapeHtml(str) {
@@ -554,7 +519,7 @@
             if (type === 'title') return trimmed;
             if (type === 'source') {
                 if (!trimmed) return '';
-                return `<div class="alert alert-info mt-2 mb-0"><i class="fas fa-book me-2"></i>来源: ${trimmed}</div>`;
+                return `<div class="alert alert-info mt-2 mb-0">来源: ${trimmed}</div>`;
             }
             const blocks = trimmed.split(/\n\s*\n/);
             let finalHTML = '';
@@ -573,7 +538,7 @@
         function renderChapter(chapterNum) {
             const container = document.querySelector(`.chapter-container#chapter${chapterNum} .question-list`);
             if (!container) return;
-            const chapterQuestions = questionsData.questions.filter(q => q.chapter === chapterNum);
+            const chapterQuestions = appData.questions.filter(q => q.chapter === chapterNum);
             chapterQuestions.sort((a, b) => a.id.localeCompare(b.id));
             
             let html = '';
@@ -585,36 +550,36 @@
                 const ansHtml = parseTextToHTML(q.ans, 'ans');
 
                 html += `
-                <div class="card mb-4 editable-card" id="q_${uid}">
+                <div class="card mb-4 editable-card chapter-card" id="q_${uid}">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h4 class="problem-title mb-0 fw-bold editable-content" id="title_${uid}" data-type="title" data-raw="${escapeHtml(q.title)}">${titleHtml}</h4>
                             <div>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')"><i class="fas fa-trash"></i> 删除</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('title_${uid}')">编辑</button>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-delete-btn" onclick="deleteQuestion('${uid}')">删除</button>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-question-circle me-2"></i>题目描述</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <h5 class="fw-bold mb-0 text-secondary">题目描述</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('desc_${uid}')">编辑</button>
                             </div>
                             <div class="editable-content" id="desc_${uid}" data-type="desc" data-raw="${escapeHtml(q.desc)}">${descHtml}</div>
                         </div>
 
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-book me-2"></i>来源出处</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <h5 class="fw-bold mb-0 text-secondary">来源出处</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('source_${uid}')">编辑</button>
                             </div>
                             <div class="editable-content" id="source_${uid}" data-type="source" data-raw="${escapeHtml(q.source)}">${sourceHtml}</div>
                         </div>
 
                         <div class="mb-2">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-secondary"><i class="fas fa-lightbulb me-2"></i>解答</h5>
-                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')"><i class="fas fa-edit"></i> 编辑</button>
+                                <h5 class="fw-bold mb-0 text-secondary">解答</h5>
+                                <button class="btn btn-sm btn-outline-danger dev-tool dev-edit-btn" onclick="toggleEdit('ans_${uid}')">编辑</button>
                             </div>
                             <div class="editable-content" id="ans_${uid}" data-type="ans" data-raw="${escapeHtml(q.ans)}">${ansHtml}</div>
                         </div>
@@ -623,6 +588,12 @@
                 `;
             });
             container.innerHTML = html;
+
+            // 更新题目计数
+            const countBadge = document.getElementById(`count_${chapterNum}`);
+            if (countBadge) {
+                countBadge.textContent = `${chapterQuestions.length}题`;
+            }
 
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
@@ -633,15 +604,124 @@
             }
         }
 
+        function renderResources() {
+            const container = document.getElementById('resourceList');
+            if (!container) return;
+            let html = '';
+            appData.resources.forEach(r => {
+                html += `
+                <div class="resource-item" id="res_${r.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="${r.file}" target="_blank" class="d-flex align-items-center flex-grow-1">
+                            <span>${escapeHtml(r.name)}</span>
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger dev-tool" onclick="deleteResource('${r.id}')" style="display:none;">
+                            ×
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-1">${escapeHtml(r.desc)}</small>
+                </div>
+                `;
+            });
+            html += `
+                <div class="text-center mt-3">
+                    <button class="btn btn-sm btn-outline-primary dev-tool" onclick="showAddResourceModal()" style="display:none;">
+                        上传资料
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        上传资料
+                    </button>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            document.querySelectorAll('.dev-tool').forEach(el => {
+                el.style.display = devModeActive ? 'inline-block' : 'none';
+            });
+        }
+
         function renderAll() {
             for (let i = 1; i <= 5; i++) {
                 renderChapter(i);
             }
+            renderResources();
             document.getElementById('devModeSwitch').checked = devModeActive;
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
         }
+
+        // ======================== 搜索功能 ============================
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase().trim();
+            const allCards = document.querySelectorAll('.editable-card');
+            allCards.forEach(card => {
+                const contentElements = card.querySelectorAll('.editable-content');
+                let isMatch = false;
+                contentElements.forEach(el => {
+                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
+                    if (text.includes(keyword)) isMatch = true;
+                });
+                card.style.display = isMatch ? '' : 'none';
+            });
+            document.querySelectorAll('.chapter-container').forEach(chapter => {
+                const cards = chapter.querySelectorAll('.editable-card');
+                let hasVisible = false;
+                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
+            });
+        });
+
+        // ======================== ScrollSpy 滚动监听 ============================
+        function setupScrollSpy() {
+            const options = { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 };
+            const scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const chapterId = entry.target.id;
+                        document.querySelectorAll('#chapterNavbar .list-group-item').forEach(btn => btn.classList.remove('active'));
+                        const targetBtn = document.querySelector(`#chapterNavbar a[href="#${chapterId}"]`);
+                        if(targetBtn) targetBtn.classList.add('active');
+                    }
+                });
+            }, options);
+            document.querySelectorAll('.chapter-container').forEach(chapter => scrollObserver.observe(chapter));
+        }
+
+        // ======================== 阅读进度条、返回顶部 ============================
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("readingProgress").style.width = scrolled + "%";
+
+            const backToTopBtn = document.getElementById("backToTop");
+            if (winScroll > 300) { backToTopBtn.classList.add("show"); } 
+            else { backToTopBtn.classList.remove("show"); }
+        };
+        document.getElementById("backToTop").onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // ======================== 沉浸模式 ============================
+        const focusBtn = document.getElementById('focusToggle');
+        focusBtn.addEventListener('click', () => {
+            document.body.classList.toggle('focus-mode');
+            const icon = focusBtn.querySelector('i');
+            if(document.body.classList.contains('focus-mode')) {
+                icon.className = 'fas fa-compress'; focusBtn.title = '退出专注模式';
+            } else {
+                icon.className = 'fas fa-expand'; focusBtn.title = '沉浸/授课模式';
+            }
+        });
+
+        // ======================== 夜间模式 ============================
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            const htmlTag = document.documentElement;
+            const currentTheme = htmlTag.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlTag.setAttribute('data-bs-theme', newTheme);
+            themeBtn.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun text-warning"></i>' : '<i class="fas fa-moon"></i>';
+        });
 
         // ======================== 编辑与删除 ============================
         function toggleEdit(elementId) {
@@ -662,7 +742,7 @@
                 textarea.value = raw;
                 contentDiv.replaceWith(textarea);
                 if (btn) {
-                    btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+                    btn.innerHTML = '保存';
                     btn.classList.remove('btn-outline-danger');
                     btn.classList.add('btn-success');
                 }
@@ -670,13 +750,13 @@
                 const currentText = contentDiv.value;
                 const id = elementId.split('_').slice(1).join('_');
                 const typeKey = elementId.split('_')[0];
-                const q = questionsData.questions.find(q => q.id === id);
+                const q = appData.questions.find(q => q.id === id);
                 if (q) {
                     if (typeKey === 'title') q.title = currentText;
                     else if (typeKey === 'desc') q.desc = currentText;
                     else if (typeKey === 'source') q.source = currentText;
                     else if (typeKey === 'ans') q.ans = currentText;
-                    saveQuestionsData(questionsData);
+                    saveData(appData);
                 }
                 const newDiv = document.createElement('div');
                 newDiv.id = elementId;
@@ -687,7 +767,7 @@
                 newDiv.innerHTML = parseTextToHTML(currentText, type);
                 contentDiv.replaceWith(newDiv);
                 if (btn) {
-                    btn.innerHTML = '<i class="fas fa-edit"></i> 编辑';
+                    btn.innerHTML = '编辑';
                     btn.classList.remove('btn-success');
                     btn.classList.add('btn-outline-danger');
                 }
@@ -700,15 +780,15 @@
         function deleteQuestion(uid) {
             if (!devModeActive) return;
             if (!confirm(`确定要删除题目 "${uid}" 吗？此操作不可撤销。`)) return;
-            questionsData.questions = questionsData.questions.filter(q => q.id !== uid);
-            saveQuestionsData(questionsData);
+            appData.questions = appData.questions.filter(q => q.id !== uid);
+            saveData(appData);
             renderAll();
         }
 
         function addNewQuestion(chapterId) {
             if (!devModeActive) return;
             const chapterNum = parseInt(chapterId.replace('chapter', ''));
-            const maxId = questionsData.questions
+            const maxId = appData.questions
                 .filter(q => q.chapter === chapterNum)
                 .reduce((max, q) => {
                     const num = parseInt(q.id.split('_')[1]);
@@ -724,9 +804,40 @@
                 source: '未指定参考书籍',
                 ans: '步骤1：输入内容。\n\n步骤2：空行后输入第二步公式：\\[ \\nabla \\cdot \\mathbf{E} = 0 \\]'
             };
-            questionsData.questions.push(newQ);
-            saveQuestionsData(questionsData);
+            appData.questions.push(newQ);
+            saveData(appData);
             renderAll();
+        }
+
+        // ======================== 资源管理 ============================
+        function deleteResource(rid) {
+            if (!devModeActive) return;
+            if (!confirm(`确定要删除资料 "${appData.resources.find(r => r.id === rid)?.name}" 吗？`)) return;
+            appData.resources = appData.resources.filter(r => r.id !== rid);
+            saveData(appData);
+            renderResources();
+        }
+
+        function showAddResourceModal() {
+            if (!devModeActive) return;
+            const name = prompt('请输入资料名称：');
+            if (!name) return;
+            const desc = prompt('请输入简要描述：');
+            const file = prompt('请输入文件路径（如：pdfs/example.pdf）：');
+            if (!file) return;
+            const newRes = {
+                id: 'r' + Date.now(),
+                name: name,
+                desc: desc || '无描述',
+                file: file
+            };
+            appData.resources.push(newRes);
+            saveData(appData);
+            renderResources();
+        }
+
+        function addResource() {
+            showAddResourceModal();
         }
 
         // ======================== 开发者认证 ============================
@@ -773,7 +884,7 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'inline-block';
                 });
-                sessionStorage.setItem('dev_authenticated', 'true');
+                sessionStorage.setItem('dev_authenticated_sound', 'true');
                 document.getElementById('devPassword').value = '';
             } else {
                 document.getElementById('authError').style.display = 'block';
@@ -819,31 +930,11 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'none';
                 });
-                sessionStorage.removeItem('dev_authenticated');
+                sessionStorage.removeItem('dev_authenticated_sound');
             }
         });
 
-        // ======================== 搜索与导航 ============================
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const keyword = e.target.value.toLowerCase().trim();
-            const allCards = document.querySelectorAll('.editable-card');
-            allCards.forEach(card => {
-                const contentElements = card.querySelectorAll('.editable-content');
-                let isMatch = false;
-                contentElements.forEach(el => {
-                    const text = (el.getAttribute('data-raw') || el.innerText || "").toLowerCase();
-                    if (text.includes(keyword)) isMatch = true;
-                });
-                card.style.display = isMatch ? '' : 'none';
-            });
-            document.querySelectorAll('.chapter-container').forEach(chapter => {
-                const cards = chapter.querySelectorAll('.editable-card');
-                let hasVisible = false;
-                cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
-                chapter.style.display = (keyword !== '' && !hasVisible) ? 'none' : '';
-            });
-        });
-
+        // ======================== 导航 ============================
         document.querySelectorAll('#chapterNavbar .list-group-item').forEach(item => {
             item.addEventListener('click', function(e) {
                 document.querySelectorAll('#chapterNavbar .list-group-item').forEach(i => i.classList.remove('active'));
@@ -851,58 +942,7 @@
             });
         });
 
-        // ======================== 启动 ============================
-        document.addEventListener('DOMContentLoaded', function() {
-            if (sessionStorage.getItem('dev_authenticated') === 'true') {
-                devModeActive = true;
-            }
-            renderAll();
-            if (devModeActive) {
-                document.getElementById('devModeSwitch').checked = true;
-                document.querySelectorAll('.dev-tool').forEach(el => {
-                    el.style.display = 'inline-block';
-                });
-            } else {
-                document.getElementById('devModeSwitch').checked = false;
-                document.querySelectorAll('.dev-tool').forEach(el => {
-                    el.style.display = 'none';
-                });
-            }
-            updateAuthUI();
-        });
-
-        window.toggleEdit = toggleEdit;
-        window.addNewQuestion = addNewQuestion;
-        window.deleteQuestion = deleteQuestion;
-        window.openDevAuth = openDevAuth;
-        window.closeDevAuth = closeDevAuth;
-        window.verifyDevAuth = verifyDevAuth;
-        window.togglePasswordVisibility = togglePasswordVisibility;
-
-        // ======================== 登录状态管理 ============================
-        function updateAuthUI() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const username = localStorage.getItem('username');
-            const authButtons = document.getElementById('authButtons');
-            const userMenu = document.getElementById('userMenu');
-            
-            if(isLoggedIn && username) {
-                authButtons.style.display = 'none';
-                userMenu.style.display = 'block';
-                document.getElementById('usernameDisplay').textContent = username;
-            } else {
-                authButtons.style.display = 'block';
-                userMenu.style.display = 'none';
-            }
-        }
-
-        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('username');
-            window.location.href = 'index.html';
-        });
-
+        // ======================== 上传功能 ============================
         document.getElementById('submitUpload')?.addEventListener('click', function() {
             const resourceName = document.getElementById('resourceName').value;
             const fileInput = document.getElementById('resourceFile');
@@ -914,6 +954,38 @@
                 alert('请填写完整信息并选择文件！');
             }
         });
+
+        // ======================== 启动 ============================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (sessionStorage.getItem('dev_authenticated_sound') === 'true') {
+                devModeActive = true;
+            }
+            renderAll();
+            setupScrollSpy();
+            if (devModeActive) {
+                document.getElementById('devModeSwitch').checked = true;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+            } else {
+                document.getElementById('devModeSwitch').checked = false;
+                document.querySelectorAll('.dev-tool').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+        });
+
+        // 暴露全局函数
+        window.toggleEdit = toggleEdit;
+        window.addNewQuestion = addNewQuestion;
+        window.deleteQuestion = deleteQuestion;
+        window.deleteResource = deleteResource;
+        window.addResource = addResource;
+        window.showAddResourceModal = showAddResourceModal;
+        window.openDevAuth = openDevAuth;
+        window.closeDevAuth = closeDevAuth;
+        window.verifyDevAuth = verifyDevAuth;
+        window.togglePasswordVisibility = togglePasswordVisibility;
     </script>
 </body>
 </html>
