@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>原子物理 | PhysicsSolution Hub</title>
+    <title>宇宙学 | PhysicsSolution Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         /* ================= 主题变量 ================= */
         :root {
-            --atomic-orange: #fd7e14;
-            --atomic-dark: #e66100;
+            --cosmo-purple: #6a11cb;
+            --cosmo-blue: #2575fc;
             --physics-blue: #2b5fdc;
             --bg-body: #f8f9fa;
             --bg-card: #ffffff;
@@ -40,26 +40,26 @@
         .text-dark { color: var(--text-main) !important; }
         .text-secondary { color: #888 !important; }
 
-        .atomic-header {
-            background: linear-gradient(135deg, var(--atomic-orange) 0%, var(--atomic-dark) 100%);
+        .cosmo-header {
+            background: linear-gradient(135deg, var(--cosmo-purple) 0%, var(--cosmo-blue) 100%);
             color: white;
         }
         .chapter-card {
-            border-left: 4px solid var(--atomic-orange);
+            border-left: 4px solid var(--cosmo-purple);
             transition: all 0.3s;
         }
         .chapter-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(253, 126, 20, 0.1);
+            box-shadow: 0 10px 20px rgba(106, 17, 203, 0.1);
         }
         .problem-title {
-            color: var(--atomic-orange);
-            border-bottom: 2px solid var(--atomic-orange);
+            color: var(--cosmo-purple);
+            border-bottom: 2px solid var(--cosmo-purple);
         }
         .nav-pills .nav-link.active, .list-group-item.active {
-            background-color: var(--atomic-orange) !important;
+            background-color: var(--cosmo-purple) !important;
             color: white !important;
-            border-color: var(--atomic-orange);
+            border-color: var(--cosmo-purple);
         }
         .book-cover {
             max-height: 250px;
@@ -72,7 +72,7 @@
         .solution-step {
             margin-bottom: 15px;
             padding-left: 15px;
-            border-left: 3px solid var(--atomic-orange);
+            border-left: 3px solid var(--cosmo-purple);
         }
         .resource-item {
             border-left: 3px solid var(--physics-blue);
@@ -85,60 +85,31 @@
         }
         .resource-item a { color: var(--text-main); text-decoration: none; }
         .resource-item a:hover { color: var(--physics-blue); }
-        .atomic-icon {
-            color: var(--atomic-orange);
-        }
+        
         @media (max-width: 768px) {
             .book-cover { max-width: 100%; height: auto; }
         }
-
-        /* 侧边栏固定样式 */
-        .sidebar-sticky {
-            position: sticky;
-            top: 85px;
-            z-index: 100;
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
-        }
-        .sidebar-sticky::-webkit-scrollbar { width: 4px; }
-        .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 4px; }
-        [data-bs-theme="dark"] .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); }
-        .sidebar-sticky::-webkit-scrollbar-track { background: transparent; }
-
-        /* 开发者模式样式 */
         textarea.editable-content {
             font-family: 'Courier New', Courier, monospace;
             background-color: rgba(0,0,0,0.02);
             color: var(--text-main);
             font-size: 0.95rem;
             line-height: 1.6;
+            width: 100%;
         }
         [data-bs-theme="dark"] textarea.editable-content { background-color: rgba(255,255,255,0.05); }
+        
         .dev-edit-btn { padding: 0.2rem 0.5rem; font-size: 0.8rem; }
         .dev-delete-btn { padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-left: 4px; }
-        .dev-tool { display: none; }
-
-        /* 进度条 */
-        .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 1060; }
-        .progress-bar { height: 4px; background: var(--atomic-orange); width: 0%; transition: width 0.1s ease-out; }
-        
-        .action-btn { background: transparent; border: none; color: var(--text-main); opacity: 0.7; transition: all 0.2s; padding: 5px 10px; border-radius: 6px; }
-        .action-btn:hover { opacity: 1; background-color: rgba(253, 126, 20, 0.1); color: var(--atomic-orange); }
-
-        .focus-mode .sidebar-col { display: none !important; }
-        .focus-mode .content-col { width: 100% !important; max-width: 900px; margin: 0 auto; transition: all 0.3s ease; }
-
-        #backToTop {
-            position: fixed; bottom: 30px; right: 30px; z-index: 99;
-            width: 50px; height: 50px; border-radius: 50%;
-            background-color: var(--atomic-orange); color: white; border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
-            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        .sidebar-sticky {
+            position: sticky; top: 85px; z-index: 100;
+            max-height: calc(100vh - 100px); overflow-y: auto;
         }
-        #backToTop.show { opacity: 1; pointer-events: auto; }
-        #backToTop:hover { transform: translateY(-5px); }
-
-        .chapter-container { scroll-margin-top: 80px; }
+        .sidebar-sticky::-webkit-scrollbar { width: 4px; }
+        .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 4px; }
+        [data-bs-theme="dark"] .sidebar-sticky::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); }
+        .sidebar-sticky::-webkit-scrollbar-track { background: transparent; }
+        .dev-tool { display: none; }
 
         /* 认证弹窗 */
         .auth-overlay {
@@ -153,8 +124,8 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .auth-modal .form-label { font-weight: 600; }
-        .auth-modal .btn-primary { background: var(--atomic-orange); border: none; }
-        .auth-modal .btn-primary:hover { background: #e05a00; }
+        .auth-modal .btn-primary { background: var(--cosmo-purple); border: none; }
+        .auth-modal .btn-primary:hover { background: #5a0fb5; }
         .auth-error { color: #dc3545; font-size: 0.9rem; margin-top: 8px; display: none; }
         #authButtons { display: none !important; }
         .password-toggle { position: relative; }
@@ -163,6 +134,28 @@
             cursor: pointer; color: #6c757d; background: none; border: none; padding: 0; z-index: 5;
         }
         .password-toggle .toggle-eye:hover { color: var(--text-main); }
+
+        /* ================= 新增功能样式 ================= */
+        .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 1060; }
+        .progress-bar { height: 4px; background: var(--cosmo-purple); width: 0%; transition: width 0.1s ease-out; }
+        
+        .action-btn { background: transparent; border: none; color: var(--text-main); opacity: 0.7; transition: all 0.2s; padding: 5px 10px; border-radius: 6px; }
+        .action-btn:hover { opacity: 1; background-color: rgba(106, 17, 203, 0.1); color: var(--cosmo-purple); }
+
+        .focus-mode .sidebar-col { display: none !important; }
+        .focus-mode .content-col { width: 100% !important; max-width: 900px; margin: 0 auto; transition: all 0.3s ease; }
+
+        #backToTop {
+            position: fixed; bottom: 30px; right: 30px; z-index: 99;
+            width: 50px; height: 50px; border-radius: 50%;
+            background-color: var(--cosmo-purple); color: white; border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
+            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+        #backToTop.show { opacity: 1; pointer-events: auto; }
+        #backToTop:hover { transform: translateY(-5px); }
+
+        .chapter-container { scroll-margin-top: 80px; }
 
         /* 图片相关样式 */
         .img-upload-preview {
@@ -181,22 +174,15 @@
         .image-gallery-img:hover {
             transform: scale(1.05);
         }
-        .chapter-editor {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
         .draggable-chapter {
             cursor: move;
             transition: all 0.2s;
         }
         .draggable-chapter:hover {
-            background: rgba(253, 126, 20, 0.05);
+            background: rgba(106, 17, 203, 0.05);
         }
         .chapter-order-handle {
-            color: var(--atomic-orange);
+            color: var(--cosmo-purple);
             margin-right: 10px;
         }
         .toast-container {
@@ -205,13 +191,21 @@
             right: 20px;
             z-index: 9999;
         }
+        .editable-content p:last-child {
+            margin-bottom: 0;
+        }
+        .editable-content .solution-step p:last-child {
+            margin-bottom: 0;
+        }
+        .editable-content .MathJax {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
     </style>
 </head>
 <body>
-    <!-- 阅读进度条 -->
     <div class="progress-container"><div class="progress-bar" id="readingProgress"></div></div>
 
-    <!-- 开发者认证弹窗 -->
     <div class="auth-overlay" id="devAuthOverlay">
         <div class="auth-modal">
             <h4 class="mb-3">开发者验证</h4>
@@ -230,14 +224,13 @@
                 </div>
             </div>
             <div class="auth-error" id="authError">账号或密码错误，请重试。</div>
-            <div class="d-flex justify-content-end gap-2">
+            <div class="d-flex justify-content-end gap-2 mt-4">
                 <button class="btn btn-secondary" onclick="closeDevAuth()">取消</button>
                 <button class="btn btn-primary" onclick="verifyDevAuth()">验证并开启</button>
             </div>
         </div>
     </div>
 
-    <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
             <a class="navbar-brand text-dark" href="index.html">
@@ -252,7 +245,7 @@
                         <a class="nav-link" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="atomic.html">原子物理</a>
+                        <a class="nav-link active" href="cosmos.html">宇宙学</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
@@ -264,34 +257,29 @@
                     </button>
                     <div class="form-check form-switch d-flex align-items-center ms-2 mb-0" id="devModeSwitchContainer">
                         <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
-                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;">开发者模式</label>
+                        <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer; margin-top:2px;">开发者模式</label>
                     </div>
-                    <div id="authButtons"></div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- 原子物理页头 -->
-    <header class="atomic-header py-5 mb-5">
+    <header class="cosmo-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
-                原子物理解答库
+                宇宙学解答库
             </h1>
-            <p class="lead mb-0">涵盖原子结构、光谱学、量子跃迁等核心内容</p>
+            <p class="lead mb-0">涵盖宇宙学基础、FRW度规、宇宙热历史等核心内容</p>
         </div>
     </header>
 
-    <!-- 主要内容区 -->
     <div class="container">
         <div class="row">
-            <!-- 左侧导航 - 固定侧边栏 -->
             <div class="col-lg-3 mb-4 sidebar-col">
                 <div class="sidebar-sticky">
-                    <!-- 搜索栏 -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
-                            <h5 class="card-title mb-3">搜索题目</h5>
+                            <h5 class="card-title mb-3 fw-bold">搜索题目</h5>
                             <div class="input-group">
                                 <input type="text" id="searchInput" class="form-control" placeholder="输入关键词...">
                             </div>
@@ -299,9 +287,9 @@
                     </div>
 
                     <!-- 章节导航 - 可管理 -->
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm mb-4">
                         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">章节导航</h5>
+                            <h5 class="mb-0 fw-bold">章节导航</h5>
                             <button class="btn btn-sm btn-outline-primary dev-tool" onclick="addChapter()" style="display:none;">
                                 <i class="fas fa-plus"></i> 添加
                             </button>
@@ -311,15 +299,14 @@
                         </div>
                     </div>
 
-                    <!-- 推荐教材 -->
-                    <div class="card shadow-sm mt-4">
+                    <div class="card shadow-sm">
                         <div class="card-header bg-transparent">
-                            <h5 class="mb-0">推荐教材</h5>
+                            <h5 class="mb-0 fw-bold">推荐教材</h5>
                         </div>
                         <div class="card-body text-center">
-                            <img src="atom.webp" alt="原子物理学" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
-                            <h6>原子物理学</h6>
-                            <p class="text-muted small mb-0">杨福家</p>
+                            <img src="cosmos.jpeg" alt="宇宙学的物理基础" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
+                            <h6 class="fw-bold">宇宙学的物理基础</h6>
+                            <p class="text-muted small mb-0">Steven Weinberg</p>
                         </div>
                     </div>
 
@@ -346,7 +333,7 @@
                     <!-- 资料库 -->
                     <div class="card shadow-sm mt-4">
                         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">资料库</h5>
+                            <h5 class="mb-0 fw-bold">资料库</h5>
                             <button class="btn btn-sm btn-outline-primary dev-tool" onclick="showAddResourceModal()" style="display:none;">
                                 添加
                             </button>
@@ -358,42 +345,38 @@
                 </div>
             </div>
 
-            <!-- 右侧内容 -->
             <div class="col-lg-9 content-col" id="contentArea">
                 <!-- 章节容器由JS动态渲染 -->
             </div>
         </div>
     </div>
 
-    <!-- 返回顶部按钮 -->
     <button id="backToTop" title="返回顶部"><i class="fas fa-arrow-up"></i></button>
 
     <!-- Toast 通知容器 -->
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- 上传资料模态框 -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadModalLabel">上传PDF资料</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">上传PDF资料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="uploadForm">
-                        <div class="mb-3">
-                            <label for="resourceName" class="form-label">资料名称</label>
-                            <input type="text" class="form-control" id="resourceName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceFile" class="form-label">选择PDF文件</label>
-                            <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceDescription" class="form-label">简要描述</label>
-                            <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label class="form-label">资料名称</label>
+                        <input type="text" class="form-control" id="resourceName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">选择PDF文件</label>
+                        <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">简要描述</label>
+                        <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -418,7 +401,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">章节名称</label>
-                        <input type="text" class="form-control" id="chapterName" placeholder="如：原子模型">
+                        <input type="text" class="form-control" id="chapterName" placeholder="如：宇宙学基础">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">章节描述（可选）</label>
@@ -437,47 +420,62 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ======================== 数据层 ============================
-        const STORAGE_KEY = 'atomic_full_data';
+        const STORAGE_KEY = 'cosmos_full_data';
 
         const DEFAULT_CHAPTERS = [
-            { id: 'ch1', number: 1, name: '原子模型', desc: '卢瑟福模型、玻尔模型' },
-            { id: 'ch2', number: 2, name: '氢原子光谱', desc: '巴尔末系、里德伯公式' },
-            { id: 'ch3', number: 3, name: '多电子原子', desc: '泡利原理、洪特规则' },
-            { id: 'ch4', number: 4, name: 'X射线', desc: '特征X射线、康普顿散射' },
-            { id: 'ch5', number: 5, name: '原子核物理基础', desc: '核衰变、核反应' }
+            { id: 'ch1', number: 1, name: '宇宙学基础', desc: '哈勃定律、临界密度' },
+            { id: 'ch2', number: 2, name: 'FRW度规', desc: '弗里德曼方程' },
+            { id: 'ch3', number: 3, name: '宇宙热历史', desc: '原初核合成、复合' },
+            { id: 'ch4', number: 4, name: '暴胀理论', desc: '暴涨模型与扰动' }
         ];
 
         const DEFAULT_QUESTIONS = [
             {
                 id: 'q1_1',
                 chapterId: 'ch1',
-                title: '问题1.1 - 卢瑟福散射公式推导',
-                desc: '推导卢瑟福散射公式，证明散射截面为：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left(\\frac{Ze^2}{16\\pi\\epsilon_0 E}\\right)^2 \\frac{1}{\\sin^4(\\theta/2)} \\]\n其中Z为靶核电荷数，E为入射粒子动能，θ为散射角。',
-                source: '杨福家《原子物理学》第一章',
-                ans: '步骤1：考虑库仑相互作用力：\n\\[ F = \\frac{Ze^2}{4\\pi\\epsilon_0 r^2} \\]\n\n步骤2：计算角动量守恒和能量守恒，得到碰撞参数b与散射角关系：\n\\[ b = \\frac{Ze^2}{8\\pi\\epsilon_0 E} \\cot(\\theta/2) \\]\n\n步骤3：散射截面定义：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left|\\frac{b}{\\sin\\theta}\\frac{db}{d\\theta}\\right| \\]\n\n步骤4：代入b的表达式得到卢瑟福公式。'
+                title: '哈勃定律推导',
+                desc: '从FRW度规出发，推导哈勃定律 \\( v = H_0 d \\) 的关系。',
+                source: 'Weinberg《宇宙学的物理基础》第一章',
+                ans: '步骤1：FRW度规为：\n\\[ ds^2 = -dt^2 + a^2(t)\\left[\\frac{dr^2}{1-kr^2} + r^2 d\\Omega^2\\right] \\]\n\n步骤2：对于共动距离 \\( \\chi \\)，物理距离为 \\( d = a(t)\\chi \\)\n\n步骤3：哈勃参数定义为 \\( H(t) = \\dot{a}/a \\)\n\n步骤4：速度 \\( v = \\dot{d} = \\dot{a}\\chi = H d \\)，即哈勃定律'
             },
             {
                 id: 'q1_2',
                 chapterId: 'ch1',
-                title: '问题1.2 - 玻尔氢原子能级',
-                desc: '根据玻尔模型推导氢原子能级公式，并计算基态能量。',
-                source: '杨福家《原子物理学》第一章',
-                ans: '步骤1：角动量量子化条件：\n\\[ mvr = n\\hbar \\]\n\n步骤2：库仑力提供向心力：\n\\[ \\frac{e^2}{4\\pi\\epsilon_0 r^2} = \\frac{mv^2}{r} \\]\n\n步骤3：联立解得轨道半径：\n\\[ r_n = n^2 a_0, \\quad a_0 = \\frac{4\\pi\\epsilon_0\\hbar^2}{me^2} \\]\n\n步骤4：能量：\n\\[ E_n = -\\frac{13.6}{n^2} \\text{eV} \\]，基态能量 -13.6 eV。'
+                title: '临界密度计算',
+                desc: '计算宇宙的临界密度 \\( \\rho_c \\)，并给出当前观测值的数量级。',
+                source: '俞允强《热大爆炸宇宙学》基础习题',
+                ans: '步骤1：从弗里德曼方程出发：\n\\[ H^2 = \\frac{8\\pi G}{3}\\rho - \\frac{k}{a^2} \\]\n\n步骤2：对于平坦宇宙 \\( k=0 \\)，解得临界密度为：\n\\[ \\rho_c = \\frac{3H^2}{8\\pi G} \\]\n\n步骤3：代入当前观测值哈勃常数，临界密度数量级约为 \\( 10^{-27} \\text{kg/m}^3 \\)'
             },
             {
                 id: 'q2_1',
                 chapterId: 'ch2',
-                title: '问题2.1 - 巴尔末系波长计算',
-                desc: '计算氢原子巴尔末系前三条谱线的波长（n=3,4,5→n=2）。',
-                source: '杨福家《原子物理学》第二章',
-                ans: '步骤1：里德伯公式：\n\\[ \\frac{1}{\\lambda} = R_H \\left(\\frac{1}{n_f^2} - \\frac{1}{n_i^2}\\right) \\]\n其中R_H=1.097×10⁷ m⁻¹\n\n步骤2：Hα线(n=3→2)：\n\\[ \\lambda = 656.3 \\text{nm} \\]\n\n步骤3：Hβ线(n=4→2)：\n\\[ \\lambda = 486.1 \\text{nm} \\]\n\n步骤4：Hγ线(n=5→2)：\n\\[ \\lambda = 434.0 \\text{nm} \\]'
+                title: '弗里德曼方程推导',
+                desc: '从爱因斯坦场方程出发，推导包含空间曲率 \\( k \\) 的弗里德曼方程。',
+                source: 'Weinberg《引力论与宇宙学》第十五章',
+                ans: '步骤1：引入理想流体动量张量 \\( T_{\\mu\\nu} = (\\rho + p)U_\\mu U_\\nu + p g_{\\mu\\nu} \\)。\n\n步骤2：计算FRW度规下的克里斯托费尔符号与里奇张量。\n\n步骤3：代入场方程，分别由时间分量和空间分量得到经典的两个弗里德曼微分方程。'
+            },
+            {
+                id: 'q3_1',
+                chapterId: 'ch3',
+                title: '原初核合成',
+                desc: '简述大爆炸核合成的主要过程及其对宇宙学参数的约束。',
+                source: '宇宙学热历史讲义',
+                ans: '步骤1：大爆炸核合成发生在宇宙年龄约1秒到3分钟之间，温度约1MeV到0.1MeV。\n\n步骤2：主要核反应过程：\n\\[ p + n \\rightarrow D + \\gamma \\]\n\\[ D + D \\rightarrow ^3He + n \\]\n\\[ D + D \\rightarrow T + p \\]\n\\[ ^3He + D \\rightarrow ^4He + p \\]\n\n步骤3：最终丰度主要由重子密度参数 \\( \\Omega_b h^2 \\) 决定。\n\n步骤4：观测到的 \\( ^4He \\) 丰度约为25%，对重子密度参数给出约束 \\( \\Omega_b h^2 \\approx 0.022 \\)。'
+            },
+            {
+                id: 'q4_1',
+                chapterId: 'ch4',
+                title: '暴胀机制',
+                desc: '解释宇宙暴胀如何解决视界问题和平坦性问题。',
+                source: '暴胀宇宙学讲义',
+                ans: '步骤1：视界问题：在标准热大爆炸模型中，CMB各向同性的区域在因果上不连通。\n\n步骤2：暴胀期间，宇宙尺度因子指数增长：\n\\[ a(t) \\propto e^{Ht} \\]\n\n步骤3：暴胀使得早期宇宙的因果区域被放大到远大于可观测宇宙的大小。\n\n步骤4：平坦性问题：暴胀期间哈勃参数接近常数，\\( |\\Omega - 1| \\) 以 \\( e^{-2Ht} \\) 方式衰减。\n\n步骤5：暴胀后，宇宙变得极其平坦，解释了为什么今天观测到 \\( \\Omega \\approx 1 \\)。'
             }
         ];
 
         const DEFAULT_RESOURCES = [
-            { id: 'r1', name: 'QZQ笔记', desc: '原子物理学习笔记', file: '原子物理学笔记.pdf' },
-            { id: 'r2', name: '原子物理学', desc: '杨福家', file: '../source/atom/原子物理学 by 杨福家 (z-lib.org).pdf' },
-            { id: 'r3', name: '蒋泊远笔记', desc: '学习笔记', file: '../source/atom/原子物理学.pdf' }
+            { id: 'r1', name: '宇宙学基础讲义', desc: 'FRW度规与动力学', file: 'cosmo_frw.pdf' },
+            { id: 'r2', name: '宇宙热历史', desc: '核合成与复合', file: 'cosmo_history.pdf' },
+            { id: 'r3', name: '暴胀宇宙学', desc: '综述文章', file: 'cosmo_inflation.pdf' }
         ];
 
         function getDefaultData() {
@@ -512,7 +510,7 @@
         let editingChapterId = null;
 
         // ======================== 图片管理系统 ============================
-        const IMAGE_STORAGE_KEY = 'atomic_images_data';
+        const IMAGE_STORAGE_KEY = 'cosmos_images_data';
 
         function loadImages() {
             const stored = localStorage.getItem(IMAGE_STORAGE_KEY);
@@ -592,7 +590,6 @@
             if (!text) return '';
             const trimmed = text.trim();
             
-            // 先解析图片
             let processed = parseImageMarkdown(trimmed);
             
             if (type === 'title') return processed;
@@ -620,7 +617,6 @@
             const navbar = document.getElementById('chapterNavbar');
             if (!navbar) return;
             
-            // 按编号排序
             const sortedChapters = [...appData.chapters].sort((a, b) => a.number - b.number);
             
             let html = '';
@@ -638,7 +634,7 @@
                             </span>
                             ${ch.number}. ${ch.name}
                         </span>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${questionCount}</span>
+                        <span class="badge rounded-pill" style="background-color: var(--cosmo-purple);">${questionCount}</span>
                     </div>
                     ${ch.desc ? `<small class="text-muted d-block ms-3">${ch.desc}</small>` : ''}
                     <div class="dev-tool mt-1" style="display:none;">
@@ -654,7 +650,6 @@
             });
             navbar.innerHTML = html;
             
-            // 更新开发者工具显示
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
@@ -678,7 +673,7 @@
                             ${ch.number}. ${ch.name}
                             ${ch.desc ? `<small class="text-muted fs-6 ms-2">${ch.desc}</small>` : ''}
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${chapterQuestions.length}题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--cosmo-purple);">${chapterQuestions.length}题</span>
                     </div>
                     <div class="question-list" data-chapter-id="${ch.id}">
                 `;
@@ -762,12 +757,10 @@
             
             container.innerHTML = html;
             
-            // 更新开发者工具显示
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
             
-            // 渲染MathJax
             if (window.MathJax) {
                 MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
             }
@@ -869,7 +862,6 @@
             }
             
             if (editingChapterId) {
-                // 编辑已有章节
                 const ch = appData.chapters.find(c => c.id === editingChapterId);
                 if (ch) {
                     ch.number = number;
@@ -878,7 +870,6 @@
                     showToast('章节已更新', 'success');
                 }
             } else {
-                // 添加新章节
                 const newChapter = {
                     id: 'ch' + Date.now(),
                     number: number,
@@ -908,7 +899,7 @@
             if (!ch) return;
             const questionCount = appData.questions.filter(q => q.chapterId === chapterId).length;
             if (questionCount > 0) {
-                if (!confirm(`章节 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除整个章节吗？题目也会被删除！`)) {
+                if (!confirm(`章节 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除吗？题目也会被删除！`)) {
                     return;
                 }
             } else {
@@ -944,8 +935,8 @@
                 id: `q${ch.number}_${maxNum + 1}`,
                 chapterId: chapterId,
                 title: '新题目名称',
-                desc: '请在此输入题目内容，支持 LaTeX 公式：\n\\[ E = mc^2 \\]\n\n双换行可以分段。',
-                source: '待补充参考书籍',
+                desc: '请在此输入题目内容，支持 LaTeX 公式：\n\\[ H = \\frac{\\dot{a}}{a} \\]\n\n双换行可以分段。',
+                source: '待补充参考来源',
                 ans: '步骤1：输入解答内容。\n\n步骤2：空行后输入下一步。'
             };
             
@@ -954,7 +945,6 @@
             renderAll();
             showToast('新题目已添加', 'success');
             
-            // 滚动到新题目
             setTimeout(() => {
                 const el = document.getElementById(`q_${newQ.id}`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -991,7 +981,6 @@
                 textarea.value = unescapeHtml(raw);
                 contentDiv.replaceWith(textarea);
                 
-                // 更新按钮
                 const btn = document.querySelector(`#q_${uid} .dev-edit-btn`);
                 if (btn) {
                     btn.innerHTML = '保存';
@@ -1078,7 +1067,6 @@
                             const imgTag = `\n![${file.name}](${imgId})\n`;
                             targetElement.value = textBefore + imgTag + textAfter;
                             
-                            // 自动保存
                             const uid = targetElementId.split('_').slice(1).join('_');
                             const typeKey = targetElementId.split('_')[0];
                             const q = appData.questions.find(q => q.id === uid);
@@ -1091,11 +1079,9 @@
                             }
                             showToast('图片已插入，点击"保存"确认', 'success');
                         } else {
-                            // 在内容后追加图片
                             const imgHTML = `<img src="${imageData[imgId].data}" alt="${file.name}" class="img-fluid my-2" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">`;
                             targetElement.innerHTML += '<br>' + imgHTML;
                             
-                            // 更新 raw 数据
                             const raw = targetElement.getAttribute('data-raw') || '';
                             const uid = targetElementId.split('_').slice(1).join('_');
                             const type = targetElement.getAttribute('data-type');
@@ -1443,7 +1429,7 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'inline-block';
                 });
-                sessionStorage.setItem('dev_authenticated_atomic', 'true');
+                sessionStorage.setItem('dev_authenticated_cosmos', 'true');
                 document.getElementById('devPassword').value = '';
                 renderAll();
                 showToast('开发者模式已开启', 'success');
@@ -1492,7 +1478,7 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'none';
                 });
-                sessionStorage.removeItem('dev_authenticated_atomic');
+                sessionStorage.removeItem('dev_authenticated_cosmos');
                 renderAll();
             }
         });
@@ -1537,7 +1523,7 @@
 
         // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
-            if (sessionStorage.getItem('dev_authenticated_atomic') === 'true') {
+            if (sessionStorage.getItem('dev_authenticated_cosmos') === 'true') {
                 devModeActive = true;
             }
             renderAll();
@@ -1554,7 +1540,6 @@
                 });
             }
             
-            // 更新主题图标
             if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
                 themeBtn.innerHTML = '<i class="fas fa-sun text-warning"></i>';
             }
