@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>原子物理 | PhysicsSolution Hub</title>
+    <title>电路原理 | PhysicsSolution Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         /* ================= 主题变量 ================= */
         :root {
-            --atomic-orange: #fd7e14;
-            --atomic-dark: #e66100;
+            --circuit-orange: #e67e22;
+            --circuit-red: #c0392b;
             --physics-blue: #2b5fdc;
             --bg-body: #f8f9fa;
             --bg-card: #ffffff;
@@ -40,26 +40,26 @@
         .text-dark { color: var(--text-main) !important; }
         .text-secondary { color: #888 !important; }
 
-        .atomic-header {
-            background: linear-gradient(135deg, var(--atomic-orange) 0%, var(--atomic-dark) 100%);
+        .circuit-header {
+            background: linear-gradient(135deg, var(--circuit-orange) 0%, var(--circuit-red) 100%);
             color: white;
         }
         .chapter-card {
-            border-left: 4px solid var(--atomic-orange);
+            border-left: 4px solid var(--circuit-orange);
             transition: all 0.3s;
         }
         .chapter-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(253, 126, 20, 0.1);
+            box-shadow: 0 10px 20px rgba(230, 126, 34, 0.1);
         }
         .problem-title {
-            color: var(--atomic-orange);
-            border-bottom: 2px solid var(--atomic-orange);
+            color: var(--circuit-red);
+            border-bottom: 2px solid var(--circuit-red);
         }
         .nav-pills .nav-link.active, .list-group-item.active {
-            background-color: var(--atomic-orange) !important;
+            background-color: var(--circuit-orange) !important;
             color: white !important;
-            border-color: var(--atomic-orange);
+            border-color: var(--circuit-orange);
         }
         .book-cover {
             max-height: 250px;
@@ -72,7 +72,7 @@
         .solution-step {
             margin-bottom: 15px;
             padding-left: 15px;
-            border-left: 3px solid var(--atomic-orange);
+            border-left: 3px solid var(--circuit-orange);
         }
         .resource-item {
             border-left: 3px solid var(--physics-blue);
@@ -85,8 +85,8 @@
         }
         .resource-item a { color: var(--text-main); text-decoration: none; }
         .resource-item a:hover { color: var(--physics-blue); }
-        .atomic-icon {
-            color: var(--atomic-orange);
+        .circuit-icon {
+            color: var(--circuit-orange);
         }
         @media (max-width: 768px) {
             .book-cover { max-width: 100%; height: auto; }
@@ -120,10 +120,10 @@
 
         /* 进度条 */
         .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 1060; }
-        .progress-bar { height: 4px; background: var(--atomic-orange); width: 0%; transition: width 0.1s ease-out; }
+        .progress-bar { height: 4px; background: var(--circuit-orange); width: 0%; transition: width 0.1s ease-out; }
         
         .action-btn { background: transparent; border: none; color: var(--text-main); opacity: 0.7; transition: all 0.2s; padding: 5px 10px; border-radius: 6px; }
-        .action-btn:hover { opacity: 1; background-color: rgba(253, 126, 20, 0.1); color: var(--atomic-orange); }
+        .action-btn:hover { opacity: 1; background-color: rgba(230, 126, 34, 0.1); color: var(--circuit-orange); }
 
         .focus-mode .sidebar-col { display: none !important; }
         .focus-mode .content-col { width: 100% !important; max-width: 900px; margin: 0 auto; transition: all 0.3s ease; }
@@ -131,7 +131,7 @@
         #backToTop {
             position: fixed; bottom: 30px; right: 30px; z-index: 99;
             width: 50px; height: 50px; border-radius: 50%;
-            background-color: var(--atomic-orange); color: white; border: none;
+            background-color: var(--circuit-orange); color: white; border: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
             transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
@@ -153,8 +153,8 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .auth-modal .form-label { font-weight: 600; }
-        .auth-modal .btn-primary { background: var(--atomic-orange); border: none; }
-        .auth-modal .btn-primary:hover { background: #e05a00; }
+        .auth-modal .btn-primary { background: var(--circuit-orange); border: none; }
+        .auth-modal .btn-primary:hover { background: #d35400; }
         .auth-error { color: #dc3545; font-size: 0.9rem; margin-top: 8px; display: none; }
         #authButtons { display: none !important; }
         .password-toggle { position: relative; }
@@ -193,10 +193,10 @@
             transition: all 0.2s;
         }
         .draggable-chapter:hover {
-            background: rgba(253, 126, 20, 0.05);
+            background: rgba(230, 126, 34, 0.05);
         }
         .chapter-order-handle {
-            color: var(--atomic-orange);
+            color: var(--circuit-orange);
             margin-right: 10px;
         }
         .toast-container {
@@ -204,6 +204,14 @@
             bottom: 20px;
             right: 20px;
             z-index: 9999;
+        }
+        .circuit-diagram-placeholder {
+            background: var(--bg-card);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -252,7 +260,7 @@
                         <a class="nav-link" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="atomic.html">原子物理</a>
+                        <a class="nav-link active" href="circuit.html">电路原理</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
@@ -266,29 +274,28 @@
                         <input class="form-check-input me-2" type="checkbox" id="devModeSwitch">
                         <label class="form-check-label text-danger fw-bold" for="devModeSwitch" style="cursor: pointer;">开发者模式</label>
                     </div>
-                    <div id="authButtons"></div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- 原子物理页头 -->
-    <header class="atomic-header py-5 mb-5">
+    <!-- 电路原理页头 -->
+    <header class="circuit-header py-5 mb-5">
         <div class="container text-center">
             <h1 class="display-4 fw-bold">
-                原子物理解答库
+                电路原理解答库
             </h1>
-            <p class="lead mb-0">涵盖原子结构、光谱学、量子跃迁等核心内容</p>
+            <p class="lead mb-0">涵盖基尔霍夫定律、网络分析、动态电路、正弦稳态等核心内容</p>
         </div>
     </header>
 
     <!-- 主要内容区 -->
     <div class="container">
         <div class="row">
-            <!-- 左侧导航 - 固定侧边栏 -->
+            <!-- 左侧导航 -->
             <div class="col-lg-3 mb-4 sidebar-col">
                 <div class="sidebar-sticky">
-                    <!-- 搜索栏 -->
+                    <!-- 搜索框 -->
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
                             <h5 class="card-title mb-3">搜索题目</h5>
@@ -317,9 +324,10 @@
                             <h5 class="mb-0">推荐教材</h5>
                         </div>
                         <div class="card-body text-center">
-                            <img src="atom.webp" alt="原子物理学" class="img-fluid book-cover mb-3" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
-                            <h6>原子物理学</h6>
-                            <p class="text-muted small mb-0">杨福家</p>
+                            <img src="circuit.jpg" alt="电路原理" class="img-fluid book-cover mb-3" style="max-height:180px;" onerror="this.src='https://via.placeholder.com/150?text=Book+Cover'">
+                            <h6>电路原理</h6>
+                            <p class="text-muted small">James W. Nilsson</p>
+                            <p class="text-muted small">邱关源《电路》</p>
                         </div>
                     </div>
 
@@ -372,28 +380,26 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- 上传资料模态框 -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadModalLabel">上传PDF资料</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">上传PDF资料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="uploadForm">
-                        <div class="mb-3">
-                            <label for="resourceName" class="form-label">资料名称</label>
-                            <input type="text" class="form-control" id="resourceName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceFile" class="form-label">选择PDF文件</label>
-                            <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="resourceDescription" class="form-label">简要描述</label>
-                            <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label class="form-label">资料名称</label>
+                        <input type="text" class="form-control" id="resourceName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">选择PDF文件</label>
+                        <input type="file" class="form-control" id="resourceFile" accept=".pdf" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">简要描述</label>
+                        <textarea class="form-control" id="resourceDescription" rows="2"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -418,7 +424,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">章节名称</label>
-                        <input type="text" class="form-control" id="chapterName" placeholder="如：原子模型">
+                        <input type="text" class="form-control" id="chapterName" placeholder="如：基尔霍夫定律">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">章节描述（可选）</label>
@@ -437,47 +443,63 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ======================== 数据层 ============================
-        const STORAGE_KEY = 'atomic_full_data';
+        const STORAGE_KEY = 'circuit_full_data';
 
         const DEFAULT_CHAPTERS = [
-            { id: 'ch1', number: 1, name: '原子模型', desc: '卢瑟福模型、玻尔模型' },
-            { id: 'ch2', number: 2, name: '氢原子光谱', desc: '巴尔末系、里德伯公式' },
-            { id: 'ch3', number: 3, name: '多电子原子', desc: '泡利原理、洪特规则' },
-            { id: 'ch4', number: 4, name: 'X射线', desc: '特征X射线、康普顿散射' },
-            { id: 'ch5', number: 5, name: '原子核物理基础', desc: '核衰变、核反应' }
+            { id: 'ch1', number: 1, name: '基尔霍夫定律', desc: 'KCL、KVL基本定律' },
+            { id: 'ch2', number: 2, name: '网络分析', desc: '节点电压法、网孔电流法' },
+            { id: 'ch3', number: 3, name: '动态电路', desc: 'RC、RL电路的瞬态响应' },
+            { id: 'ch4', number: 4, name: '正弦稳态分析', desc: '相量法、阻抗、功率' }
         ];
 
         const DEFAULT_QUESTIONS = [
             {
                 id: 'q1_1',
                 chapterId: 'ch1',
-                title: '问题1.1 - 卢瑟福散射公式推导',
-                desc: '推导卢瑟福散射公式，证明散射截面为：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left(\\frac{Ze^2}{16\\pi\\epsilon_0 E}\\right)^2 \\frac{1}{\\sin^4(\\theta/2)} \\]\n其中Z为靶核电荷数，E为入射粒子动能，θ为散射角。',
-                source: '杨福家《原子物理学》第一章',
-                ans: '步骤1：考虑库仑相互作用力：\n\\[ F = \\frac{Ze^2}{4\\pi\\epsilon_0 r^2} \\]\n\n步骤2：计算角动量守恒和能量守恒，得到碰撞参数b与散射角关系：\n\\[ b = \\frac{Ze^2}{8\\pi\\epsilon_0 E} \\cot(\\theta/2) \\]\n\n步骤3：散射截面定义：\n\\[ \\frac{d\\sigma}{d\\Omega} = \\left|\\frac{b}{\\sin\\theta}\\frac{db}{d\\theta}\\right| \\]\n\n步骤4：代入b的表达式得到卢瑟福公式。'
+                title: '基尔霍夫电流定律 (KCL)',
+                desc: '简述基尔霍夫电流定律的内容，并给出数学表达式。',
+                source: '邱关源《电路》第一章',
+                ans: '步骤1：基尔霍夫电流定律（KCL）指出，在集总电路中，任何时刻，对任一节点，所有流出节点的支路电流的代数和等于零。\n\n步骤2：数学表达式：\n\\[ \\sum_{k=1}^{n} i_k = 0 \\]\n\n步骤3：也可以表述为：流入节点的电流之和等于流出节点的电流之和。\n\n步骤4：KCL适用于任何集总参数电路，与元件的性质无关。'
             },
             {
                 id: 'q1_2',
                 chapterId: 'ch1',
-                title: '问题1.2 - 玻尔氢原子能级',
-                desc: '根据玻尔模型推导氢原子能级公式，并计算基态能量。',
-                source: '杨福家《原子物理学》第一章',
-                ans: '步骤1：角动量量子化条件：\n\\[ mvr = n\\hbar \\]\n\n步骤2：库仑力提供向心力：\n\\[ \\frac{e^2}{4\\pi\\epsilon_0 r^2} = \\frac{mv^2}{r} \\]\n\n步骤3：联立解得轨道半径：\n\\[ r_n = n^2 a_0, \\quad a_0 = \\frac{4\\pi\\epsilon_0\\hbar^2}{me^2} \\]\n\n步骤4：能量：\n\\[ E_n = -\\frac{13.6}{n^2} \\text{eV} \\]，基态能量 -13.6 eV。'
+                title: '基尔霍夫电压定律 (KVL)',
+                desc: '简述基尔霍夫电压定律的内容，并给出数学表达式。',
+                source: '邱关源《电路》第一章',
+                ans: '步骤1：基尔霍夫电压定律（KVL）指出，在集总电路中，任何时刻，沿任一回路，所有支路电压的代数和等于零。\n\n步骤2：数学表达式：\n\\[ \\sum_{k=1}^{n} u_k = 0 \\]\n\n步骤3：在列写KVL方程时，需要先指定回路的参考方向。\n\n步骤4：KVL适用于任何集总参数电路，与元件的性质无关。'
             },
             {
                 id: 'q2_1',
                 chapterId: 'ch2',
-                title: '问题2.1 - 巴尔末系波长计算',
-                desc: '计算氢原子巴尔末系前三条谱线的波长（n=3,4,5→n=2）。',
-                source: '杨福家《原子物理学》第二章',
-                ans: '步骤1：里德伯公式：\n\\[ \\frac{1}{\\lambda} = R_H \\left(\\frac{1}{n_f^2} - \\frac{1}{n_i^2}\\right) \\]\n其中R_H=1.097×10⁷ m⁻¹\n\n步骤2：Hα线(n=3→2)：\n\\[ \\lambda = 656.3 \\text{nm} \\]\n\n步骤3：Hβ线(n=4→2)：\n\\[ \\lambda = 486.1 \\text{nm} \\]\n\n步骤4：Hγ线(n=5→2)：\n\\[ \\lambda = 434.0 \\text{nm} \\]'
+                title: '节点电压法',
+                desc: '简述节点电压法的基本原理和求解步骤。',
+                source: '邱关源《电路》第二章',
+                ans: '步骤1：节点电压法是以节点电压为未知量，根据KCL列写节点电流方程。\n\n步骤2：首先选定参考节点（通常选接地节点）。\n\n步骤3：对每个独立节点，列写KCL方程：\n\\[ \\sum_{k} G_{ik} u_k = i_{si} \\]\n\n步骤4：其中 \\(G_{ik}\\) 为节点电导矩阵，\\(i_{si}\\) 为注入节点的电流源电流代数和。\n\n步骤5：求解节点电压方程组，再根据欧姆定律求出各支路电流。'
+            },
+            {
+                id: 'q3_1',
+                chapterId: 'ch3',
+                title: 'RC电路的零状态响应',
+                desc: '推导一阶RC电路在阶跃电压激励下的零状态响应。',
+                source: '邱关源《电路》第三章',
+                ans: '步骤1：RC串联电路，电容初始电压为零 \\(u_C(0^-) = 0\\)，在 \\(t=0\\) 时接入阶跃电压 \\(U_s\\)。\n\n步骤2：根据KVL：\n\\[ U_s = R i(t) + u_C(t) \\]\n\n步骤3：代入 \\(i = C \\frac{du_C}{dt}\\)，得微分方程：\n\\[ RC \\frac{du_C}{dt} + u_C = U_s \\]\n\n步骤4：求解得：\n\\[ u_C(t) = U_s (1 - e^{-t/\\tau}) \\quad (t \\ge 0) \\]\n其中 \\(\\tau = RC\\) 为时间常数。\n\n步骤5：电流响应：\n\\[ i(t) = \\frac{U_s}{R} e^{-t/\\tau} \\]'
+            },
+            {
+                id: 'q4_1',
+                chapterId: 'ch4',
+                title: '相量法基础',
+                desc: '解释为什么在正弦稳态分析中使用相量法，并给出正弦量与相量的转换关系。',
+                source: '邱关源《电路》第四章',
+                ans: '步骤1：在正弦稳态电路中，所有激励和响应都是同频率的正弦量。相量法将时域的正弦量转换为复数的代数运算。\n\n步骤2：正弦量 \\(u(t) = U_m \\cos(\\omega t + \\phi)\\) 对应相量：\n\\[ \\dot{U} = U_m \\angle \\phi = U_m e^{j\\phi} \\]\n\n步骤3：相量法的优点：将时域的微分方程转换为频域的代数方程，简化计算。\n\n步骤4：相量是复数，但不同于一般的复数，它代表的是正弦量的有效值或幅值以及初相位。'
             }
         ];
 
         const DEFAULT_RESOURCES = [
-            { id: 'r1', name: 'QZQ笔记', desc: '原子物理学习笔记', file: '原子物理学笔记.pdf' },
-            { id: 'r2', name: '原子物理学', desc: '杨福家', file: '../source/atom/原子物理学 by 杨福家 (z-lib.org).pdf' },
-            { id: 'r3', name: '蒋泊远笔记', desc: '学习笔记', file: '../source/atom/原子物理学.pdf' }
+            { id: 'r1', name: '《电路》邱关源 第五版', desc: '经典电路理论教材', file: '#' },
+            { id: 'r2', name: '《电路原理》Nilsson 第10版', desc: '国际经典教材', file: '#' },
+            { id: 'r3', name: '《电路分析基础》李瀚荃', desc: '国内经典教材', file: '#' },
+            { id: 'r4', name: '电路原理习题精选与解析', desc: '习题集', file: '#' }
         ];
 
         function getDefaultData() {
@@ -512,7 +534,7 @@
         let editingChapterId = null;
 
         // ======================== 图片管理系统 ============================
-        const IMAGE_STORAGE_KEY = 'atomic_images_data';
+        const IMAGE_STORAGE_KEY = 'circuit_images_data';
 
         function loadImages() {
             const stored = localStorage.getItem(IMAGE_STORAGE_KEY);
@@ -592,7 +614,6 @@
             if (!text) return '';
             const trimmed = text.trim();
             
-            // 先解析图片
             let processed = parseImageMarkdown(trimmed);
             
             if (type === 'title') return processed;
@@ -620,7 +641,6 @@
             const navbar = document.getElementById('chapterNavbar');
             if (!navbar) return;
             
-            // 按编号排序
             const sortedChapters = [...appData.chapters].sort((a, b) => a.number - b.number);
             
             let html = '';
@@ -638,7 +658,7 @@
                             </span>
                             ${ch.number}. ${ch.name}
                         </span>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${questionCount}</span>
+                        <span class="badge rounded-pill" style="background-color: var(--circuit-orange);">${questionCount}</span>
                     </div>
                     ${ch.desc ? `<small class="text-muted d-block ms-3">${ch.desc}</small>` : ''}
                     <div class="dev-tool mt-1" style="display:none;">
@@ -654,7 +674,6 @@
             });
             navbar.innerHTML = html;
             
-            // 更新开发者工具显示
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
@@ -678,7 +697,7 @@
                             ${ch.number}. ${ch.name}
                             ${ch.desc ? `<small class="text-muted fs-6 ms-2">${ch.desc}</small>` : ''}
                         </h2>
-                        <span class="badge rounded-pill" style="background-color: var(--atomic-orange);">${chapterQuestions.length}题</span>
+                        <span class="badge rounded-pill" style="background-color: var(--circuit-orange);">${chapterQuestions.length}题</span>
                     </div>
                     <div class="question-list" data-chapter-id="${ch.id}">
                 `;
@@ -762,12 +781,10 @@
             
             container.innerHTML = html;
             
-            // 更新开发者工具显示
             document.querySelectorAll('.dev-tool').forEach(el => {
                 el.style.display = devModeActive ? 'inline-block' : 'none';
             });
             
-            // 渲染MathJax
             if (window.MathJax) {
                 MathJax.typesetPromise([container]).catch(err => console.error('MathJax渲染错误', err));
             }
@@ -869,7 +886,6 @@
             }
             
             if (editingChapterId) {
-                // 编辑已有章节
                 const ch = appData.chapters.find(c => c.id === editingChapterId);
                 if (ch) {
                     ch.number = number;
@@ -878,7 +894,6 @@
                     showToast('章节已更新', 'success');
                 }
             } else {
-                // 添加新章节
                 const newChapter = {
                     id: 'ch' + Date.now(),
                     number: number,
@@ -908,7 +923,7 @@
             if (!ch) return;
             const questionCount = appData.questions.filter(q => q.chapterId === chapterId).length;
             if (questionCount > 0) {
-                if (!confirm(`章节 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除整个章节吗？题目也会被删除！`)) {
+                if (!confirm(`章节 "${ch.number}. ${ch.name}" 包含 ${questionCount} 道题目，确定要删除吗？题目也会被删除！`)) {
                     return;
                 }
             } else {
@@ -944,7 +959,7 @@
                 id: `q${ch.number}_${maxNum + 1}`,
                 chapterId: chapterId,
                 title: '新题目名称',
-                desc: '请在此输入题目内容，支持 LaTeX 公式：\n\\[ E = mc^2 \\]\n\n双换行可以分段。',
+                desc: '请在此输入题目内容，支持 LaTeX 公式：\n\\[ I = \\frac{U}{R} \\]\n\n双换行可以分段。',
                 source: '待补充参考书籍',
                 ans: '步骤1：输入解答内容。\n\n步骤2：空行后输入下一步。'
             };
@@ -954,7 +969,6 @@
             renderAll();
             showToast('新题目已添加', 'success');
             
-            // 滚动到新题目
             setTimeout(() => {
                 const el = document.getElementById(`q_${newQ.id}`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -991,7 +1005,6 @@
                 textarea.value = unescapeHtml(raw);
                 contentDiv.replaceWith(textarea);
                 
-                // 更新按钮
                 const btn = document.querySelector(`#q_${uid} .dev-edit-btn`);
                 if (btn) {
                     btn.innerHTML = '保存';
@@ -1078,7 +1091,6 @@
                             const imgTag = `\n![${file.name}](${imgId})\n`;
                             targetElement.value = textBefore + imgTag + textAfter;
                             
-                            // 自动保存
                             const uid = targetElementId.split('_').slice(1).join('_');
                             const typeKey = targetElementId.split('_')[0];
                             const q = appData.questions.find(q => q.id === uid);
@@ -1091,11 +1103,9 @@
                             }
                             showToast('图片已插入，点击"保存"确认', 'success');
                         } else {
-                            // 在内容后追加图片
                             const imgHTML = `<img src="${imageData[imgId].data}" alt="${file.name}" class="img-fluid my-2" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">`;
                             targetElement.innerHTML += '<br>' + imgHTML;
                             
-                            // 更新 raw 数据
                             const raw = targetElement.getAttribute('data-raw') || '';
                             const uid = targetElementId.split('_').slice(1).join('_');
                             const type = targetElement.getAttribute('data-type');
@@ -1443,7 +1453,7 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'inline-block';
                 });
-                sessionStorage.setItem('dev_authenticated_atomic', 'true');
+                sessionStorage.setItem('dev_authenticated_circuit', 'true');
                 document.getElementById('devPassword').value = '';
                 renderAll();
                 showToast('开发者模式已开启', 'success');
@@ -1492,7 +1502,7 @@
                 document.querySelectorAll('.dev-tool').forEach(el => {
                     el.style.display = 'none';
                 });
-                sessionStorage.removeItem('dev_authenticated_atomic');
+                sessionStorage.removeItem('dev_authenticated_circuit');
                 renderAll();
             }
         });
@@ -1537,7 +1547,7 @@
 
         // ======================== 启动 ============================
         document.addEventListener('DOMContentLoaded', function() {
-            if (sessionStorage.getItem('dev_authenticated_atomic') === 'true') {
+            if (sessionStorage.getItem('dev_authenticated_circuit') === 'true') {
                 devModeActive = true;
             }
             renderAll();
@@ -1554,7 +1564,6 @@
                 });
             }
             
-            // 更新主题图标
             if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
                 themeBtn.innerHTML = '<i class="fas fa-sun text-warning"></i>';
             }
