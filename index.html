@@ -831,232 +831,232 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
         // ======================== 教材数据配置 ============================
-        var TEXTBOOKS_CONFIG = {
-            main: [
-                {
-                    id: 'electrodynamics',
-                    title: '电动力学导论',
-                    author: 'David J. Griffiths',
-                    cover: 'electro.jpg',
-                    description: '从麦克斯韦方程组到电磁波辐射，系统讲解经典电动力学的数学结构与物理图像，包含丰富例题与习题解析。',
-                    color: '#2b5fdc',
-                    page: 'electrodynamics.html',
-                    storageKey: 'electro_questions_data',
-                    tags: ['电动力学', '电磁场', '麦克斯韦', 'Griffiths']
-                },
-                {
-                    id: 'quantum',
-                    title: '量子力学教程',
-                    author: '周世勋',
-                    cover: 'quantum.jpeg',
-                    description: '国内经典教材，从波函数与薛定谔方程出发，系统讲授量子力学基本原理及其在原子、分子等体系中的应用。',
-                    color: '#6f42c1',
-                    page: 'quantum.html',
-                    storageKey: 'quantum_questions_data',
-                    tags: ['量子力学', '波函数', '薛定谔', '周世勋']
-                },
-                {
-                    id: 'statistical',
-                    title: '统计力学',
-                    author: 'R. K. Pathria',
-                    cover: 'statis.jpg',
-                    description: '系综理论为纲，系统阐述平衡态统计物理的数学结构，涵盖经典与量子统计、相变及临界现象。',
-                    color: '#28a745',
-                    page: 'statistical.html',
-                    storageKey: 'statistical_questions_data',
-                    tags: ['统计力学', '系综理论', '相变', 'Pathria']
-                },
-                {
-                    id: 'relative',
-                    title: '广义相对论基础',
-                    author: 'Sean Carroll',
-                    cover: 'relative.jpeg',
-                    description: '从微分几何入门到爱因斯坦场方程，深入讲解时空弯曲、黑洞物理及宇宙学的现代图景。',
-                    color: '#fd7e14',
-                    page: 'relative.html',
-                    storageKey: 'relativity_questions_data',
-                    tags: ['广义相对论', '时空几何', '黑洞', '宇宙学', 'Carroll']
-                }
-            ],
-            more: [
-                {
-                    id: 'quantum-info',
-                    title: '量子信息导论',
-                    author: 'Michael A. Nielsen',
-                    cover: 'quantum-info.jpeg',
-                    description: '量子计算与量子信息领域标准教材，全面介绍量子比特、量子算法、量子纠错及量子通信协议。',
-                    color: '#6a11cb',
-                    page: 'quantum-info.html',
-                    storageKey: 'quantum_info_questions_data',
-                    tags: ['量子信息', '量子计算', '量子算法', 'Nielsen']
-                },
-                {
-                    id: 'solid-state',
-                    title: '固体物理学',
-                    author: '黄昆',
-                    cover: 'solid-state.jpg',
-                    description: '固体物理学经典入门教材，涵盖晶体结构、晶格振动、能带理论及半导体物理等核心内容。',
-                    color: '#2575fc',
-                    page: 'solid-state.html',
-                    storageKey: 'solid_state_questions_data',
-                    tags: ['固体物理', '能带理论', '半导体', 'Kittel']
-                },
-                {
-                    id: 'qft',
-                    title: '量子场论导论',
-                    author: 'M. Peskin & D. Schroeder',
-                    cover: 'qft.webp',
-                    description: '量子场论标准教材，系统介绍正则量子化、路径积分、费曼图技术与重正化理论的基本框架。',
-                    color: '#fd7e14',
-                    page: 'qft.html',
-                    storageKey: 'qft_questions_data',
-                    tags: ['量子场论', '费曼图', '重正化', 'Peskin']
-                },
-                {
-                    id: 'cosmos',
-                    title: '宇宙学的物理基础',
-                    author: 'Viatcheslav Mukhanov',
-                    cover: 'cosmos.jpeg',
-                    description: '现代宇宙学权威著作，从观测基础到暴胀模型，系统阐述宇宙演化与结构形成的物理原理。',
-                    color: '#6f42c1',
-                    page: 'cosmos.html',
-                    storageKey: 'cosmos_questions_data',
-                    tags: ['宇宙学', '暴胀', '大爆炸', 'Weinberg']
-                },
-                {
-                    id: 'mathphysics',
-                    title: '数学物理方法',
-                    author: '汪德新',
-                    cover: 'mathphysics.webp',
-                    description: '物理专业核心数学工具书，涵盖复变函数、特殊函数、积分变换及偏微分方程求解方法。',
-                    color: '#6c757d',
-                    page: 'mathphysics.html',
-                    storageKey: 'mathphy_questions_data',
-                    tags: ['数学物理', '复变函数', '微分方程']
-                },
-                {
-                    id: 'mechanism',
-                    title: '理论力学',
-                    author: '周衍柏',
-                    cover: 'mechanism.jpeg',
-                    description: '理论物理入门课程，从牛顿力学到分析力学，系统讲解拉格朗日与哈密顿力学体系。',
-                    color: '#fd7e14',
-                    page: 'mechanism.html',
-                    storageKey: 'mechanics_questions_data',
-                    tags: ['理论力学', '拉格朗日', '哈密顿']
-                },
-                {
-                    id: 'ai',
-                    title: '人工智能与物理学',
-                    author: '王士同',
-                    cover: 'AI.png',
-                    description: '探索机器学习在物理研究中的应用，涵盖神经网络求解薛定谔方程、量子态重构等前沿方向。',
-                    color: '#6f42c1',
-                    page: 'AI.html',
-                    storageKey: 'ai_physics_data',
-                    tags: ['人工智能', '机器学习', '神经网络']
-                },
-                {
-                    id: 'group',
-                    title: '物理学中的群论',
-                    author: '马中骐',
-                    cover: 'group.jpg',
-                    description: '群论在物理系统中的应用，包括点群与空间群的分类、李群表示论及在量子力学中的对称性分析。',
-                    color: '#ffc107',
-                    page: 'group.html',
-                    storageKey: 'grouptheory_questions_data',
-                    tags: ['群论', '对称性', '李群']
-                },
-                {
-                    id: 'optical',
-                    title: '光学',
-                    author: '姚启钧',
-                    cover: 'optical.png',
-                    description: '从几何光学到波动光学，涵盖干涉、衍射、偏振及量子光学的基本原理与典型实验设计。',
-                    color: '#17a2b8',
-                    page: 'optical.html',
-                    storageKey: 'optics_questions_data',
-                    tags: ['光学', '干涉', '衍射']
-                },
-                {
-                    id: 'fluid',
-                    title: '流体力学',
-                    author: '于海明',
-                    cover: 'fluid.webp',
-                    description: '流体运动的理论基础，系统推导纳维-斯托克斯方程，并讨论湍流、边界层等经典问题。',
-                    color: '#20c997',
-                    page: 'fluid.html',
-                    storageKey: 'fluid_questions_data',
-                    tags: ['流体力学', '纳维-斯托克斯', '湍流']
-                },
-                {
-                    id: 'sound',
-                    title: '声学基础',
-                    author: '杜功焕',
-                    cover: 'sound.webp',
-                    description: '声波传播与声场理论，涵盖波动方程、声阻抗、声辐射及声学测量技术的物理原理。',
-                    color: '#6610f2',
-                    page: 'sound.html',
-                    storageKey: 'acoustics_questions_data',
-                    tags: ['声学', '声波', '声阻抗']
-                },
-                {
-                    id: 'atom',
-                    title: '原子物理学',
-                    author: '杨福家',
-                    cover: 'atom.webp',
-                    description: '原子结构、光谱学与核物理基础，从玻尔模型到量子原子理论，涵盖核力与放射性衰变。',
-                    color: '#e83e8c',
-                    page: 'atom.html',
-                    storageKey: 'atomic_questions_data',
-                    tags: ['原子物理', '核物理', '光谱']
-                },
-                {
-                    id: 'quantumad',
-                    title: '高等量子力学',
-                    author: '曾谨言',
-                    cover: 'quatumad.jpeg',
-                    description: '量子力学进阶课程，涵盖二次量子化、散射理论、路径积分及量子纠缠等高级主题。',
-                    color: '#22b4ac',
-                    page: 'quantumad.html',
-                    storageKey: 'quantumad_questions_data',
-                    tags: ['高等量子力学', '二次量子化', '路径积分']
-                },
-                {
-                    id: 'condense',
-                    title: '高等凝聚态物理',
-                    author: '冯端',
-                    cover: 'condense.jpeg',
-                    description: '凝聚态物理前沿理论，涵盖能带论、强关联电子系统、拓扑物态及超导与磁性物理。',
-                    color: '#1a7cd6',
-                    page: 'condense.html',
-                    storageKey: 'condensed_questions_data',
-                    tags: ['凝聚态物理', '拓扑物态', '超导']
-                },
-                {
-                    id: 'statisticad',
-                    title: '高等统计力学',
-                    author: 'R. K. Pathria',
-                    cover: 'statistic-ad.jpeg',
-                    description: '统计力学进阶内容，系统讲解系综理论、相变临界现象、非平衡统计及涨落耗散定理。',
-                    color: '#d9751d',
-                    page: 'statistic-ad.html',
-                    storageKey: 'advanced_statistical_questions_data',
-                    tags: ['高等统计力学', '相变', '临界现象']
-                },
-                {
-                    id: 'circuit',
-                    title: '电路原理',
-                    author: '邱关源',
-                    cover: 'circuit-picture.gif',
-                    description: '电路分析与设计的基础理论，涵盖直流交流电路、滤波器设计、谐振电路及网络分析方法。',
-                    color: '#e21014',
-                    page: 'circuit.html',
-                    storageKey: 'circuit_questions_data',
-                    tags: ['电路', '滤波器', '谐振']
-                }
-            ]
-        };
+      var TEXTBOOKS_CONFIG = {
+    main: [
+        {
+            id: 'electrodynamics',
+            title: '电动力学导论',
+            author: 'David J. Griffiths',
+            cover: 'electro.jpg',
+            description: '从麦克斯韦方程组到电磁波辐射，系统讲解经典电动力学的数学结构与物理图像，包含丰富例题与习题解析。',
+            color: '#1a73e8', // 提取自 electrodynamics.html (--electro-blue)[cite: 17]
+            page: 'electrodynamics.html',
+            storageKey: 'electro_full_data',
+            tags: ['电动力学', '电磁场', '麦克斯韦', 'Griffiths']
+        },
+        {
+            id: 'quantum',
+            title: '量子力学教程',
+            author: '周世勋',
+            cover: 'quantum.jpeg',
+            description: '国内经典教材，从波函数与薛定谔方程出发，系统讲授量子力学基本原理及其在原子、分子等体系中的应用。',
+            color: '#6f42c1', // 提取自 quantum.html (--quantum-purple)[cite: 23]
+            page: 'quantum.html',
+            storageKey: 'quantum_full_data',
+            tags: ['量子力学', '波函数', '薛定谔', '周世勋']
+        },
+        {
+            id: 'statistical',
+            title: '统计力学',
+            author: 'R. K. Pathria',
+            cover: 'statis.jpg',
+            description: '系综理论为纲，系统阐述平衡态统计物理的数学结构，涵盖经典与量子统计、相变及临界现象。',
+            color: '#fd7e14', // 提取自 statistical.html (--statistical-orange)[cite: 14]
+            page: 'statistical.html',
+            storageKey: 'statistical_full_data',
+            tags: ['统计力学', '系综理论', '相变', 'Pathria']
+        },
+        {
+            id: 'relative',
+            title: '广义相对论基础',
+            author: 'Sean Carroll',
+            cover: 'relative.jpeg',
+            description: '从微分几何入门到爱因斯坦场方程，深入讲解时空弯曲、黑洞物理及宇宙学的现代图景。',
+            color: '#ca4345', // 提取自 relative.html (--relativity-purple)[cite: 12]
+            page: 'relative.html',
+            storageKey: 'relativity_full_data',
+            tags: ['广义相对论', '时空几何', '黑洞', '宇宙学', 'Carroll']
+        }
+    ],
+    more: [
+        {
+            id: 'quantum-info',
+            title: '量子信息导论',
+            author: 'Michael A. Nielsen',
+            cover: 'quantum-info.jpeg',
+            description: '量子计算与量子信息领域标准教材，全面介绍量子比特、量子算法、量子纠错及量子通信协议。',
+            color: '#6a11cb', // 提取自 quantum-info.html (--quantum-info-color)[cite: 22]
+            page: 'quantum-info.html',
+            storageKey: 'quantum_info_full_data',
+            tags: ['量子信息', '量子计算', '量子算法', 'Nielsen']
+        },
+        {
+            id: 'solid-state',
+            title: '固体物理学',
+            author: '黄昆',
+            cover: 'solid-state.jpg',
+            description: '固体物理学经典入门教材，涵盖晶体结构、晶格振动、能带理论及半导体物理等核心内容。',
+            color: '#2575fc', // 提取自 solid-state.html (--solid-state-blue)[cite: 13]
+            page: 'solid-state.html',
+            storageKey: 'solid_state_full_data',
+            tags: ['固体物理', '能带理论', '半导体', 'Kittel']
+        },
+        {
+            id: 'qft',
+            title: '量子场论导论',
+            author: 'M. Peskin & D. Schroeder',
+            cover: 'qft.webp',
+            description: '量子场论标准教材，系统介绍正则量子化、路径积分、费曼图技术与重正化理论的基本框架。',
+            color: '#ad7044', // 提取自 qft.html (--qft-color)[cite: 21]
+            page: 'qft.html',
+            storageKey: 'qft_full_data',
+            tags: ['量子场论', '费曼图', '重正化', 'Peskin']
+        },
+        {
+            id: 'cosmos',
+            title: '宇宙学的物理基础',
+            author: 'Viatcheslav Mukhanov',
+            cover: 'cosmos.jpeg',
+            description: '现代宇宙学权威著作，从观测基础到暴胀模型，系统阐述宇宙演化与结构形成的物理原理。',
+            color: '#6a11cb', // 提取自 cosmos.html (--cosmo-purple)[cite: 9]
+            page: 'cosmos.html',
+            storageKey: 'cosmos_full_data',
+            tags: ['宇宙学', '暴胀', '大爆炸', 'Weinberg']
+        },
+        {
+            id: 'mathphysics',
+            title: '数学物理方法',
+            author: '汪德新',
+            cover: 'mathphysics.webp',
+            description: '物理专业核心数学工具书，涵盖复变函数、特殊函数、积分变换及偏微分方程求解方法。',
+            color: '#2b5fdc', // 提取自 mathphysics.html (--mathphy-blue)[cite: 10]
+            page: 'mathphysics.html',
+            storageKey: 'mathphy_full_data',
+            tags: ['数学物理', '复变函数', '微分方程']
+        },
+        {
+            id: 'mechanism',
+            title: '理论力学',
+            author: '周衍柏',
+            cover: 'mechanism.jpeg',
+            description: '理论物理入门课程，从牛顿力学到分析力学，系统讲解拉格朗日与哈密顿力学体系。',
+            color: '#28a745', // 提取自 mechanism.html (--mechanics-green)[cite: 11]
+            page: 'mechanism.html',
+            storageKey: 'mechanics_full_data',
+            tags: ['理论力学', '拉格朗日', '哈密顿']
+        },
+        {
+            id: 'ai',
+            title: '人工智能与物理学',
+            author: '王士同',
+            cover: 'AI.png',
+            description: '探索机器学习在物理研究中的应用，涵盖神经网络求解薛定谔方程、量子态重构等前沿方向。',
+            color: '#9c27b0', // 提取自 AI.html (--ai-purple)[cite: 15]
+            page: 'AI.html',
+            storageKey: 'ai_physics_full_data',
+            tags: ['人工智能', '机器学习', '神经网络']
+        },
+        {
+            id: 'group',
+            title: '物理学中的群论',
+            author: '马中骐',
+            cover: 'group.jpg',
+            description: '群论在物理系统中的应用，包括点群与空间群的分类、李群表示论及在量子力学中的对称性分析。',
+            color: '#e53935', // 提取自 group.html (--grouptheory-red)[cite: 19]
+            page: 'group.html',
+            storageKey: 'grouptheory_full_data',
+            tags: ['群论', '对称性', '李群']
+        },
+        {
+            id: 'optical',
+            title: '光学',
+            author: '姚启钧',
+            cover: 'optical.png',
+            description: '从几何光学到波动光学，涵盖干涉、衍射、偏振及量子光学的基本原理与典型实验设计。',
+            color: '#1a73e8', // 提取自 optical.html (--optics-blue)[cite: 20]
+            page: 'optical.html',
+            storageKey: 'optics_full_data',
+            tags: ['光学', '干涉', '衍射']
+        },
+        {
+            id: 'fluid',
+            title: '流体力学',
+            author: '于海明',
+            cover: 'fluid.webp',
+            description: '流体运动的理论基础，系统推导纳维-斯托克斯方程，并讨论湍流、边界层等经典问题。',
+            color: '#0d6efd', // 提取自 fluid.html (--fluid-blue)[cite: 18]
+            page: 'fluid.html',
+            storageKey: 'fluid_full_data',
+            tags: ['流体力学', '纳维-斯托克斯', '湍流']
+        },
+        {
+            id: 'sound',
+            title: '声学基础',
+            author: '杜功焕',
+            cover: 'sound.webp',
+            description: '声波传播与声场理论，涵盖波动方程、声阻抗、声辐射及声学测量技术的物理原理。',
+            color: '#20c997', // 提取自 sound.html (--acoustics-teal)[cite: 25]
+            page: 'sound.html',
+            storageKey: 'acoustics_full_data',
+            tags: ['声学', '声波', '声阻抗']
+        },
+        {
+            id: 'atom',
+            title: '原子物理学',
+            author: '杨福家',
+            cover: 'atom.webp',
+            description: '原子结构、光谱学与核物理基础，从玻尔模型到量子原子理论，涵盖核力与放射性衰变。',
+            color: '#fd7e14', // 提取自 atom.html (--atomic-orange)[cite: 16]
+            page: 'atom.html',
+            storageKey: 'atomic_full_data',
+            tags: ['原子物理', '核物理', '光谱']
+        },
+        {
+            id: 'quantumad',
+            title: '高等量子力学',
+            author: '曾谨言',
+            cover: 'quatumad.jpeg',
+            description: '量子力学进阶课程，涵盖二次量子化、散射理论、路径积分及量子纠缠等高级主题。',
+            color: '#6f42c1', // 提取自 quantumad.html (--quantum-purple)[cite: 24]
+            page: 'quantumad.html',
+            storageKey: 'quantum_advanced_full_data',
+            tags: ['高等量子力学', '二次量子化', '路径积分']
+        },
+        {
+            id: 'condense',
+            title: '高等凝聚态物理',
+            author: '冯端',
+            cover: 'condense.jpeg',
+            description: '凝聚态物理前沿理论，涵盖能带论、强关联电子系统、拓扑物态及超导与磁性物理。',
+            color: '#1b8a4b', // 提取自 condense.html (--condensed-green)[cite: 8]
+            page: 'condense.html',
+            storageKey: 'condensed_full_data',
+            tags: ['凝聚态物理', '拓扑物态', '超导']
+        },
+        {
+            id: 'statisticad',
+            title: '高等统计力学',
+            author: 'R. K. Pathria',
+            cover: 'statistic-ad.jpeg',
+            description: '统计力学进阶内容，系统讲解系综理论、相变临界现象、非平衡统计及涨落耗散定理。',
+            color: '#8e44ad', // 提取自 statistic-ad.html (--advanced-stat-color)[cite: 6]
+            page: 'statistic-ad.html',
+            storageKey: 'advanced_stat_full_data',
+            tags: ['高等统计力学', '相变', '临界现象']
+        },
+        {
+            id: 'circuit',
+            title: '电路原理',
+            author: '邱关源',
+            cover: 'circuit-picture.gif',
+            description: '电路分析与设计的基础理论，涵盖直流交流电路、滤波器设计、谐振电路及网络分析方法。',
+            color: '#e67e22', // 提取自 circuit.html (--circuit-orange)[cite: 7]
+            page: 'circuit.html',
+            storageKey: 'circuit_full_data',
+            tags: ['电路', '滤波器', '谐振']
+        }
+    ]
+};
 
         // ======================== 获取题目数量 ============================
         function getQuestionCount(storageKey) {
